@@ -28,7 +28,6 @@ urlpatterns = [
     path('clear-pending-restaurant/', viewsfree.clear_pending_restaurant, name='clear_pending_restaurant'),
     path('orders/<int:order_id>/', viewsfree.order_detail, name='order_detail'),
     path('orders/<int:order_id>/update-status/', viewsfree.update_order_status, name='update_order_status'),
-    path('orders/<int:order_id>/payment/', viewsfree.process_payment, name='process_payment'),
     path('orders/<int:order_id>/cancel/', viewsfree.cancel_order, name='cancel_order'),
     path('<slug:slug>/foods/<int:food_id>/toggle-selection/', viewsfree.toggle_food_selection, name='toggle_food_selection'),
     path('<slug:slug>/foods/<int:food_id>/assign-category/', viewsfree.assign_food_to_category, name='assign_food_to_category'),

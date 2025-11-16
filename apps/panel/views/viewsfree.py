@@ -33,12 +33,15 @@ def restaurant_owner_required(view_func):
         return view_func(request, slug, *args, **kwargs)
     return wrapper
 
+
 @login_required
 def panel(request):
     """پنل اصلی - نمایش رستوران‌های کاربر و سفارشات"""
+
+    # دریافت رستوران‌های کاربر
     user_restaurants = Restaurant.objects.filter(owner=request.user, isActive=True)
 
-    # دریافت سفارشات کاربر
+    # دریافت سفارشات منوهای کاربر
     user_orders = Ordermenu.objects.filter(restaurant__owner=request.user).select_related('restaurant').prefetch_related('images')
 
     # محاسبه آمار واقعی
@@ -90,6 +93,7 @@ def panel(request):
     }
 
     return render(request, 'panel_app/free/panel.html', context)
+
 
 @login_required
 def order_detail(request, order_id):
@@ -153,44 +157,8 @@ def update_order_status(request, order_id):
         'message': 'متد نامعتبر'
     })
 
-@login_required
-def process_payment(request, order_id):
-    """پردازش پرداخت برای سفارشات پرداخت نشده"""
-    order = get_object_or_404(Ordermenu, id=order_id, restaurant__owner=request.user)
 
-    # فقط برای سفارشات پرداخت نشده
-    if order.status != Ordermenu.STATUS_UNPAID:
-        return JsonResponse({
-            'success': False,
-            'message': 'این سفارش قبلاً پرداخت شده است'
-        })
 
-    if request.method == 'POST':
-        try:
-            order.status = Ordermenu.STATUS_PAID
-            order.isfinaly = True
-            order.isActive = True
-            order.save()
-
-            return JsonResponse({
-                'success': True,
-                'message': 'پرداخت با موفقیت انجام شد',
-                'redirect_url': f'/panel/orders/{order.id}/'
-            })
-
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': f'خطا در پردازش پرداخت: {str(e)}'
-            })
-
-    # نمایش صفحه پرداخت
-    context = {
-        'order': order,
-        'amount': order.get_fixed_price(),
-    }
-
-    return render(request, 'panel_app/free/payment_page.html', context)
 
 @login_required
 def cancel_order(request, order_id):
@@ -224,6 +192,7 @@ def cancel_order(request, order_id):
         'message': 'متد نامعتبر'
     })
 
+
 @login_required
 def order_list(request):
     """لیست تمام سفارشات کاربر"""
@@ -250,6 +219,8 @@ def order_list(request):
     }
 
     return render(request, 'panel_app/free/order_list.html', context)
+
+
 
 @login_required
 def create_restaurant(request):
