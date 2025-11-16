@@ -319,13 +319,14 @@ def checkout_view(request, order_id):
     if cart.items.count() == 0:
         return redirect('cart_empty')
 
-    # محاسبه قیمت‌ها
+    # محاسبه قیمت‌ها (این کار در save مدل انجام می‌شود)
     cart.calculate_prices()
 
-    # محاسبه مالیات و هزینه‌ها
-    tax_amount = int(cart.final_price * 0.09)  # 9% مالیات
+    # هزینه‌های اضافی
     shipping_cost = 0  # هزینه ارسال
-    total_with_tax = cart.final_price + tax_amount + shipping_cost
+
+    # مالیات قبلاً در مدل محاسبه شده است
+    total_with_tax = cart.final_price + shipping_cost
 
     # بررسی آیا اطلاعات قبلی برای این سفارش وجود دارد
     previous_info = None
@@ -348,10 +349,10 @@ def checkout_view(request, order_id):
         'cart': cart,
         'plan': cart.plan,
         'items': cart.items.all(),
-        'subtotal': cart.total_price,
-        'tax': tax_amount,
+        'subtotal': cart.total_price_without_tax,  # قیمت بدون مالیات
+        'tax': cart.tax_amount,  # مبلغ مالیات ۹٪
         'shipping': shipping_cost,
-        'total': total_with_tax,
+        'total': total_with_tax,  # قیمت نهایی با مالیات
         'order_id': order_id,
         'previous_info': previous_info  # اطلاعات قبلی کاربر
     }
@@ -407,7 +408,7 @@ def apply_discount(request, order_id):
 
 @require_http_methods(["POST"])
 def complete_order(request, order_id):
-    """تکمیل سفارش و ذخیره اطلاعات"""
+    """تکمیل سفارش و هدایت مستقیم به درگاه پرداخت"""
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'message': 'لطفاً وارد شوید'})
 
@@ -482,12 +483,9 @@ def complete_order(request, order_id):
         cart.status = 'pending'
         cart.save()
 
-        return JsonResponse({
-            'success': True,
-            'message': 'سفارش با موفقیت ثبت شد',
-            'order_id': cart.id,
-            'redirect_url': f'/payment/{cart.id}/'  # صفحه پرداخت
-        })
+        # هدایت مستقیم به درگاه پرداخت
+        from apps.peyment.views import unified_send_request
+        return unified_send_request(request, 'product', cart.id)
 
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'خطا در ثبت سفارش: {str(e)}'})

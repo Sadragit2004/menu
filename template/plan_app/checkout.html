@@ -626,7 +626,7 @@
                             <div class="product-quantity">
                                 <span>{{ item.quantity }} عدد</span>
                             </div>
-                            <div class="product-price">{{ item.total_price|floatformat:0|intcomma }} تومان</div>
+                            <div class="product-price">{{ item.total_price|floatformat:0|intcomma }} ریال</div>
                         </div>
                     </div>
                     {% empty %}
@@ -648,24 +648,24 @@
                 <div class="calculation-section">
                     <h3 class="section-title" style="font-size: 1.2rem;"><i class="fas fa-file-invoice-dollar"></i> محاسبه هزینه‌ها</h3>
 
-                    <div class="calculation-row">
-                        <span class="calculation-label">جمع کل محصولات</span>
-                        <span class="calculation-value" id="subtotal">{{ subtotal|floatformat:0|intcomma }} تومان</span>
-                    </div>
+                   <div class="calculation-row">
+    <span class="calculation-label">جمع کل محصولات</span>
+    <span class="calculation-value" id="subtotal">{{ subtotal|floatformat:0|intcomma }} تومان</span>
+</div>
 
-                    <div class="calculation-row">
-                        <span class="calculation-label">تخفیف محصولات</span>
-                        <span class="calculation-value" style="color: var(--success);" id="product-discount">۰ تومان</span>
-                    </div>
+<div class="calculation-row">
+    <span class="calculation-label">مالیات بر ارزش افزوده (۹٪)</span>
+    <span class="calculation-value" id="tax-amount">{{ tax|floatformat:0|intcomma }} تومان</span>
+</div>
 
-                    <div class="calculation-row">
-                        <span class="calculation-label">هزینه ارسال</span>
-                        <span class="calculation-value" id="shipping-cost">{{ shipping|floatformat:0|intcomma }} تومان</span>
-                    </div>
+<div class="total-row">
+    <span>مبلغ قابل پرداخت</span>
+    <span id="total-price">{{ total|floatformat:0|intcomma }} تومان</span>
+</div>
 
                     <div class="calculation-row">
                         <span class="calculation-label">مالیات بر ارزش افزوده (۹٪)</span>
-                        <span class="calculation-value" id="tax-amount">{{ tax|floatformat:0|intcomma }} تومان</span>
+                        <span class="calculation-value" id="tax-amount">{{ tax|floatformat:0|intcomma }} ریال</span>
                     </div>
 
                     <!-- بخش کد تخفیف -->
@@ -682,7 +682,7 @@
 
                     <div class="total-row">
                         <span>مبلغ قابل پرداخت</span>
-                        <span id="total-price">{{ total|intcomma }} تومان</span>
+                        <span id="total-price">{{ total|intcomma }} ریال</span>
                     </div>
                 </div>
             </div>
@@ -843,11 +843,11 @@
                         discountCodeField.value = discountCode;
 
                         // بروزرسانی قیمت‌ها
-                        document.getElementById('total-price').textContent = data.new_total.toLocaleString() + ' تومان';
+                        document.getElementById('total-price').textContent = data.new_total.toLocaleString() + ' ریال';
 
                         // نمایش مبلغ تخفیف
                         const discountRow = document.querySelector('.calculation-row:nth-child(2)');
-                        discountRow.querySelector('.calculation-value').textContent = `-${data.discount_amount.toLocaleString()} تومان`;
+                        discountRow.querySelector('.calculation-value').textContent = `-${data.discount_amount.toLocaleString()} ریال`;
 
                         discountInput.value = '';
                     } else {

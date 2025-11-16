@@ -801,7 +801,7 @@ def create_restaurant_modal(request):
         step = data.get('step')
         menu_creation_type = data.get('menu_creation_type')
 
-        print(f"Step: {step}, Menu Creation Type: {menu_creation_type}")  # برای دیباگ
+        print(f"Step: {step}, Menu Creation Type: {menu_creation_type}")
 
         if step == 3:  # ساخت رستوران توسط خود کاربر
             # دریافت داده‌ها
@@ -810,7 +810,7 @@ def create_restaurant_modal(request):
             restaurant_name = data.get('restaurant_name', '').strip()
             english_name = data.get('english_name', '').strip().lower()
             is_seo_enabled = data.get('is_seo_enabled', False)
-            expire_days = data.get('expire_days', 29)  # دریافت تعداد روزهای انقضا
+            expire_days = data.get('expire_days', 29)
 
             # اعتبارسنجی داده‌ها
             if not name or not family or not restaurant_name or not english_name:
@@ -839,7 +839,7 @@ def create_restaurant_modal(request):
                 english_name=english_name,
                 isActive=True,
                 isSeo=is_seo_enabled,
-                expireDate=expire_date  # تنظیم تاریخ انقضا
+                expireDate=expire_date
             )
             restaurant.save()
 
@@ -863,7 +863,7 @@ def create_restaurant_modal(request):
             is_seo_enabled_str = data.get('is_seo_enabled', '0')
             is_seo_enabled = is_seo_enabled_str == '1'
 
-            print(f"Data received - Name: {name}, Family: {family}, Restaurant: {restaurant_name}, English: {english_name}, SEO: {is_seo_enabled}")  # دیباگ
+            print(f"Data received - Name: {name}, Family: {family}, Restaurant: {restaurant_name}, English: {english_name}, SEO: {is_seo_enabled}")
 
             # اعتبارسنجی داده‌ها
             if not name or not family or not restaurant_name or not english_name:
@@ -926,13 +926,13 @@ def create_restaurant_modal(request):
                 })
 
             else:
-                # ایجاد رستوران و سفارش
+                # ایجاد رستوران (غیرفعال تا پرداخت انجام شود)
                 restaurant = Restaurant(
                     owner=request.user,
                     title=restaurant_name,
                     english_name=english_name,
-                    isActive=True,
-                    isSeo=is_seo_enabled  # اضافه کردن این خط
+                    isActive=False,  # غیرفعال تا پرداخت انجام شود
+                    isSeo=is_seo_enabled
                 )
                 restaurant.save()
 
@@ -961,15 +961,19 @@ def create_restaurant_modal(request):
                 if 'pending_restaurant' in request.session:
                     del request.session['pending_restaurant']
 
+                # استفاده از سیستم پرداخت یکپارچه
                 return JsonResponse({
                     'success': True,
                     'message': f'رستوران ایجاد شد و {saved_images_count} عکس آپلود شد',
                     'order_id': order.id,
-                    'redirect_url': f'/peyment/request/{order.id}/'
+                    'redirect_url': f'/peyment/request/menu/{order.id}/'
                 })
 
+
+
+
     except Exception as e:
-        print(f"Error in create_restaurant_modal: {str(e)}")  # برای دیباگ
+        print(f"Error in create_restaurant_modal: {str(e)}")
         return JsonResponse({
             'success': False,
             'message': f'خطا در پردازش: {str(e)}'

@@ -85,8 +85,9 @@ class ProductOrder(models.Model):
     )
 
     # اطلاعات مالی
-    total_price = models.PositiveIntegerField(default=0, verbose_name="قیمت کل")
-    final_price = models.PositiveIntegerField(default=0, verbose_name="قیمت نهایی")
+    total_price = models.PositiveIntegerField(default=0, verbose_name="قیمت کل (بدون مالیات)")
+    tax_amount = models.PositiveIntegerField(default=0, verbose_name="مبلغ مالیات ۹٪")  # جدید
+    final_price = models.PositiveIntegerField(default=0, verbose_name="قیمت نهایی (با مالیات)")
 
     # اطلاعات پرداخت
     isPaid = models.BooleanField(default=False, verbose_name="پرداخت شده")
@@ -109,17 +110,21 @@ class ProductOrder(models.Model):
         return f"{self.user} - {self.plan.name} - {self.final_price}"
 
     def calculate_prices(self):
-        """محاسبه قیمت کل و نهایی"""
-        # قیمت پلن
-        plan_price = self.plan.price if self.plan.price else 0
-
+        """محاسبه قیمت کل، مالیات و قیمت نهایی"""
         # قیمت محصولات
+    
+        # قیمت محصولات (به تومان)
         items_total = self.items.aggregate(
             total=Sum(F('price') * F('quantity'))
         )['total'] or 0
 
-        self.total_price =  items_total
-        self.final_price = self.total_price  # می‌توانید تخفیف هم اضافه کنید
+        self.total_price = items_total  # به تومان
+
+        # محاسبه مالیات ۹ درصد روی مبلغ تومان
+        self.tax_amount = int(self.total_price * 0.09)  # 9% مالیات به تومان
+
+        # قیمت نهایی با احتساب مالیات (به تومان)
+        self.final_price = self.total_price + self.tax_amount
 
     def save(self, *args, **kwargs):
         # محاسبه خودکار قیمت‌ها
@@ -135,6 +140,16 @@ class ProductOrder(models.Model):
     def items_count(self):
         """تعداد کل آیتم‌های محصول در سبد"""
         return self.items.aggregate(total=Sum('quantity'))['total'] or 0
+
+    @property
+    def total_price_without_tax(self):
+        """قیمت کل بدون مالیات"""
+        return self.total_price
+
+    @property
+    def total_price_with_tax(self):
+        """قیمت کل با مالیات"""
+        return self.final_price
 
     def add_product(self, product, quantity=1):
         """افزودن محصول به سبد خرید"""
@@ -227,9 +242,13 @@ class ProductOrderDetail(models.Model):
 
     @property
     def total_price(self):
+        """قیمت کل این آیتم (بدون مالیات)"""
         return self.price * self.quantity
 
-
+    @property
+    def total_price_with_tax(self):
+        """قیمت کل این آیتم با مالیات ۹٪"""
+        return int((self.price * self.quantity) * 1.09)  # 9% مالیات
 
 # models.py
 class OrderDetailInfo(models.Model):

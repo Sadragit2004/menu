@@ -326,12 +326,13 @@
                                 <i class="fas fa-save ml-2"></i>
                                 ذخیره عکس‌ها
                             </button>
-                            <button id="uploadButton" onclick="proceedToPayment()"
-                                    class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                                    disabled>
-                                ادامه به پرداخت
-                                <i class="fas fa-arrow-left mr-2"></i>
-                            </button>
+                           <!-- در step 4، دکمه پرداخت را به این صورت به‌روزرسانی کنید -->
+<button id="uploadButton" onclick="proceedToPayment()"
+        class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        disabled>
+    ادامه به پرداخت
+    <i class="fas fa-arrow-left mr-2"></i>
+</button>
                         </div>
                     </div>
                 </div>
@@ -548,6 +549,7 @@ function updateSeoCheckbox() {
     }
 }
 
+// در تابع updateTotalPrice، اطلاعات را به صورت واضح‌تر نمایش دهید
 function updateTotalPrice() {
     const totalPriceElement = document.getElementById('totalPrice');
     const basePriceElement = document.querySelector('#seoPriceDetails div:first-child span:last-child');
@@ -575,6 +577,12 @@ function updateTotalPrice() {
             seoPriceElement.textContent = '+۰ تومان';
             seoPriceElement.classList.remove('text-purple-600', 'font-bold');
         }
+    }
+
+    // به‌روزرسانی متن دکمه پرداخت
+    const uploadButton = document.getElementById('uploadButton');
+    if (uploadButton) {
+        uploadButton.innerHTML = `پرداخت ${(total / 10).toLocaleString('fa-IR')} تومان <i class="fas fa-arrow-left mr-2"></i>`;
     }
 }
 
@@ -1110,6 +1118,7 @@ function createRestaurantFinal() {
 }
 
 // پردازش ساخت منو توسط شرکت
+// پردازش ساخت منو توسط شرکت - اصلاح شده برای پرداخت
 function processCompanyMenuCreation() {
     const formData = new FormData();
     formData.append('step', 'create_with_company');
@@ -1133,6 +1142,15 @@ function processCompanyMenuCreation() {
         image_count: restaurantData.uploadedImages.length
     });
 
+    // به‌روزرسانی UI
+    const processingTitle = document.getElementById('processingTitle');
+    const processingMessage = document.getElementById('processingMessage');
+    const progressBar = document.getElementById('progressBarAnimated');
+
+    if (processingTitle) processingTitle.textContent = 'در حال اتصال به درگاه پرداخت...';
+    if (processingMessage) processingMessage.textContent = 'لطفاً چند لحظه صبر کنید';
+    if (progressBar) progressBar.style.width = '80%';
+
     fetch("{% url 'panel:create_restaurant_modal' %}", {
         method: 'POST',
         headers: {
@@ -1148,21 +1166,24 @@ function processCompanyMenuCreation() {
     })
     .then(data => {
         console.log('پاسخ پرداخت:', data);
-        const progressBar = document.getElementById('progressBarAnimated');
+
         if (progressBar) progressBar.style.width = '100%';
 
         if (data.success) {
-            const processingTitle = document.getElementById('processingTitle');
-            const processingMessage = document.getElementById('processingMessage');
-
             if (processingTitle) processingTitle.textContent = 'در حال انتقال به درگاه پرداخت...';
-            if (processingMessage) processingMessage.textContent = 'لطفاً چند لحظه صبر کنید';
+            if (processingMessage) processingMessage.textContent = 'لطفاً منتظر بمانید';
 
             clearPendingRestaurant();
             localStorage.removeItem('restaurantData');
 
+            // انتقال به درگاه پرداخت
             setTimeout(() => {
-                window.location.href = data.redirect_url;
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    // اگر redirect_url وجود ندارد، از سیستم پرداخت یکپارچه استفاده کن
+                    window.location.href = `/peyment/request/menu/${data.order_id}/`;
+                }
             }, 1500);
         } else {
             if (data.message.includes('نام انگلیسی قبلاً انتخاب شده')) {
