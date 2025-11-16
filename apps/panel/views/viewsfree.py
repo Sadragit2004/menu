@@ -7,6 +7,8 @@ from django.db.models import Q
 import json
 from apps.menu.models.menufreemodels.models import Restaurant, Category, MenuCategory, Food
 from apps.order.models import Ordermenu, MenuImage
+from apps.plan.models import PlanOrder
+from apps.product.models import ProductOrder
 from django.utils import timezone
 from django.db.models import Count, Sum
 from datetime import datetime, timedelta
@@ -36,109 +38,274 @@ def restaurant_owner_required(view_func):
 
 @login_required
 def panel(request):
-    """پنل اصلی - نمایش رستوران‌های کاربر و سفارشات"""
+    """پنل اصلی - نمایش تمام سفارشات کاربر"""
 
     # دریافت رستوران‌های کاربر
     user_restaurants = Restaurant.objects.filter(owner=request.user, isActive=True)
 
-    # دریافت سفارشات منوهای کاربر
+    # دریافت تمام سفارشات کاربر از انواع مختلف
     user_orders = Ordermenu.objects.filter(restaurant__owner=request.user).select_related('restaurant').prefetch_related('images')
+    plan_orders = PlanOrder.objects.filter(user=request.user).select_related('plan')
+    product_orders = ProductOrder.objects.filter(user=request.user).select_related('plan').prefetch_related('items')
 
-    # محاسبه آمار واقعی
+    # محاسبه آمار کلی
     today = timezone.now().date()
-
-    # سفارشات پرداخت شده
-    paid_orders = user_orders.filter(status=Ordermenu.STATUS_PAID)
-
-    # سفارشات تایید شده
-    confirmed_orders = user_orders.filter(status=Ordermenu.STATUS_CONFIRMED)
-
-    # سفارشات تحویل شده
-    delivered_orders = user_orders.filter(status=Ordermenu.STATUS_DELIVERED)
-
-    # سفارشات پرداخت نشده
-    unpaid_orders = user_orders.filter(status=Ordermenu.STATUS_UNPAID)
-
-    # آمار سفارشات امروز
-    today_orders_count = user_orders.filter(created_at__date=today).count()
-
-    # آمار سفارشات این ماه
     month_start = today.replace(day=1)
-    monthly_orders_count = user_orders.filter(created_at__date__gte=month_start).count()
 
-    # محاسبه درآمد واقعی
-    today_revenue = sum(order.final_price for order in user_orders.filter(
-        created_at__date=today,
-        status__in=[Ordermenu.STATUS_PAID, Ordermenu.STATUS_CONFIRMED, Ordermenu.STATUS_DELIVERED]
-    )) // 10  # تبدیل به تومان
+    # آمار سفارشات منو
+    menu_paid_orders = user_orders.filter(status=Ordermenu.STATUS_PAID)
+    menu_confirmed_orders = user_orders.filter(status=Ordermenu.STATUS_CONFIRMED)
+    menu_delivered_orders = user_orders.filter(status=Ordermenu.STATUS_DELIVERED)
+    menu_unpaid_orders = user_orders.filter(status=Ordermenu.STATUS_UNPAID)
 
-    monthly_revenue = sum(order.final_price for order in user_orders.filter(
-        created_at__date__gte=month_start,
-        status__in=[Ordermenu.STATUS_PAID, Ordermenu.STATUS_CONFIRMED, Ordermenu.STATUS_DELIVERED]
-    )) // 10  # تبدیل به تومان
+    # آمار سفارشات پلن
+    plan_paid_orders = plan_orders.filter(isPaid=True)
+    plan_unpaid_orders = plan_orders.filter(isPaid=False)
+
+    # آمار سفارشات محصول
+    product_paid_orders = product_orders.filter(isPaid=True)
+    product_unpaid_orders = product_orders.filter(isPaid=False)
+
+    # آمار کلی سفارشات امروز
+    today_menu_orders = user_orders.filter(created_at__date=today).count()
+    today_plan_orders = plan_orders.filter(createdAt__date=today).count()
+    today_product_orders = product_orders.filter(createdAt__date=today).count()
+    today_orders_count = today_menu_orders + today_plan_orders + today_product_orders
+
+    # آمار کلی سفارشات این ماه
+    monthly_menu_orders = user_orders.filter(created_at__date__gte=month_start).count()
+    monthly_plan_orders = plan_orders.filter(createdAt__date__gte=month_start).count()
+    monthly_product_orders = product_orders.filter(createdAt__date__gte=month_start).count()
+    monthly_orders_count = monthly_menu_orders + monthly_plan_orders + monthly_product_orders
+
+    # محاسبه درآمد واقعی (فقط سفارشات پرداخت شده)
+    today_revenue = (
+        sum(order.final_price for order in user_orders.filter(
+            created_at__date=today,
+            status__in=[Ordermenu.STATUS_PAID, Ordermenu.STATUS_CONFIRMED, Ordermenu.STATUS_DELIVERED]
+        )) +
+        sum(order.finalPrice for order in plan_orders.filter(
+            createdAt__date=today,
+            isPaid=True
+        )) +
+        sum(order.final_price for order in product_orders.filter(
+            createdAt__date=today,
+            isPaid=True
+        ))
+    ) // 10  # تبدیل به تومان
+
+    monthly_revenue = (
+        sum(order.final_price for order in user_orders.filter(
+            created_at__date__gte=month_start,
+            status__in=[Ordermenu.STATUS_PAID, Ordermenu.STATUS_CONFIRMED, Ordermenu.STATUS_DELIVERED]
+        )) +
+        sum(order.finalPrice for order in plan_orders.filter(
+            createdAt__date__gte=month_start,
+            isPaid=True
+        )) +
+        sum(order.final_price for order in product_orders.filter(
+            createdAt__date__gte=month_start,
+            isPaid=True
+        ))
+    ) // 10  # تبدیل به تومان
+
+    # ترکیب تمام سفارشات برای نمایش
+    all_orders = []
+
+    # افزودن سفارشات منو
+    for order in user_orders:
+        all_orders.append({
+            'type': 'menu',
+            'object': order,
+            'created_at': order.created_at,
+            'status': order.status,
+            'final_price': order.final_price,
+            'is_paid': order.status in [Ordermenu.STATUS_PAID, Ordermenu.STATUS_CONFIRMED, Ordermenu.STATUS_DELIVERED]
+        })
+
+    # افزودن سفارشات پلن
+    for order in plan_orders:
+        all_orders.append({
+            'type': 'plan',
+            'object': order,
+            'created_at': order.createdAt,
+            'status': 'paid' if order.isPaid else 'unpaid',
+            'final_price': order.finalPrice,
+            'is_paid': order.isPaid
+        })
+
+    # افزودن سفارشات محصول
+    for order in product_orders:
+        all_orders.append({
+            'type': 'product',
+            'object': order,
+            'created_at': order.createdAt,
+            'status': order.status,
+            'final_price': order.final_price,
+            'is_paid': order.isPaid
+        })
+
+    # مرتب‌سازی بر اساس تاریخ (جدیدترین اول)
+    all_orders.sort(key=lambda x: x['created_at'], reverse=True)
 
     context = {
         'restaurants': user_restaurants,
         'has_restaurant': user_restaurants.exists(),
+
+        # سفارشات ترکیبی
+        'all_orders': all_orders,
+
+        # آمار سفارشات منو
         'user_orders': user_orders,
-        'paid_orders': paid_orders,
-        'confirmed_orders': confirmed_orders,
-        'delivered_orders': delivered_orders,
-        'unpaid_orders': unpaid_orders,
+        'paid_orders': menu_paid_orders,
+        'confirmed_orders': menu_confirmed_orders,
+        'delivered_orders': menu_delivered_orders,
+        'unpaid_orders': menu_unpaid_orders,
+
+        # آمار سفارشات پلن
+        'plan_orders': plan_orders,
+        'plan_paid_orders': plan_paid_orders,
+        'plan_unpaid_orders': plan_unpaid_orders,
+
+        # آمار سفارشات محصول
+        'product_orders': product_orders,
+        'product_paid_orders': product_paid_orders,
+        'product_unpaid_orders': product_unpaid_orders,
+
+        # آمار کلی
         'today_orders': today_orders_count,
         'monthly_orders': monthly_orders_count,
         'today_revenue': today_revenue,
         'monthly_revenue': monthly_revenue,
-        'purchased_menus': paid_orders.count(),
+        'purchased_menus': menu_paid_orders.count(),
     }
 
     return render(request, 'panel_app/free/panel.html', context)
 
+# views.py - بخش order_detail
+@login_required
+def order_detail(request, order_id, order_type=None):
+    """جزئیات سفارش بر اساس نوع"""
+
+    # تشخیص نوع سفارش از URL
+    if 'menu' in request.path:
+        order_type = 'menu'
+    elif 'plan' in request.path:
+        order_type = 'plan'
+    elif 'product' in request.path:
+        order_type = 'product'
+    else:
+        # اگر از URL قدیمی استفاده شده، فرض می‌کنیم سفارش منو است
+        order_type = 'menu'
+
+    try:
+        if order_type == 'menu':
+            order = get_object_or_404(
+                Ordermenu,
+                id=order_id,
+                restaurant__owner=request.user
+            )
+            menu_images = order.images.all()
+            status_info = order.get_status_info()
+            template = 'panel_app/free/order_detail.html'
+
+        elif order_type == 'plan':
+            from apps.plan.models import PlanOrder
+            order = get_object_or_404(
+                PlanOrder,
+                id=order_id,
+                user=request.user
+            )
+            menu_images = []
+            status_info = {
+                'code': 'paid' if order.isPaid else 'unpaid',
+                'display': 'پرداخت شده' if order.isPaid else 'پرداخت نشده',
+                'is_paid': order.isPaid,
+                'is_completed': order.isPaid,
+                'is_pending': not order.isPaid,
+            }
+            template = 'panel_app/free/order_detail.html'
+
+        elif order_type == 'product':
+            from apps.product.models import ProductOrder
+            order = get_object_or_404(
+                ProductOrder,
+                id=order_id,
+                user=request.user
+            )
+            menu_images = []
+            status_info = {
+                'code': order.status,
+                'display': dict(ProductOrder.STATUS_CHOICES).get(order.status, order.status),
+                'is_paid': order.isPaid,
+                'is_completed': order.status == 'paid',
+                'is_pending': order.status in ['draft', 'pending'],
+            }
+            template = 'panel_app/free/order_detail.html'
+
+        else:
+            messages.error(request, 'نوع سفارش نامعتبر است')
+            return redirect('panel:panel')
+
+        context = {
+            'order': order,
+            'order_type': order_type,
+            'menu_images': menu_images,
+            'status_info': status_info,
+        }
+
+        return render(request, template, context)
+
+    except Exception as e:
+        messages.error(request, f'خطا در دریافت اطلاعات سفارش: {str(e)}')
+        return redirect('panel:panel')
+
 
 @login_required
-def order_detail(request, order_id):
-    """جزئیات سفارش"""
-    order = get_object_or_404(
-        Ordermenu,
-        id=order_id,
-        restaurant__owner=request.user
-    )
-
-    # دریافت عکس‌های مربوط به سفارش
-    menu_images = order.images.all()
-
-    # اطلاعات وضعیت برای نمایش در تمپلیت
-    status_info = order.get_status_info()
-
-    context = {
-        'order': order,
-        'menu_images': menu_images,
-        'status_info': status_info,
-    }
-
-    return render(request, 'panel_app/free/order_detail.html', context)
-
-
-
-@login_required
-def update_order_status(request, order_id):
+def update_order_status(request, order_id, order_type):
     """به‌روزرسانی وضعیت سفارش"""
     if request.method == 'POST':
-        order = get_object_or_404(Ordermenu, id=order_id, restaurant__owner=request.user)
-
         try:
-            new_status = int(request.POST.get('status'))
+            if order_type == 'menu':
+                order = get_object_or_404(Ordermenu, id=order_id, restaurant__owner=request.user)
+                new_status = int(request.POST.get('status'))
+                valid_statuses = [status[0] for status in Ordermenu.STATUS_CHOICES]
 
-            # بررسی معتبر بودن وضعیت
-            valid_statuses = [status[0] for status in Ordermenu.STATUS_CHOICES]
+            elif order_type == 'plan':
+                order = get_object_or_404(PlanOrder, id=order_id, user=request.user)
+                new_status = request.POST.get('status')
+                valid_statuses = ['paid', 'unpaid']
+
+            elif order_type == 'product':
+                order = get_object_or_404(ProductOrder, id=order_id, user=request.user)
+                new_status = request.POST.get('status')
+                valid_statuses = [status[0] for status in ProductOrder.STATUS_CHOICES]
+
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'نوع سفارش نامعتبر'
+                })
+
             if new_status in valid_statuses:
-                order.status = new_status
+                if order_type == 'menu':
+                    order.status = new_status
+                elif order_type == 'plan':
+                    order.isPaid = (new_status == 'paid')
+                    if order.isPaid and not order.paidAt:
+                        order.paidAt = timezone.now()
+                elif order_type == 'product':
+                    order.status = new_status
+                    if new_status == 'paid' and not order.paidAt:
+                        order.isPaid = True
+                        order.paidAt = timezone.now()
+
                 order.save()
 
                 return JsonResponse({
                     'success': True,
                     'message': 'وضعیت سفارش با موفقیت به‌روزرسانی شد',
-                    'new_status': order.get_status_display()
+                    'new_status': getattr(order, 'get_status_display', lambda: 'پرداخت شده' if getattr(order, 'isPaid', False) else 'پرداخت نشده')()
                 })
             else:
                 return JsonResponse({
@@ -146,7 +313,7 @@ def update_order_status(request, order_id):
                     'message': 'وضعیت نامعتبر'
                 })
 
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
             return JsonResponse({
                 'success': False,
                 'message': 'خطا در پردازش درخواست'
@@ -158,23 +325,46 @@ def update_order_status(request, order_id):
     })
 
 
-
-
 @login_required
-def cancel_order(request, order_id):
+def cancel_order(request, order_id, order_type):
     """لغو سفارش"""
     if request.method == 'POST':
-        order = get_object_or_404(Ordermenu, id=order_id, restaurant__owner=request.user)
-
-        # فقط سفارشات پرداخت نشده قابل لغو هستند
-        if order.status != Ordermenu.STATUS_UNPAID:
-            return JsonResponse({
-                'success': False,
-                'message': 'فقط سفارشات پرداخت نشده قابل لغو هستند'
-            })
-
         try:
-            order.delete()
+            if order_type == 'menu':
+                order = get_object_or_404(Ordermenu, id=order_id, restaurant__owner=request.user)
+                # فقط سفارشات پرداخت نشده قابل لغو هستند
+                if order.status != Ordermenu.STATUS_UNPAID:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'فقط سفارشات پرداخت نشده قابل لغو هستند'
+                    })
+                order.delete()
+
+            elif order_type == 'plan':
+                order = get_object_or_404(PlanOrder, id=order_id, user=request.user)
+                # فقط سفارشات پرداخت نشده قابل لغو هستند
+                if order.isPaid:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'سفارشات پرداخت شده قابل لغو نیستند'
+                    })
+                order.delete()
+
+            elif order_type == 'product':
+                order = get_object_or_404(ProductOrder, id=order_id, user=request.user)
+                # فقط سفارشات پرداخت نشده قابل لغو هستند
+                if order.isPaid:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'سفارشات پرداخت شده قابل لغو نیستند'
+                    })
+                order.delete()
+
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'نوع سفارش نامعتبر'
+                })
 
             return JsonResponse({
                 'success': True,
@@ -195,31 +385,58 @@ def cancel_order(request, order_id):
 
 @login_required
 def order_list(request):
-    """لیست تمام سفارشات کاربر"""
+    """لیست تمام سفارشات کاربر با فیلتر"""
     status_filter = request.GET.get('status', 'all')
+    type_filter = request.GET.get('type', 'all')
 
+    # دریافت تمام سفارشات
     user_orders = Ordermenu.objects.filter(restaurant__owner=request.user)
+    plan_orders = PlanOrder.objects.filter(user=request.user)
+    product_orders = ProductOrder.objects.filter(user=request.user)
+
+    # فیلتر بر اساس نوع
+    if type_filter == 'menu':
+        orders_data = user_orders
+    elif type_filter == 'plan':
+        orders_data = plan_orders
+    elif type_filter == 'product':
+        orders_data = product_orders
+    else:
+        # ترکیب تمام سفارشات
+        orders_data = list(user_orders) + list(plan_orders) + list(product_orders)
 
     # فیلتر بر اساس وضعیت
-    if status_filter == 'unpaid':
-        orders = user_orders.filter(status=Ordermenu.STATUS_UNPAID)
-    elif status_filter == 'paid':
-        orders = user_orders.filter(status=Ordermenu.STATUS_PAID)
-    elif status_filter == 'confirmed':
-        orders = user_orders.filter(status=Ordermenu.STATUS_CONFIRMED)
-    elif status_filter == 'delivered':
-        orders = user_orders.filter(status=Ordermenu.STATUS_DELIVERED)
+    filtered_orders = []
+    for order in orders_data:
+        if hasattr(order, 'status'):
+            status = order.status
+        elif hasattr(order, 'isPaid'):
+            status = 'paid' if order.isPaid else 'unpaid'
+        else:
+            status = 'unknown'
+
+        if (status_filter == 'all' or
+            (status_filter == 'unpaid' and status in ['unpaid', 1]) or
+            (status_filter == 'paid' and status in ['paid', 2, 3, 4]) or
+            (status_filter == 'confirmed' and status == 3) or
+            (status_filter == 'delivered' and status == 4)):
+            filtered_orders.append(order)
+
+    # مرتب‌سازی
+    if type_filter == 'all':
+        filtered_orders.sort(key=lambda x: getattr(x, 'created_at', getattr(x, 'createdAt', timezone.now())), reverse=True)
     else:
-        orders = user_orders
+        if hasattr(filtered_orders, 'order_by'):
+            filtered_orders = filtered_orders.order_by('-created_at' if hasattr(filtered_orders.first(), 'created_at') else '-createdAt')
 
     context = {
-        'orders': orders.order_by('-id'),
+        'orders': filtered_orders,
         'current_filter': status_filter,
+        'current_type': type_filter,
         'status_choices': Ordermenu.STATUS_CHOICES,
     }
 
     return render(request, 'panel_app/free/order_list.html', context)
-
 
 
 @login_required

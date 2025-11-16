@@ -2,36 +2,28 @@
 
 <div class="w-full max-w-7xl mx-auto p-4">
 
-    <!-- بنر افتتاح اولین منو - برای کاربران بدون منو -->
+    <!-- بنر افتتاح اولین منو -->
     <div id="firstTimeBanner" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm transform transition-all duration-500 scale-95 animate-in">
             <div class="p-6 text-center">
-                <!-- آیکون بزرگ -->
                 <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-utensils text-white text-2xl"></i>
                 </div>
-
-                <!-- متن بنر -->
                 <h3 class="text-xl font-bold text-gray-800 mb-3">منوی آنلاین خودت رو بساز!</h3>
                 <p class="text-gray-600 mb-6 text-sm leading-relaxed">
                     با ساخت منوی دیجیتال، کسب و کارت رو متحول کن و سفارشاتت رو چند برابر افزایش بده
                 </p>
-
-                <!-- دکمه‌های اقدام -->
                 <div class="space-y-3">
                     <button onclick="startCreatingMenu()"
                             class="w-full bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                         <i class="fas fa-rocket ml-2"></i>
                         شروع کن، رایگان!
                     </button>
-
                     <button onclick="closeFirstTimeBanner()"
                             class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-medium transition-colors">
                         بعداً می‌سازم
                     </button>
                 </div>
-
-                <!-- نکات مثبت -->
                 <div class="mt-6 pt-4 border-t border-gray-200">
                     <div class="grid grid-cols-2 gap-3 text-xs text-gray-500">
                         <div class="flex items-center justify-center">
@@ -58,13 +50,25 @@
 
     <!-- آمار کلی -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <!-- کارت منوهای ساخته شده -->
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-blue-100 text-sm mb-2">منوهای ساخته شده</p>
+                    <p class="text-blue-100 text-sm mb-2">کل سفارشات</p>
+                    <h3 class="text-2xl font-bold">{{ all_orders|length|default:0 }}</h3>
+                    <p class="text-blue-100 text-xs mt-2">همه انواع سفارشات</p>
+                </div>
+                <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shopping-bag text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm mb-2">منوهای ساخته شده</p>
                     <h3 class="text-2xl font-bold">{{ restaurants.count|default:0 }}</h3>
-                    <p class="text-blue-100 text-xs mt-2">همه منوهای فعال</p>
+                    <p class="text-green-100 text-xs mt-2">همه منوهای فعال</p>
                 </div>
                 <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                     <i class="fas fa-utensils text-2xl"></i>
@@ -72,21 +76,6 @@
             </div>
         </div>
 
-        <!-- کارت منوهای خریداری شده -->
-        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-green-100 text-sm mb-2">منوهای خریداری شده</p>
-                    <h3 class="text-2xl font-bold">{{ purchased_menus|default:0 }}</h3>
-                    <p class="text-green-100 text-xs mt-2">پکیج‌های فعال</p>
-                </div>
-                <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-shopping-cart text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- کارت سفارشات امروز -->
         <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
@@ -100,7 +89,6 @@
             </div>
         </div>
 
-        <!-- کارت درآمد امروز -->
         <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
@@ -115,7 +103,7 @@
         </div>
     </div>
 
-    <!-- فیلترهای وضعیت سفارش -->
+    <!-- فیلترهای سفارشات -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
@@ -123,243 +111,246 @@
                     <i class="fas fa-filter text-blue-500 ml-3 text-lg"></i>
                     فیلتر سفارشات
                 </h2>
-                <p class="text-gray-600 text-sm mt-2">سفارشات خود را بر اساس وضعیت فیلتر کنید</p>
+                <p class="text-gray-600 text-sm mt-2">سفارشات خود را بر اساس نوع و وضعیت فیلتر کنید</p>
             </div>
 
-            <div class="flex flex-wrap gap-2">
-                <button onclick="filterOrders('all')"
-                        class="filter-btn active px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-blue-500 text-white shadow-lg">
-                    <i class="fas fa-layer-group ml-2"></i>
-                    همه سفارشات
-                    <span class="bg-white bg-opacity-20 px-2 py-1 rounded-lg text-xs mr-2">
-                        {{ user_orders.count|default:0 }}
-                    </span>
-                </button>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- فیلتر نوع سفارش -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterOrdersByType('all')"
+                            class="type-filter-btn active px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-blue-500 text-white shadow-lg">
+                        <i class="fas fa-layer-group ml-2"></i>
+                        همه سفارشات
+                    </button>
 
-                <button onclick="filterOrders('unpaid')"
-                        class="filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-lg">
-                    <i class="fas fa-clock ml-2"></i>
-                    پرداخت نشده
-                    <span class="bg-white bg-opacity-20 px-2 py-1 rounded-lg text-xs mr-2">
-                        {{ unpaid_orders.count|default:0 }}
-                    </span>
-                </button>
+                    <button onclick="filterOrdersByType('menu')"
+                            class="type-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-green-500 text-white hover:shadow-lg">
+                        <i class="fas fa-utensils ml-2"></i>
+                        سفارشات منو
+                    </button>
 
-                <button onclick="filterOrders('paid')"
-                        class="filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-lg">
-                    <i class="fas fa-check-circle ml-2"></i>
-                    پرداخت شده
-                    <span class="bg-white bg-opacity-20 px-2 py-1 rounded-lg text-xs mr-2">
-                        {{ paid_orders.count|default:0 }}
-                    </span>
-                </button>
+                    <button onclick="filterOrdersByType('plan')"
+                            class="type-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-purple-500 text-white hover:shadow-lg">
+                        <i class="fas fa-crown ml-2"></i>
+                        سفارشات پلن
+                    </button>
 
-                <button onclick="filterOrders('confirmed')"
-                        class="filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:shadow-lg">
-                    <i class="fas fa-clipboard-check ml-2"></i>
-                    تایید شده
-                    <span class="bg-white bg-opacity-20 px-2 py-1 rounded-lg text-xs mr-2">
-                        {{ confirmed_orders.count|default:0 }}
-                    </span>
-                </button>
+                    <button onclick="filterOrdersByType('product')"
+                            class="type-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-orange-500 text-white hover:shadow-lg">
+                        <i class="fas fa-box ml-2"></i>
+                        سفارشات محصول
+                    </button>
+                </div>
 
-                <button onclick="filterOrders('delivered')"
-                        class="filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:shadow-lg">
-                    <i class="fas fa-check-double ml-2"></i>
-                    تحویل شده
-                    <span class="bg-white bg-opacity-20 px-2 py-1 rounded-lg text-xs mr-2">
-                        {{ delivered_orders.count|default:0 }}
-                    </span>
-                </button>
+                <!-- فیلتر وضعیت -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterOrdersByStatus('all')"
+                            class="status-filter-btn active px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-gray-500 text-white shadow-lg">
+                        همه وضعیت‌ها
+                    </button>
+
+                    <button onclick="filterOrdersByStatus('unpaid')"
+                            class="status-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-red-500 text-white hover:shadow-lg">
+                        <i class="fas fa-clock ml-2"></i>
+                        پرداخت نشده
+                    </button>
+
+                    <button onclick="filterOrdersByStatus('paid')"
+                            class="status-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-green-500 text-white hover:shadow-lg">
+                        <i class="fas fa-check-circle ml-2"></i>
+                        پرداخت شده
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- بخش سفارشات منو -->
+    <!-- بخش تمام سفارشات -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
         <div class="p-6 border-b border-gray-100">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                <i class="fas fa-shopping-cart text-blue-500 ml-3 text-lg"></i>
-                سفارشات ساخت منو
+                <i class="fas fa-shopping-bag text-blue-500 ml-3 text-lg"></i>
+                تمام سفارشات من
             </h2>
-            <p class="text-gray-600 text-sm mt-2">مدیریت سفارشات ساخت منوی حرفه‌ای</p>
+            <p class="text-gray-600 text-sm mt-2">مدیریت تمام سفارشات شما در یک مکان</p>
         </div>
 
         <div class="p-6">
-            {% if user_orders %}
-            <div class="space-y-4" id="orders-container">
-                {% for order in user_orders %}
+            {% if all_orders %}
+            <div class="space-y-4" id="all-orders-container">
+                {% for order_data in all_orders %}
                 <div class="order-item border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-300"
-                     data-status="{{ order.status }}"
-                     data-order-id="{{ order.id }}">
-                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                        <!-- اطلاعات سفارش -->
-                        <div class="flex-1">
-                            <div class="flex items-center flex-wrap gap-2 mb-4">
-                                <!-- وضعیت داینامیک -->
-                                <span class="status-badge px-3 py-1 rounded-lg text-sm font-medium
-                                    {% if order.status == 1 %}bg-red-100 text-red-600 border border-red-200
-                                    {% elif order.status == 2 %}bg-green-100 text-green-600 border border-green-200
-                                    {% elif order.status == 3 %}bg-purple-100 text-purple-600 border border-purple-200
-                                    {% elif order.status == 4 %}bg-blue-100 text-blue-600 border border-blue-200
-                                    {% elif order.status == 5 %}bg-teal-100 text-teal-600 border border-teal-200
-                                    {% elif order.status == 6 %}bg-orange-100 text-orange-600 border border-orange-200
-                                    {% else %}bg-gray-100 text-gray-600 border border-gray-200{% endif %}">
-                                    <i class="fas
-                                        {% if order.status == 1 %}fa-clock
-                                        {% elif order.status == 2 %}fa-check-circle
-                                        {% elif order.status == 3 %}fa-clipboard-check
-                                        {% elif order.status == 4 %}fa-check-double
-                                        {% elif order.status == 5 %}fa-sync-alt
-                                        {% elif order.status == 6 %}fa-times-circle
-                                        {% else %}fa-circle{% endif %} ml-1 text-xs">
-                                    </i>
-                                    {{ order.get_status_display }}
-                                </span>
+                     data-type="{{ order_data.type }}"
+                     data-status="{{ order_data.status }}"
+                     data-order-id="{{ order_data.object.id }}">
 
-                                <!-- شماره سفارش -->
-                                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium border border-gray-200">
-                                    <i class="fas fa-hashtag ml-1 text-xs"></i>
-                                    #{{ order.id }}
-                                </span>
-
-                                <!-- رستوران -->
-                                <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-sm font-medium border border-orange-200">
-                                    <i class="fas fa-store ml-1 text-xs"></i>
-                                    {{ order.restaurant.title }}
-                                </span>
-
-                                <!-- قیمت -->
-                                <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-lg text-sm font-medium border border-indigo-200">
-                                    <i class="fas fa-tag ml-1 text-xs"></i>
-                                    {{ order.final_price|intcomma }} تومان
-                                </span>
+                    <!-- هدر سفارش -->
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <div class="flex items-center space-x-4 space-x-reverse">
+                            <!-- آیکون نوع سفارش -->
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center
+                                {% if order_data.type == 'menu' %}bg-green-100 text-green-600
+                                {% elif order_data.type == 'plan' %}bg-purple-100 text-purple-600
+                                {% else %}bg-orange-100 text-orange-600{% endif %}">
+                                <i class="fas
+                                    {% if order_data.type == 'menu' %}fa-utensils
+                                    {% elif order_data.type == 'plan' %}fa-crown
+                                    {% else %}fa-box{% endif %}">
+                                </i>
                             </div>
 
-                            <!-- اطلاعات رستوران -->
+                            <div>
+                                <h3 class="font-bold text-gray-800">
+                                    {% if order_data.type == 'menu' %}
+                                        سفارش منو: {{ order_data.object.restaurant.title }}
+                                    {% elif order_data.type == 'plan' %}
+                                        سفارش پلن: {{ order_data.object.plan.name }}
+                                    {% else %}
+                                        سفارش محصول
+                                    {% endif %}
+                                </h3>
+                                <p class="text-gray-500 text-sm">
+                                    <i class="fas fa-calendar ml-1"></i>
+                                    {{ order_data.created_at|date:"Y/m/d - H:i" }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 space-x-reverse">
+                            <!-- وضعیت -->
+                            <span class="status-badge px-3 py-1 rounded-lg text-sm font-medium
+                                {% if order_data.is_paid %}bg-green-100 text-green-600 border border-green-200
+                                {% else %}bg-red-100 text-red-600 border border-red-200{% endif %}">
+                                <i class="fas {% if order_data.is_paid %}fa-check-circle{% else %}fa-clock{% endif %} ml-1 text-xs"></i>
+                                {% if order_data.type == 'menu' %}
+                                    {{ order_data.object.get_status_display }}
+                                {% elif order_data.type == 'plan' %}
+                                    {% if order_data.is_paid %}پرداخت شده{% else %}پرداخت نشده{% endif %}
+                                {% else %}
+                                    {{ order_data.object.get_status_display }}
+                                {% endif %}
+                            </span>
+
+                            <!-- نوع سفارش -->
+                            <span class="type-badge px-3 py-1 rounded-lg text-sm font-medium
+                                {% if order_data.type == 'menu' %}bg-green-100 text-green-600 border border-green-200
+                                {% elif order_data.type == 'plan' %}bg-purple-100 text-purple-600 border border-purple-200
+                                {% else %}bg-orange-100 text-orange-600 border border-orange-200{% endif %}">
+                                {% if order_data.type == 'menu' %}منو
+                                {% elif order_data.type == 'plan' %}پلن
+                                {% else %}محصول{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- اطلاعات سفارش -->
+                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                        <div class="flex-1">
+                            <!-- اطلاعات خاص هر نوع -->
+                            {% if order_data.type == 'menu' %}
                             <div class="mb-4">
-                                <p class="text-gray-700 font-medium text-lg">{{ order.restaurant.title }}</p>
+                                <p class="text-gray-700 font-medium">{{ order_data.object.restaurant.title }}</p>
                                 <p class="text-gray-500 text-sm mt-1">
                                     <i class="fas fa-link ml-1 text-gray-400"></i>
-                                    آدرس: /menu/{{ order.restaurant.slug }}
+                                    آدرس: /menu/{{ order_data.object.restaurant.slug }}
+                                </p>
+                                {% if order_data.object.is_seo_enabled %}
+                                <p class="text-purple-600 text-sm mt-1">
+                                    <i class="fas fa-search ml-1"></i>
+                                    سئو فعال
+                                </p>
+                                {% endif %}
+                            </div>
+
+                            {% elif order_data.type == 'plan' %}
+                            <div class="mb-4">
+                                <p class="text-gray-700 font-medium">{{ order_data.object.plan.name }}</p>
+                                <p class="text-gray-500 text-sm mt-1">
+                                    <i class="fas fa-calendar ml-1"></i>
+                                    {% if order_data.object.expiryDate %}
+                                        انقضا: {{ order_data.object.expiryDate|date:"Y/m/d" }}
+                                        ({{ order_data.object.days_remaining }} روز باقی‌مانده)
+                                    {% else %}
+                                        تاریخ انقضا تنظیم نشده
+                                    {% endif %}
                                 </p>
                             </div>
 
-                            <!-- اطلاعات قیمت داینامیک -->
+                            {% else %}
+                            <div class="mb-4">
+                                <p class="text-gray-700 font-medium">سفارش محصول</p>
+                                <p class="text-gray-500 text-sm mt-1">
+                                    <i class="fas fa-cube ml-1"></i>
+                                    {{ order_data.object.items.count }} آیتم
+                                </p>
+                                {% if order_data.object.order_info %}
+                                <p class="text-gray-500 text-sm mt-1">
+                                    <i class="fas fa-user ml-1"></i>
+                                    {{ order_data.object.order_info.full_name }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <!-- اطلاعات قیمت -->
                             <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                    <div class="text-center">
-                                        <p class="text-gray-600">قیمت پایه</p>
-                                        <p class="font-bold text-gray-800">{{ order.final_price|intcomma }} تومان</p>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-gray-600 text-sm">مبلغ سفارش</p>
+                                        <p class="font-bold text-gray-800 text-lg">
+                                            {{ order_data.final_price|intcomma }} تومان
+                                        </p>
                                     </div>
-                                    {% if order.is_seo_enabled %}
-                                    <div class="text-center">
-                                        <p class="text-purple-600">هزینه سئو</p>
-                                        <p class="font-bold text-purple-600">{{ order.seo_price|default:0|intcomma }} تومان</p>
-                                    </div>
+                                    {% if not order_data.is_paid %}
+                                    <button onclick="processPayment('{{ order_data.type }}', {{ order_data.object.id }})"
+                                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-credit-card ml-2"></i>
+                                        پرداخت
+                                    </button>
                                     {% endif %}
-                                    <div class="text-center">
-                                        <p class="text-green-600">قیمت نهایی</p>
-                                        <p class="font-bold text-green-600 text-lg">{{ order.final_price|intcomma }} تومان</p>
-                                    </div>
                                 </div>
                             </div>
-
-                            <!-- اطلاعات زمانی -->
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-100 space-y-2 sm:space-y-0">
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <i class="fas fa-clock ml-1"></i>
-                                    تاریخ ایجاد:
-                                    <span class="font-medium mr-1">{{ order.created_at|date:"Y/m/d - H:i" }}</span>
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <i class="fas fa-info-circle ml-1"></i>
-                                    سئو: {% if order.is_seo_enabled %}فعال{% else %}غیرفعال{% endif %}
-                                </div>
-                            </div>
-
-                            <!-- عکس‌های آپلود شده -->
-                            {% if order.images.all %}
-                            <div class="mt-4 pt-4 border-t border-gray-100">
-                                <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
-                                    <i class="fas fa-images ml-2 text-gray-400"></i>
-                                    عکس‌های آپلود شده ({{ order.images.count }})
-                                </h4>
-                                <div class="grid grid-cols-3 gap-2">
-                                    {% for image in order.images.all %}
-                                    <div class="relative group">
-                                        <img src="{{ image.image.url }}"
-                                             alt="عکس منو {{ forloop.counter }}"
-                                             class="w-full h-20 object-cover rounded-lg border">
-                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 rounded-lg transition-all flex items-center justify-center">
-                                            <button onclick="viewImage('{{ image.image.url }}')"
-                                                    class="w-8 h-8 bg-white text-gray-700 rounded-full text-sm flex items-center justify-center hover:bg-gray-100 transition-all opacity-0 group-hover:opacity-100">
-                                                <i class="fas fa-expand"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
 
-                        <!-- دکمه‌های اقدام داینامیک -->
-                        <div class="flex flex-col space-y-3 min-w-[200px]">
-                            {% if order.status == 1 %}
-                            <!-- وضعیت پرداخت نشده -->
-                            <button onclick="processRealPayment({{ order.id }})"
-                                    class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
-                                <i class="fas fa-credit-card ml-2"></i>
-                                پرداخت ({{ order.final_price|intcomma }} تومان)
-                            </button>
-                            {% elif order.status == 2 %}
-                            <!-- وضعیت پرداخت شده -->
-                            <span class="w-full bg-green-500 text-white px-4 py-3 rounded-xl text-sm font-medium text-center flex items-center justify-center">
-                                <i class="fas fa-check-circle ml-2"></i>
-                                پرداخت شده
-                            </span>
-                            {% elif order.status == 3 %}
-                            <!-- وضعیت تایید شده -->
-                            <span class="w-full bg-purple-500 text-white px-4 py-3 rounded-xl text-sm font-medium text-center flex items-center justify-center">
-                                <i class="fas fa-clipboard-check ml-2"></i>
-                                تایید شده
-                            </span>
-                            {% elif order.status == 4 %}
-                            <!-- وضعیت تحویل شده -->
-                            <span class="w-full bg-blue-500 text-white px-4 py-3 rounded-xl text-sm font-medium text-center flex items-center justify-center">
-                                <i class="fas fa-check-double ml-2"></i>
-                                تحویل شده
-                            </span>
-                            {% elif order.status == 5 %}
-                            <!-- وضعیت تمدید شده -->
-                            <span class="w-full bg-teal-500 text-white px-4 py-3 rounded-xl text-sm font-medium text-center flex items-center justify-center">
-                                <i class="fas fa-sync-alt ml-2"></i>
-                                تمدید شده
-                            </span>
-                            {% elif order.status == 6 %}
-                            <!-- وضعیت تمدید نشده -->
-                            <button onclick="processRealPayment({{ order.id }})"
-                                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
-                                <i class="fas fa-credit-card ml-2"></i>
-                                تمدید ({{ order.final_price|intcomma }} تومان)
-                            </button>
-                            {% endif %}
+                        <!-- دکمه‌های اقدام -->
+                        <!-- دکمه‌های اقدام -->
+<div class="flex flex-col space-y-3 min-w-[200px]">
+    {% if order_data.type == 'menu' %}
+        <a href="{% url 'panel:menu_order_detail' order_data.object.id %}"
+           class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
+            <i class="fas fa-eye ml-2"></i>
+            مشاهده جزئیات
+        </a>
+    {% elif order_data.type == 'plan' %}
+        <a href="{% url 'panel:plan_order_detail' order_data.object.id %}"
+           class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
+            <i class="fas fa-eye ml-2"></i>
+            مشاهده جزئیات
+        </a>
+    {% elif order_data.type == 'product' %}
+        <a href="{% url 'panel:product_order_detail' order_data.object.id %}"
+           class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
+            <i class="fas fa-eye ml-2"></i>
+            مشاهده جزئیات
+        </a>
+    {% endif %}
 
-                            <a href="{% url 'panel:order_detail' order.id %}"
-                               class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
-                                <i class="fas fa-eye ml-2"></i>
-                                مشاهده جزئیات
-                            </a>
+    {% if not order_data.is_paid %}
+    <button onclick="cancelOrder('{{ order_data.type }}', {{ order_data.object.id }})"
+            class="w-full border border-red-300 hover:bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
+        <i class="fas fa-times ml-2"></i>
+        لغو سفارش
+    </button>
+    {% endif %}
 
-                            {% if order.status == 1 or order.status == 6 %}
-                            <button onclick="cancelOrder({{ order.id }})"
-                                    class="w-full border border-red-300 hover:bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
-                                <i class="fas fa-times ml-2"></i>
-                                لغو سفارش
-                            </button>
-                            {% endif %}
-                        </div>
+    {% if order_data.type == 'plan' and order_data.is_paid %}
+    <button onclick="extendPlan({{ order_data.object.id }})"
+            class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center">
+        <i class="fas fa-sync-alt ml-2"></i>
+        تمدید پلن
+    </button>
+    {% endif %}
+</div>
                     </div>
                 </div>
                 {% endfor %}
@@ -368,23 +359,28 @@
             <!-- حالت خالی -->
             <div class="text-center py-12">
                 <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-4">
-                    <i class="fas fa-shopping-cart text-3xl"></i>
+                    <i class="fas fa-shopping-bag text-3xl"></i>
                 </div>
                 <h3 class="text-gray-500 text-lg font-medium mb-2">هنوز سفارشی ثبت نکرده‌اید</h3>
-                <p class="text-gray-400 mb-6">سفارشات ساخت منو در این بخش نمایش داده می‌شوند</p>
-                <button onclick="openCreateRestaurantModal()"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors">
-                    ساخت اولین منو
-                </button>
+                <p class="text-gray-400 mb-6">سفارشات شما در این بخش نمایش داده می‌شوند</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="openCreateRestaurantModal()"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+                        ساخت اولین منو
+                    </button>
+                    <a href="{% url 'plan:plan_list' %}"
+                       class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+                        مشاهده پلن‌ها
+                    </a>
+                </div>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- محتوای اصلی - طرح دو ستونی برای دسکتاپ -->
+    <!-- محتوای اصلی -->
     <div class="flex flex-col xl:flex-row gap-6">
-
-        <!-- ستون سمت چپ - سفارشات زنده و آمار -->
+        <!-- ستون سمت چپ -->
         <div class="xl:w-2/3 space-y-6">
             <!-- آمار ماهانه -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -406,9 +402,8 @@
             </div>
         </div>
 
-        <!-- ستون سمت راست - منوها و نکات -->
+        <!-- ستون سمت راست -->
         <div class="xl:w-1/3 space-y-6">
-
             <!-- منوهای شما -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
                 <div class="p-6 border-b border-gray-100">
@@ -417,7 +412,6 @@
                         منوهای شما
                     </h2>
                 </div>
-
                 <div class="p-6">
                     {% if restaurants %}
                     <div class="space-y-4">
@@ -436,9 +430,6 @@
                                         </span>
                                         <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-medium">
                                             {{ restaurant.categories.count }} دسته‌بندی
-                                        </span>
-                                        <span class="bg-purple-100 text-purple-600 px-2 py-1 rounded text-xs font-medium">
-                                            {{ restaurant.orders.count }} سفارش
                                         </span>
                                     </div>
                                 </div>
@@ -477,7 +468,6 @@
                     <i class="fas fa-lightbulb text-yellow-500 ml-2"></i>
                     راهنمای افزایش فروش
                 </h3>
-
                 <div class="space-y-3">
                     <div class="flex items-start space-x-3 space-x-reverse">
                         <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
@@ -487,7 +477,6 @@
                             <strong>QR Code روی میزها:</strong> برای افزایش ۳ برابری سفارشات
                         </p>
                     </div>
-
                     <div class="flex items-start space-x-3 space-x-reverse">
                         <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                             <i class="fas fa-image text-white text-xs"></i>
@@ -496,7 +485,6 @@
                             <strong>عکس‌های باکیفیت:</strong> ۶۰٪ افزایش جذابیت منو
                         </p>
                     </div>
-
                     <div class="flex items-start space-x-3 space-x-reverse">
                         <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                             <i class="fas fa-bolt text-white text-xs"></i>
@@ -506,7 +494,6 @@
                         </p>
                     </div>
                 </div>
-
                 <div class="mt-6 pt-4 border-t border-blue-200">
                     <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center">
                         راهنمای کامل استفاده
@@ -532,26 +519,19 @@
 </div>
 
 <script>
-// فیلتر کردن سفارشات
-function filterOrders(status) {
+// فیلتر کردن بر اساس نوع سفارش
+function filterOrdersByType(type) {
     const orderItems = document.querySelectorAll('.order-item');
-    const filterButtons = document.querySelectorAll('.filter-btn');
+    const typeButtons = document.querySelectorAll('.type-filter-btn');
 
-    // به‌روزرسانی دکمه‌های فعال
-    filterButtons.forEach(btn => {
+    typeButtons.forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
 
-    // فیلتر کردن سفارشات
     orderItems.forEach(item => {
-        const itemStatus = item.getAttribute('data-status');
-
-        if (status === 'all' ||
-            (status === 'unpaid' && itemStatus === '1') ||
-            (status === 'paid' && itemStatus === '2') ||
-            (status === 'confirmed' && itemStatus === '3') ||
-            (status === 'delivered' && itemStatus === '4')) {
+        const itemType = item.getAttribute('data-type');
+        if (type === 'all' || itemType === type) {
             item.style.display = 'block';
         } else {
             item.style.display = 'none';
@@ -559,26 +539,51 @@ function filterOrders(status) {
     });
 }
 
-// پرداخت واقعی - انتقال به درگاه پرداخت
-function processRealPayment(orderId) {
+// فیلتر کردن بر اساس وضعیت
+function filterOrdersByStatus(status) {
+    const orderItems = document.querySelectorAll('.order-item');
+    const statusButtons = document.querySelectorAll('.status-filter-btn');
+
+    statusButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    orderItems.forEach(item => {
+        const itemStatus = item.getAttribute('data-status');
+        const isPaid = itemStatus === '2' || itemStatus === '3' || itemStatus === '4' || itemStatus === 'paid';
+
+        if (status === 'all' ||
+            (status === 'unpaid' && !isPaid) ||
+            (status === 'paid' && isPaid)) {
+            if (item.style.display !== 'none') {
+                item.style.display = 'block';
+            }
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// پرداخت سفارش
+function processPayment(orderType, orderId) {
     if (confirm('آیا می‌خواهید به درگاه پرداخت منتقل شوید؟')) {
-        // نمایش وضعیت در حال پردازش
         showNotification('در حال انتقال به درگاه پرداخت...', 'info');
 
-        // انتقال به درگاه پرداخت واقعی - هر order پرداخت جداگانه دارد
-        window.location.href = `/peyment/request/menu/${orderId}/`;
+        if (orderType === 'menu') {
+            window.location.href = `/peyment/request/menu/${orderId}/`;
+        } else if (orderType === 'plan') {
+            window.location.href = `/peyment/request/plan/${orderId}/`;
+        } else if (orderType === 'product') {
+            window.location.href = `/peyment/request/product/${orderId}/`;
+        }
     }
 }
 
-// مشاهده جزئیات سفارش
-function viewOrderDetails(orderId) {
-    window.open(`/panel/orders/${orderId}/`, '_blank');
-}
-
 // لغو سفارش
-function cancelOrder(orderId) {
+function cancelOrder(orderType, orderId) {
     if (confirm('آیا از لغو این سفارش مطمئن هستید؟')) {
-        fetch(`/panel/orders/${orderId}/cancel/`, {
+        fetch(`/panel/orders/${orderType}/${orderId}/cancel/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -603,6 +608,14 @@ function cancelOrder(orderId) {
     }
 }
 
+// تمدید پلن
+function extendPlan(planOrderId) {
+    if (confirm('آیا می‌خواهید این پلن را تمدید کنید؟')) {
+        showNotification('در حال انتقال به صفحه تمدید...', 'info');
+        window.location.href = `/plan/renew/${planOrderId}/`;
+    }
+}
+
 // مشاهده عکس در مودال
 function viewImage(imageUrl) {
     document.getElementById('modalImage').src = imageUrl;
@@ -613,7 +626,7 @@ function closeImageModal() {
     document.getElementById('imageModal').classList.add('hidden');
 }
 
-// تابع کپی لینک منو
+// کپی لینک منو
 function copyMenuLink(slug) {
     const link = `${window.location.origin}/menu/${slug}`;
     navigator.clipboard.writeText(link).then(() => {
@@ -621,7 +634,7 @@ function copyMenuLink(slug) {
     });
 }
 
-// تابع نمایش نوتیفیکیشن
+// نمایش نوتیفیکیشن
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-white font-medium ${
@@ -637,16 +650,13 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// بررسی نمایش بنر - هر بار برای کاربران بدون منو
+// مدیریت بنر
 function checkFirstTimeVisit() {
     const hasRestaurants = {{ restaurants.count|default:0 }} > 0;
-
-    // اگر کاربر منو دارد، بنر نمایش داده نشود
     if (hasRestaurants) {
         return;
     }
 
-    // 2 ثانیه تاخیر برای بهتر دیده شدن
     setTimeout(() => {
         const banner = document.getElementById('firstTimeBanner');
         banner.classList.remove('hidden');
@@ -656,13 +666,11 @@ function checkFirstTimeVisit() {
     }, 2000);
 }
 
-// شروع ساخت منو
 function startCreatingMenu() {
     closeFirstTimeBanner();
     openCreateRestaurantModal();
 }
 
-// بستن بنر
 function closeFirstTimeBanner() {
     const banner = document.getElementById('firstTimeBanner');
     banner.querySelector('.animate-in').classList.add('scale-95');
@@ -671,15 +679,14 @@ function closeFirstTimeBanner() {
     }, 300);
 }
 
-// شروع به‌روزرسانی‌های زنده
+// مقداردهی اولیه
 document.addEventListener('DOMContentLoaded', function() {
     checkFirstTimeVisit();
-
-    // مقداردهی اولیه فیلتر
-    filterOrders('all');
+    filterOrdersByType('all');
+    filterOrdersByStatus('all');
 });
 
-// بستن با کلیک خارج از بنر
+// مدیریت کلیک خارج از بنر و مودال
 document.getElementById('firstTimeBanner').addEventListener('click', function(e) {
     if (e.target === this) {
         closeFirstTimeBanner();
@@ -764,21 +771,21 @@ document.addEventListener('keydown', function(e) {
     animation: slideInUp 0.5s ease-out;
 }
 
-.filter-btn {
+.type-filter-btn, .status-filter-btn {
     @apply flex items-center transition-all duration-300 transform hover:scale-105;
 }
 
-.filter-btn.active {
+.type-filter-btn.active, .status-filter-btn.active {
     @apply shadow-lg scale-105;
 }
 
-.status-badge {
+.status-badge, .type-badge {
     display: inline-flex;
     align-items: center;
     transition: all 0.3s ease;
 }
 
-.status-badge:hover {
+.status-badge:hover, .type-badge:hover {
     transform: scale(1.05);
 }
 
@@ -790,7 +797,6 @@ document.addEventListener('keydown', function(e) {
     transform: translateY(-2px);
 }
 
-/* بهبود نمایش در موبایل‌های مختلف */
 @media (max-width: 380px) {
     #firstTimeBanner .max-w-sm {
         max-width: 95vw;
@@ -798,19 +804,17 @@ document.addEventListener('keydown', function(e) {
     }
 }
 
-/* حذف اسکرول هنگام نمایش بنر */
 body:has(#firstTimeBanner:not(.hidden)) {
     overflow: hidden;
 }
 
-/* responsive improvements */
 @media (max-width: 768px) {
     .container {
         padding-left: 1rem;
         padding-right: 1rem;
     }
 
-    .filter-btn {
+    .type-filter-btn, .status-filter-btn {
         @apply text-sm px-3 py-2;
     }
 }

@@ -26,10 +26,15 @@ urlpatterns = [
     path('generate-qr/<slug:restaurant_slug>/', viewsfree.generate_qr_code, name='generate_qr'),
     path('check-pending-restaurant/', viewsfree.check_pending_restaurant, name='check_pending_restaurant'),
     path('clear-pending-restaurant/', viewsfree.clear_pending_restaurant, name='clear_pending_restaurant'),
-    path('orders/<int:order_id>/', viewsfree.order_detail, name='order_detail'),
+
+    # URLهای سفارشات - به‌روزرسانی شده
+    path('orders/<int:order_id>/', viewsfree.order_detail, name='order_detail'),  # قدیمی - فقط برای سفارشات منو
+    path('orders/menu/<int:order_id>/', viewsfree.order_detail, name='menu_order_detail'),
+    path('orders/plan/<int:order_id>/', viewsfree.order_detail, name='plan_order_detail'),
+    path('orders/product/<int:order_id>/', viewsfree.order_detail, name='product_order_detail'),
+
     path('orders/<int:order_id>/update-status/', viewsfree.update_order_status, name='update_order_status'),
     path('orders/<int:order_id>/cancel/', viewsfree.cancel_order, name='cancel_order'),
     path('<slug:slug>/foods/<int:food_id>/toggle-selection/', viewsfree.toggle_food_selection, name='toggle_food_selection'),
     path('<slug:slug>/foods/<int:food_id>/assign-category/', viewsfree.assign_food_to_category, name='assign_food_to_category'),
-
 ]

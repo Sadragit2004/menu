@@ -3,13 +3,7 @@ from apps.menu.models.menufreemodels.models import Restaurant
 import utils
 from django.utils import timezone
 
-
-# apps/order/models.py
-from django.db import models
-from apps.menu.models.menufreemodels.models import Restaurant
-import utils
 from django.utils import timezone
-from decimal import Decimal
 
 class Ordermenu(models.Model):
     STATUS_UNPAID = 1

@@ -15,7 +15,7 @@ class Plan(models.Model):
         null=True,
         verbose_name="قیمت پلن"
     )
-  
+
     expiryDays = models.IntegerField(
         default=30,
         verbose_name="انقضای پلن (روز)"
@@ -80,7 +80,7 @@ class PlanOrder(models.Model):
     )
     createdAt = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
     finalPrice = models.PositiveIntegerField(verbose_name="قیمت نهایی")
-
+    isActive = models.BooleanField(default=True,verbose_name='فعال')
     # فیلدهای اضافی که ممکن است مفید باشند:
     isPaid = models.BooleanField(default=False, verbose_name="پرداخت شده")
     paidAt = models.DateTimeField(blank=True, null=True, verbose_name="تاریخ پرداخت")
