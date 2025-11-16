@@ -445,6 +445,7 @@
         width: 100%;
         justify-content: center;
         font-size: 1.1rem;
+        text-decoration: none;
     }
 
     .btn-primary {
@@ -750,6 +751,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
     }
 
@@ -1202,6 +1204,27 @@
             grid-template-columns: repeat(2, 1fr);
         }
     }
+
+    /* استایل‌های جدید برای دکمه‌ها */
+    .btn, .mobile-pay-btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:disabled, .mobile-pay-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* انیمیشن برای تغییر وضعیت دکمه */
+    @keyframes buttonPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .btn-updating {
+        animation: buttonPulse 0.5s ease-in-out;
+    }
 </style>
 
 <div class="container">
@@ -1369,9 +1392,6 @@
                 </div>
             </div>
 
-            <!-- Stands Section -->
-
-
             <!-- Products Section - بخش جدید اضافه شده -->
             <div class="products-section" id="products-section">
                 <div class="products-header">
@@ -1475,10 +1495,11 @@
                     <span class="total-price" id="total-cost">{{ total_cost|intcomma }} تومان</span>
                 </div>
 
-                <button class="btn btn-primary" id="continue-payment">
-                    <i class="fas fa-credit-card"></i>
-                    پرداخت و فعال‌سازی
-                </button>
+                <!-- تغییر اصلی: دکمه پرداخت داینامیک -->
+                <a href="/panel/" class="btn btn-primary" id="continue-payment">
+                    <i class="fas fa-rocket"></i>
+                    فعالسازی 30 روز رایگان
+                </a>
 
                 <button class="btn btn-outline" id="save-cart">
                     <i class="fas fa-sync-alt"></i>
@@ -1489,7 +1510,7 @@
                 <div class="selected-stands" id="selected-stands-container" style="display: none;">
                     <div class="selected-stands-title">
                         <i class="fas fa-store"></i>
-                        استند‌های انتخاب شده
+                        محصولات انتخاب شده
                     </div>
                     <div id="selected-stands-list">
                         <!-- Selected stands will be added here dynamically -->
@@ -1519,10 +1540,10 @@
         <span class="mobile-total-label">مبلغ قابل پرداخت</span>
         <span class="mobile-total-price" id="mobile-total-cost">{{ total_cost|intcomma }} تومان</span>
     </div>
-    <button class="mobile-pay-btn" id="mobile-pay-btn">
-        <i class="fas fa-credit-card"></i>
-        پرداخت
-    </button>
+    <a href="/panel/" class="mobile-pay-btn" id="mobile-pay-btn">
+        <i class="fas fa-rocket"></i>
+        فعالسازی
+    </a>
 </div>
 {% endif %}
 
@@ -1536,6 +1557,9 @@
     </div>
 </div>
 
+<!-- اضافه کردن CSRF Token در اینجا -->
+{% csrf_token %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 <script>
     // داده‌های محصولات
@@ -1544,7 +1568,7 @@
         {{ product.id }}: {
             id: {{ product.id }},
             name: "{{ product.name|escapejs }}",
-            price: "{{ product.price|intcomma }}",
+            price: {{ product.price }},
             description: `{{ product.description|escapejs }}`,
             features: [
                 {% for feature in product.features.all %}
@@ -1567,10 +1591,334 @@
         {% endfor %}
     };
 
+    // CSRF Token برای درخواست‌های AJAX
+    function getCSRFToken() {
+        const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfInput) {
+            return csrfInput.value;
+        }
+        console.error('CSRF token not found');
+        return '';
+    }
+
+    // افزودن به سبد خرید - نسخه اصلاح شده
+    async function addToCart(productId, quantity = 1) {
+        try {
+            const response = await fetch('{% url "product:add_to_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: quantity
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification(`"${data.product_name}" به سبد خرید اضافه شد`, 'success');
+
+                // نمایش جزئیات سبد خرید بدون رفرش صفحه
+                await loadCartDetails();
+
+                // بروزرسانی وضعیت دکمه پرداخت
+                updatePaymentButton(true);
+
+                // بستن مودال اگر باز است
+                closeProductModal();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showNotification('خطا در افزودن به سبد خرید', 'error');
+        }
+    }
+
+    // بروزرسانی تعداد محصول در سبد
+    async function updateCartQuantity(productId, quantity) {
+        try {
+            const response = await fetch('{% url "product:update_cart_item" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: quantity
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // بروزرسانی صفحه
+                await loadCartDetails();
+                updatePaymentButton(true);
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error updating cart:', error);
+            showNotification('خطا در بروزرسانی سبد خرید', 'error');
+        }
+    }
+
+    // حذف از سبد خرید - نسخه اصلاح شده
+    async function removeFromCart(productId) {
+        try {
+            const response = await fetch('{% url "product:remove_from_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    product_id: productId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('محصول از سبد خرید حذف شد', 'success');
+
+                // بروزرسانی صفحه بدون رفرش
+                await loadCartDetails();
+
+                // اگر سبد خالی شد، وضعیت دکمه را تغییر بده
+                if (data.items_count === 0) {
+                    updatePaymentButton(false);
+                }
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error removing from cart:', error);
+            showNotification('خطا در حذف از سبد خرید', 'error');
+        }
+    }
+
+    // بارگذاری جزئیات سبد خرید
+    async function loadCartDetails() {
+        try {
+            const response = await fetch('{% url "product:get_cart_details" %}');
+            const data = await response.json();
+
+            if (data.success) {
+                displayCartItems(data.cart);
+            }
+        } catch (error) {
+            console.error('Error loading cart details:', error);
+        }
+    }
+
+    // نمایش آیتم‌های سبد خرید - نسخه اصلاح شده
+    function displayCartItems(cartData) {
+        const container = document.getElementById('selected-stands-container');
+        const list = document.getElementById('selected-stands-list');
+
+        if (cartData.items && cartData.items.length > 0) {
+            container.style.display = 'block';
+            list.innerHTML = '';
+
+            cartData.items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'selected-stand-item';
+                itemElement.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div>
+                            <div class="selected-stand-name">${item.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">
+                                ${formatNumber(item.price)} تومان × ${item.quantity}
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="selected-stand-price">${formatNumber(item.total_price)} تومان</span>
+                            <div style="display: flex; gap: 5px;">
+                                <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})"
+                                        class="remove-stand" style="padding: 5px 8px;">-</button>
+                                <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})"
+                                        class="add-stand" style="padding: 5px 8px;">+</button>
+                                <button onclick="removeFromCart(${item.id})"
+                                        class="remove-stand" style="padding: 5px 8px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(itemElement);
+            });
+
+            // بروزرسانی قیمت‌ها در خلاصه
+            updateSummaryWithCart(cartData);
+
+            // بروزرسانی وضعیت دکمه پرداخت
+            updatePaymentButton(true);
+        } else {
+            container.style.display = 'none';
+            // بازنشانی قیمت‌ها
+            resetSummary();
+            // بروزرسانی وضعیت دکمه پرداخت
+            updatePaymentButton(false);
+        }
+    }
+
+    // بروزرسانی وضعیت دکمه پرداخت - نسخه اصلاح شده
+    function updatePaymentButton(hasProducts = null) {
+        const container = document.getElementById('selected-stands-container');
+        const continuePaymentBtn = document.getElementById('continue-payment');
+        const mobilePayBtn = document.getElementById('mobile-pay-btn');
+
+        // اگر مقدار hasProducts مشخص نشده، از وضعیت فعلی استفاده کن
+        if (hasProducts === null) {
+            hasProducts = container.style.display !== 'none' && container.style.display !== '';
+        }
+
+        if (hasProducts) {
+            // اگر محصول وجود دارد: "پرداخت و ساخت منو"
+            if (continuePaymentBtn) {
+                continuePaymentBtn.innerHTML = '<i class="fas fa-credit-card"></i> پرداخت و ساخت منو';
+                continuePaymentBtn.href = "{% url 'product:create_checkout' %}";
+            }
+            if (mobilePayBtn) {
+                mobilePayBtn.innerHTML = '<i class="fas fa-credit-card"></i> پرداخت';
+                mobilePayBtn.href = "{% url 'product:create_checkout' %}";
+            }
+        } else {
+            // اگر محصولی وجود ندارد: "فعالسازی 30 روز رایگان"
+            if (continuePaymentBtn) {
+                continuePaymentBtn.innerHTML = '<i class="fas fa-rocket"></i> فعالسازی 30 روز رایگان';
+                continuePaymentBtn.href = "/panel/";
+            }
+            if (mobilePayBtn) {
+                mobilePayBtn.innerHTML = '<i class="fas fa-rocket"></i> فعالسازی';
+                mobilePayBtn.href = "/panel/";
+            }
+        }
+    }
+
+    // بروزرسانی خلاصه با اطلاعات سبد خرید
+    function updateSummaryWithCart(cartData) {
+        const planCost = {{ plan_cost|default:0 }};
+        const productsCost = cartData.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        const tax = Math.round((planCost + productsCost) * 0.09);
+        const total = planCost + productsCost + tax;
+
+        // بروزرسانی هزینه‌ها
+        document.getElementById('plan-cost').textContent = `${formatNumber(planCost)} تومان`;
+        document.getElementById('stands-cost').textContent = `${formatNumber(productsCost)} تومان`;
+        document.getElementById('tax-cost').textContent = `${formatNumber(tax)} تومان`;
+        document.getElementById('total-cost').textContent = `${formatNumber(total)} تومان`;
+
+        // بروزرسانی نوار پرداخت موبایل
+        document.getElementById('mobile-total-cost').textContent = `${formatNumber(total)} تومان`;
+    }
+
+    // بازنشانی خلاصه به حالت اولیه
+    function resetSummary() {
+        const planCost = {{ plan_cost|default:0 }};
+        const tax = Math.round(planCost * 0.09);
+        const total = planCost + tax;
+
+        document.getElementById('plan-cost').textContent = `${formatNumber(planCost)} تومان`;
+        document.getElementById('stands-cost').textContent = `0 تومان`;
+        document.getElementById('tax-cost').textContent = `${formatNumber(tax)} تومان`;
+        document.getElementById('total-cost').textContent = `${formatNumber(total)} تومان`;
+
+        document.getElementById('mobile-total-cost').textContent = `${formatNumber(total)} تومان`;
+    }
+
+    // نمایش نوتیفیکیشن
+    function showNotification(message, type = 'info') {
+        // ایجاد یک نوتیفیکیشن ساده
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            ${type === 'success' ? 'background: var(--success);' : ''}
+            ${type === 'error' ? 'background: var(--danger);' : ''}
+            ${type === 'info' ? 'background: var(--primary);' : ''}
+        `;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Format number function
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // تغییر در تابع خرید محصول
+    function buyProduct(productId) {
+        const product = productsData[productId];
+        if (!product) return;
+
+        if (confirm(`آیا از خرید محصول "${product.name}" به مبلغ ${formatNumber(product.price)} تومان اطمینان دارید؟`)) {
+            addToCart(productId, 1).then(() => {
+                // بعد از اضافه شدن به سبد، کاربر را به صفحه پرداخت هدایت کن
+                setTimeout(() => {
+                    window.location.href = "{% url 'product:create_checkout' %}";
+                }, 1000);
+            });
+        }
+    }
+
+    // جلوگیری از رفرش صفحه هنگام کلیک روی دکمه‌ها
+    document.addEventListener('DOMContentLoaded', function() {
+        // برای دکمه‌های افزودن به سبد خرید
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const productId = this.closest('.product-card').dataset.productId;
+                addToCart(parseInt(productId));
+            });
+        });
+
+        // برای دکمه‌های داخل مودال
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-cart') || e.target.closest('.btn-cart')) {
+                e.preventDefault();
+                const productId = currentProductId;
+                if (productId) {
+                    addToCart(productId);
+                }
+            }
+
+            if (e.target.classList.contains('btn-buy') || e.target.closest('.btn-buy')) {
+                e.preventDefault();
+                const productId = currentProductId;
+                if (productId) {
+                    buyProduct(productId);
+                }
+            }
+        });
+
+        // بارگذاری اولیه سبد خرید
+        loadCartDetails();
+    });
+
+    // توابع مودال محصول
     let currentProductId = null;
     let currentImageIndex = 0;
 
-    // باز کردن مودال محصول
     function openProductModal(productId) {
         const product = productsData[productId];
         if (!product) return;
@@ -1599,7 +1947,7 @@
             </div>
             <div class="modal-details">
                 <h1 class="modal-product-name">${product.name}</h1>
-                <div class="modal-product-price">${product.price} تومان</div>
+                <div class="modal-product-price">${formatNumber(product.price)} تومان</div>
                 <p class="modal-product-description">${product.description}</p>
 
                 ${product.features.length > 0 ? `
@@ -1636,7 +1984,6 @@
         document.body.style.overflow = 'hidden';
     }
 
-    // بستن مودال
     function closeProductModal() {
         document.getElementById('productModal').style.display = 'none';
         document.body.style.overflow = 'auto';
@@ -1644,59 +1991,17 @@
         currentImageIndex = 0;
     }
 
-    // تغییر عکس اصلی
     function changeMainImage(index) {
         const product = productsData[currentProductId];
         if (!product || !product.gallery[index]) return;
 
         currentImageIndex = index;
-
-        // آپدیت عکس اصلی
         document.getElementById('mainProductImage').src = product.gallery[index].url;
         document.getElementById('mainProductImage').alt = product.gallery[index].alt;
 
-        // آپدیت وضعیت تامبنیل‌ها
         document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
             thumb.classList.toggle('active', i === index);
         });
-    }
-
-    // افزودن به سبد خرید
-    function addToCart(productId) {
-        const product = productsData[productId];
-        if (!product) return;
-
-        // اینجا می‌توانید درخواست AJAX به سرور بفرستید
-        alert(`محصول "${product.name}" به سبد خرید اضافه شد`);
-
-        // برای نمونه، به localStorage اضافه می‌کنیم
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = cart.find(item => item.id === productId);
-
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                id: productId,
-                name: product.name,
-                price: product.price,
-                quantity: 1
-            });
-        }
-
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    // خرید محصول
-    function buyProduct(productId) {
-        const product = productsData[productId];
-        if (!product) return;
-
-        if (confirm(`آیا از خرید محصول "${product.name}" به مبلغ ${product.price} تومان اطمینان دارید؟`)) {
-            // اینجا می‌توانید کاربر را به صفحه پرداخت هدایت کنید
-            alert('در حال انتقال به صفحه پرداخت...');
-            // window.location.href = `/payment/product/${productId}/`;
-        }
     }
 
     // بستن مودال با کلید ESC
@@ -1713,170 +2018,6 @@
             closeProductModal();
         }
     });
-
-    // Lightbox برای گالری
-    lightbox.option({
-        'resizeDuration': 200,
-        'wrapAround': true,
-        'imageFadeDuration': 300,
-        'positionFromTop': 100,
-        'showImageNumberLabel': true,
-        'alwaysShowNavOnTouchDevices': true
-    });
-
-    // Selected stands array
-    let selectedStands = [];
-
-    // Add stand functionality
-    document.querySelectorAll('.add-stand').forEach(button => {
-        button.addEventListener('click', function() {
-            const standCard = this.closest('.stand-card');
-            const standId = standCard.getAttribute('data-stand');
-            const standName = standCard.querySelector('.stand-name').textContent;
-            const standPrice = parseInt(standCard.getAttribute('data-price'));
-
-            // Check if stand is already selected
-            if (selectedStands.find(stand => stand.id === standId)) {
-                alert('این استند قبلاً انتخاب شده است');
-                return;
-            }
-
-            // Add to selected stands
-            selectedStands.push({
-                id: standId,
-                name: standName,
-                price: standPrice
-            });
-
-            // Update UI
-            updateSelectedStands();
-            updateSummary();
-
-            // Change button to remove
-            this.innerHTML = '<i class="fas fa-times"></i> حذف';
-            this.classList.remove('add-stand');
-            this.classList.add('remove-stand');
-            standCard.classList.add('selected');
-
-            // Update click event
-            this.onclick = function() {
-                removeStand(standId);
-            };
-        });
-    });
-
-    // Remove stand function
-    function removeStand(standId) {
-        selectedStands = selectedStands.filter(stand => stand.id !== standId);
-        updateSelectedStands();
-        updateSummary();
-
-        // Update button
-        const standCard = document.querySelector(`[data-stand="${standId}"]`);
-        const button = standCard.querySelector('.remove-stand');
-        button.innerHTML = '<i class="fas fa-plus"></i> افزودن';
-        button.classList.remove('remove-stand');
-        button.classList.add('add-stand');
-        standCard.classList.remove('selected');
-
-        // Restore click event
-        button.onclick = function() {
-            const standCard = this.closest('.stand-card');
-            const standId = standCard.getAttribute('data-stand');
-            const standName = standCard.querySelector('.stand-name').textContent;
-            const standPrice = parseInt(standCard.getAttribute('data-price'));
-
-            selectedStands.push({
-                id: standId,
-                name: standName,
-                price: standPrice
-            });
-
-            updateSelectedStands();
-            updateSummary();
-
-            this.innerHTML = '<i class="fas fa-times"></i> حذف';
-            this.classList.remove('add-stand');
-            this.classList.add('remove-stand');
-            standCard.classList.add('selected');
-
-            this.onclick = function() {
-                removeStand(standId);
-            };
-        };
-    }
-
-    // Update selected stands UI
-    function updateSelectedStands() {
-        const container = document.getElementById('selected-stands-container');
-        const list = document.getElementById('selected-stands-list');
-
-        if (selectedStands.length > 0) {
-            container.style.display = 'block';
-            list.innerHTML = '';
-
-            selectedStands.forEach(stand => {
-                const standItem = document.createElement('div');
-                standItem.className = 'selected-stand-item';
-                standItem.innerHTML = `
-                    <span class="selected-stand-name">${stand.name}</span>
-                    <span class="selected-stand-price">${formatNumber(stand.price)} تومان</span>
-                `;
-                list.appendChild(standItem);
-            });
-        } else {
-            container.style.display = 'none';
-        }
-    }
-
-    // Update summary function
-    function updateSummary() {
-        const planCost = {{ plan_cost }};
-        const standsCost = selectedStands.reduce((total, stand) => total + stand.price, 0);
-        const tax = Math.round((planCost + standsCost) * 0.09);
-        const total = planCost + standsCost + tax;
-
-        // Update costs in summary
-        document.getElementById('plan-cost').textContent = `${formatNumber(planCost)} تومان`;
-        document.getElementById('stands-cost').textContent = `${formatNumber(standsCost)} تومان`;
-        document.getElementById('tax-cost').textContent = `${formatNumber(tax)} تومان`;
-        document.getElementById('total-cost').textContent = `${formatNumber(total)} تومان`;
-
-        // Update mobile payment bar
-        document.getElementById('mobile-total-cost').textContent = `${formatNumber(total)} تومان`;
-    }
-
-    // Format number function
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    // Continue to payment
-    document.getElementById('continue-payment')?.addEventListener('click', function() {
-        alert('در حال انتقال به صفحه پرداخت...');
-    });
-
-    // Save to cart
-    document.getElementById('save-cart')?.addEventListener('click', function() {
-        window.location.href = '{% url "plan:plan_list" %}';
-    });
-
-    // Mobile pay button
-    document.getElementById('mobile-pay-btn')?.addEventListener('click', function() {
-        alert('در حال انتقال به صفحه پرداخت...');
-    });
-
-    // Stands promotion button
-    document.getElementById('stands-promotion')?.addEventListener('click', function() {
-        document.getElementById('products-section').scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-
-    // Initialize summary on page load
-    {% if selected_plan %}
-    updateSummary();
-    {% endif %}
 </script>
 
 {% endblock content %}

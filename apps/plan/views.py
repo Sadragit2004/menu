@@ -101,69 +101,177 @@ def shop_cart(request):
     return render(request, 'plan_app/shop_cart.html', context)
 
 
-@require_POST
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from apps.product.models import ProductOrder, ProductOrderDetail
+
 @login_required
-def update_cart(request):
-    """
-    به‌روزرسانی سبد خرید
-    """
+@require_POST
+def add_product_to_cart(request):
+    """افزودن محصول به سبد خرید"""
     try:
         data = json.loads(request.body)
         product_id = data.get('product_id')
-        quantity = data.get('quantity')
+        quantity = int(data.get('quantity', 1))
 
-        # اینجا منطق به‌روزرسانی سبد خرید در دیتابیس
+        # پیدا کردن آخرین سفارش پرداخت نشده کاربر
+        product_order = ProductOrder.objects.filter(
+            user=request.user,
+            isPaid=False
+        ).order_by('-createdAt').first()
+
+        if not product_order:
+            return JsonResponse({
+                'success': False,
+                'message': 'لطفاً ابتدا یک پلن انتخاب کنید'
+            }, status=400)
+
+        product = get_object_or_404(Product, id=product_id, is_active=True)
+
+        # بررسی آیا محصول قبلاً اضافه شده
+        order_item, created = ProductOrderDetail.objects.get_or_create(
+            product_order=product_order,
+            product=product,
+            defaults={
+                'quantity': quantity,
+                'price': product.price
+            }
+        )
+
+        if not created:
+            order_item.quantity += quantity
+            order_item.save()
+
+        # محاسبه قیمت‌های به روز شده
+        product_order.calculate_prices()
+        product_order.save()
 
         return JsonResponse({
             'success': True,
-            'message': 'سبد خرید با موفقیت به‌روزرسانی شد'
+            'message': 'محصول به سبد خرید اضافه شد',
+            'cart_total': product_order.final_price,
+            'items_count': product_order.items.count()
         })
 
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': 'خطا در به‌روزرسانی سبد خرید'
-        })
+            'message': 'خطا در افزودن محصول'
+        }, status=400)
 
-@require_POST
 @login_required
-def remove_from_cart(request):
-    """
-    حذف محصول از سبد خرید
-    """
+@require_POST
+def update_cart_item(request):
+    """بروزرسانی تعداد محصول در سبد خرید"""
     try:
         data = json.loads(request.body)
-        product_id = data.get('product_id')
+        item_id = data.get('item_id')
+        quantity = int(data.get('quantity', 1))
 
-        # اینجا منطق حذف محصول از سبد خرید در دیتابیس
+        if quantity <= 0:
+            return JsonResponse({
+                'success': False,
+                'message': 'تعداد باید بیشتر از صفر باشد'
+            }, status=400)
+
+        order_item = get_object_or_404(
+            ProductOrderDetail,
+            id=item_id,
+            product_order__user=request.user,
+            product_order__isPaid=False
+        )
+
+        order_item.quantity = quantity
+        order_item.save()
+
+        # محاسبه مجدد قیمت‌ها
+        product_order = order_item.product_order
+        product_order.calculate_prices()
+        product_order.save()
 
         return JsonResponse({
             'success': True,
-            'message': 'محصول با موفقیت از سبد خرید حذف شد'
+            'message': 'تعداد محصول بروزرسانی شد',
+            'item_total': order_item.total_price,
+            'cart_total': product_order.final_price
         })
 
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': 'خطا در حذف محصول از سبد خرید'
-        })
+            'message': 'خطا در بروزرسانی محصول'
+        }, status=400)
 
-@require_POST
 @login_required
-def clear_cart(request):
-    """
-    خالی کردن سبد خرید
-    """
+@require_POST
+def remove_cart_item(request):
+    """حذف محصول از سبد خرید"""
     try:
-        # اینجا منطق خالی کردن سبد خرید در دیتابیس
+        data = json.loads(request.body)
+        item_id = data.get('item_id')
+
+        order_item = get_object_or_404(
+            ProductOrderDetail,
+            id=item_id,
+            product_order__user=request.user,
+            product_order__isPaid=False
+        )
+
+        product_order = order_item.product_order
+        order_item.delete()
+
+        # محاسبه مجدد قیمت‌ها
+        product_order.calculate_prices()
+        product_order.save()
 
         return JsonResponse({
             'success': True,
-            'message': 'سبد خرید با موفقیت خالی شد'
+            'message': 'محصول از سبد خرید حذف شد',
+            'cart_total': product_order.final_price,
+            'items_count': product_order.items.count()
         })
 
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': 'خطا در خالی کردن سبد خرید'
+            'message': 'خطا در حذف محصول'
+        }, status=400)
+
+@login_required
+def get_cart_summary(request):
+    """دریافت خلاصه سبد خرید برای نمایش در لحظه"""
+    product_order = ProductOrder.objects.filter(
+        user=request.user,
+        isPaid=False
+    ).order_by('-createdAt').first()
+
+    if not product_order:
+        return JsonResponse({
+            'cart_total': 0,
+            'items_count': 0,
+            'items': []
         })
+
+    items_data = []
+    for item in product_order.items.all():
+        items_data.append({
+            'id': item.id,
+            'product_name': item.product.name,
+            'quantity': item.quantity,
+            'unit_price': float(item.price),
+            'total_price': float(item.total_price)
+        })
+
+    return JsonResponse({
+        'cart_total': product_order.final_price,
+        'items_count': product_order.items.count(),
+        'items': items_data,
+        'plan_price': product_order.plan.price if product_order.plan.price else 0,
+        'products_total': product_order.total_price - (product_order.plan.price if product_order.plan.price else 0)
+    })
+
+
+
+    

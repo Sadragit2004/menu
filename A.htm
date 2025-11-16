@@ -1,13 +1,11 @@
-
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاکتور نهایی - فروشگاه آنلاین</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         :root {
             --primary: #3a86ff;
             --primary-dark: #2667cc;
@@ -21,986 +19,668 @@
             --border: #e2e8f0;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --radius: 12px;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazir', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #f5f7fb;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--dark);
             line-height: 1.6;
-            overflow-x: hidden;
-            padding-bottom: 80px; /* Space for fixed mobile button */
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .container {
-            max-width: 1200px;
+        .invoice-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow);
-            position: relative;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo i {
-            font-size: 2rem;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 20px;
-        }
-
-        .user-actions a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 500;
-            transition: opacity 0.3s;
-        }
-
-        .user-actions a:hover {
-            opacity: 0.8;
-        }
-
-        /* Main Content */
-        .main-wrapper {
-            display: flex;
-            gap: 2rem;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .main-wrapper {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-
-        /* Content Column */
-        .content-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        /* Summary Column */
-        .summary-column {
-            width: 400px;
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-        }
-
-        @media (max-width: 768px) {
-            .summary-column {
-                width: 100%;
-                position: static;
-                order: 3; /* Move summary to bottom on mobile */
-            }
-        }
-
-        /* Plan Section */
-        .plan-section {
-            background-color: white;
+            background: white;
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .invoice-header {
+            background: var(--gradient);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invoice-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .invoice-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
             position: relative;
         }
 
-        .section-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .invoice-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .invoice-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        @media (max-width: 992px) {
+            .invoice-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* بخش صورتحساب */
+        .invoice-summary {
+            padding: 2.5rem;
+            background: #f8fafc;
+            border-left: 1px solid var(--border);
         }
 
         .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--primary);
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.3rem;
-            font-weight: 600;
         }
 
-        .section-content {
-            padding: 1.5rem;
-        }
-
-        /* Single Plan */
-        .plan-card {
-            border: 2px solid var(--primary);
-            border-radius: var(--radius);
-            padding: 2rem;
-            background-color: rgba(58, 134, 255, 0.05);
-            position: relative;
-        }
-
-        .plan-badge {
-            position: absolute;
-            top: -10px;
-            left: 20px;
-            background: var(--success);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .plan-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .plan-description {
-            color: var(--gray);
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-        .plan-price {
-            display: flex;
-            align-items: baseline;
-            gap: 5px;
-            margin-bottom: 2rem;
-        }
-
-        .price-amount {
-            font-size: 2.5rem;
-            font-weight: 700;
+        .section-title i {
             color: var(--primary);
         }
 
-        .price-period {
-            color: var(--gray);
-            font-size: 1.1rem;
-        }
-
-        .plan-features {
-            list-style: none;
+        /* لیست محصولات */
+        .products-list {
             margin-bottom: 2rem;
         }
 
-        .plan-features li {
-            margin-bottom: 1rem;
+        .product-item {
             display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            font-size: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            background: white;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-right: 4px solid var(--primary);
         }
 
-        .plan-features i {
-            color: var(--success);
-            margin-top: 3px;
-            font-size: 1.1rem;
+        .product-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* Stands Promotion Button */
-        .stands-promotion {
-            background: linear-gradient(135deg, var(--secondary), #a855f7);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 25px;
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image i {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .product-details h4 {
             font-weight: 600;
-            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .product-details p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .product-quantity {
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(131, 56, 236, 0.4);
-            animation: pulse 2s infinite;
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
         }
 
-        .stands-promotion:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(131, 56, 236, 0.6);
+        .product-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 4px 15px rgba(131, 56, 236, 0.4);
-            }
-            50% {
-                box-shadow: 0 4px 20px rgba(131, 56, 236, 0.7);
-            }
-            100% {
-                box-shadow: 0 4px 15px rgba(131, 56, 236, 0.4);
-            }
-        }
-
-        /* Summary Section */
-        .summary-section {
-            background-color: white;
+        /* بخش محاسبات */
+        .calculation-section {
+            background: white;
+            padding: 1.5rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 1.5rem;
-            height: fit-content;
+            margin-bottom: 2rem;
         }
 
-        .summary-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+        .calculation-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
             border-bottom: 1px solid var(--border);
         }
 
-        .selected-plan-summary {
-            background-color: rgba(58, 134, 255, 0.05);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
+        .calculation-row:last-child {
+            border-bottom: none;
         }
 
-        .selected-plan-name {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .selected-plan-price {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .summary-label {
+        .calculation-label {
             color: var(--gray);
         }
 
-        .summary-value {
+        .calculation-value {
             font-weight: 500;
         }
 
-        .summary-total {
+        .discount-section {
+            display: flex;
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .discount-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .apply-discount {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .apply-discount:hover {
+            background: #7229d9;
+        }
+
+        .total-row {
+            background: var(--gradient);
+            color: white;
+            padding: 1.2rem;
+            border-radius: var(--radius);
+            margin-top: 1rem;
             display: flex;
             justify-content: space-between;
-            margin: 1.5rem 0;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
             font-size: 1.3rem;
             font-weight: 700;
         }
 
-        .total-price {
-            color: var(--primary);
+        /* بخش فرم */
+        .invoice-form {
+            padding: 2.5rem;
+            background: white;
         }
 
-        /* Buttons */
-        .btn {
-            padding: 1rem 1.5rem;
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            border: none;
-            font-weight: 500;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 576px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* دکمه‌ها */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             transition: all 0.3s;
-            width: 100%;
-            justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            flex: 1;
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: var(--primary);
             color: white;
-            margin-bottom: 1rem;
+            border: none;
         }
 
         .btn-primary:hover {
-            background-color: var(--primary-dark);
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
         }
 
         .btn-outline {
-            background-color: transparent;
+            background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
         }
 
         .btn-outline:hover {
-            background-color: rgba(58, 134, 255, 0.1);
+            background: rgba(58, 134, 255, 0.1);
         }
 
-        /* Stands Section */
-        .stands-section {
-            background-color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .stands-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            color: white;
-        }
-
-        .stands-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .stands-subtitle {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .stands-content {
-            padding: 1.5rem;
-        }
-
-        .stands-grid {
+        /* اطلاعات فاکتور */
+        .invoice-info {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 2rem;
         }
 
-        @media (max-width: 480px) {
-            .stands-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-        }
-
-        .stand-card {
-            background-color: white;
+        .info-card {
+            background: white;
+            padding: 1.2rem;
             border-radius: var(--radius);
-            overflow: hidden;
             box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 2px solid transparent;
+            border-top: 3px solid var(--primary);
         }
 
-        .stand-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .stand-card.selected {
-            border-color: var(--secondary);
-        }
-
-        .stand-image {
-            width: 100%;
-            height: 140px;
-            overflow: hidden;
-        }
-
-        .stand-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s;
-        }
-
-        .stand-card:hover .stand-image img {
-            transform: scale(1.05);
-        }
-
-        .stand-info {
-            padding: 1rem;
-        }
-
-        .stand-name {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-            height: 40px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .stand-description {
+        .info-title {
+            font-size: 0.9rem;
             color: var(--gray);
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-            height: 40px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
         }
 
-        .stand-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .stand-price {
-            font-weight: 700;
-            color: var(--secondary);
-            font-size: 1rem;
-        }
-
-        .add-stand {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5rem 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 0.8rem;
-        }
-
-        .add-stand:hover {
-            background-color: #7229d9;
-        }
-
-        .remove-stand {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5rem 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 0.8rem;
-        }
-
-        .remove-stand:hover {
-            background-color: #d93a5f;
-        }
-
-        /* Selected Stands */
-        .selected-stands {
-            margin-top: 1.5rem;
-            background-color: rgba(131, 56, 236, 0.05);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .selected-stands-title {
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .selected-stand-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .selected-stand-item:last-child {
-            border-bottom: none;
-        }
-
-        .selected-stand-name {
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .selected-stand-price {
-            color: var(--secondary);
+        .info-value {
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
         }
 
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* استایل برای کد تخفیف اعمال شده */
+        .discount-applied {
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .plan-card, .stand-card {
-            animation: fadeIn 0.5s ease-out;
+        .remove-discount {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
         }
 
-        /* Mobile Optimization */
+        /* انیمیشن‌ها */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* رسپانسیو */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 15px;
-            }
-
-            .section-content, .stands-content {
-                padding: 1rem;
-            }
-
-            .plan-card {
+            .invoice-header {
                 padding: 1.5rem;
             }
 
-            .plan-name {
-                font-size: 1.5rem;
+            .invoice-title {
+                font-size: 1.8rem;
             }
 
-            .price-amount {
-                font-size: 2rem;
+            .invoice-summary, .invoice-form {
+                padding: 1.5rem;
             }
 
-            .user-actions {
-                display: none;
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
 
-            /* Mobile Payment Bar */
-            .mobile-payment-bar {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: white;
-                padding: 15px;
-                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            .product-info {
+                width: 100%;
+            }
+
+            .product-quantity-price {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
-                z-index: 100;
+                width: 100%;
             }
 
-            .mobile-total {
-                display: flex;
+            .action-buttons {
                 flex-direction: column;
-            }
-
-            .mobile-total-label {
-                font-size: 0.9rem;
-                color: var(--gray);
-            }
-
-            .mobile-total-price {
-                font-size: 1.3rem;
-                font-weight: 700;
-                color: var(--primary);
-            }
-
-            .mobile-pay-btn {
-                background: var(--primary);
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 12px 20px;
-                font-weight: 600;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .mobile-payment-bar {
-                display: none !important;
             }
         }
     </style>
-    <div class="container">
-        <div class="main-wrapper">
-            <!-- Content Column -->
-            <div class="content-column">
-                <!-- Plan Section -->
-                <div class="plan-section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            <i class="fas fa-cube"></i>
-                            پلن حرفه‌ای
-                        </h2>
-                        <button class="stands-promotion" id="stands-promotion">
-                            <i class="fas fa-store"></i>
-                            خرید استندهای فروشگاهی
-                            <i class="fas fa-arrow-left"></i>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1 class="invoice-title"><i class="fas fa-receipt"></i> فاکتور نهایی</h1>
+            <p class="invoice-subtitle">لطفاً اطلاعات خود را بررسی و تکمیل کنید</p>
+        </div>
+
+        <div class="invoice-body">
+            <!-- بخش صورتحساب -->
+            <div class="invoice-summary">
+                <h2 class="section-title"><i class="fas fa-calculator"></i> صورتحساب</h2>
+
+                <!-- اطلاعات فاکتور -->
+                <div class="invoice-info">
+                    <div class="info-card">
+                        <div class="info-title">شماره فاکتور</div>
+                        <div class="info-value">INV-2023-0876</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-title">تاریخ صدور</div>
+                        <div class="info-value">۲۵ آبان ۱۴۰۲</div>
+                    </div>
+                </div>
+
+                <!-- لیست محصولات -->
+                <div class="products-list">
+                    <h3 class="section-title" style="font-size: 1.2rem;"><i class="fas fa-shopping-bag"></i> محصولات انتخابی</h3>
+
+                    <div class="product-item">
+                        <div class="product-info">
+                            <div class="product-image">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="product-details">
+                                <h4>گوشی موبایل سامسونگ</h4>
+                                <p>مدل Galaxy S23 Ultra</p>
+                            </div>
+                        </div>
+                        <div class="product-quantity-price">
+                            <div class="product-quantity">
+                                <span>۲ عدد</span>
+                            </div>
+                            <div class="product-price">۲۴,۸۰۰,۰۰۰ تومان</div>
+                        </div>
+                    </div>
+
+                    <div class="product-item">
+                        <div class="product-info">
+                            <div class="product-image">
+                                <i class="fas fa-headphones"></i>
+                            </div>
+                            <div class="product-details">
+                                <h4>هدفون بی‌سیم</h4>
+                                <p>مدل Sony WH-1000XM4</p>
+                            </div>
+                        </div>
+                        <div class="product-quantity-price">
+                            <div class="product-quantity">
+                                <span>۱ عدد</span>
+                            </div>
+                            <div class="product-price">۶,۵۰۰,۰۰۰ تومان</div>
+                        </div>
+                    </div>
+
+                    <div class="product-item">
+                        <div class="product-info">
+                            <div class="product-image">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <div class="product-details">
+                                <h4>لپ‌تاپ ایسوس</h4>
+                                <p>مدل ROG Strix G15</p>
+                            </div>
+                        </div>
+                        <div class="product-quantity-price">
+                            <div class="product-quantity">
+                                <span>۱ عدد</span>
+                            </div>
+                            <div class="product-price">۴۲,۰۰۰,۰۰۰ تومان</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بخش محاسبات -->
+                <div class="calculation-section">
+                    <h3 class="section-title" style="font-size: 1.2rem;"><i class="fas fa-file-invoice-dollar"></i> محاسبه هزینه‌ها</h3>
+
+                    <div class="calculation-row">
+                        <span class="calculation-label">جمع کل محصولات</span>
+                        <span class="calculation-value">۷۳,۳۰۰,۰۰۰ تومان</span>
+                    </div>
+
+                    <div class="calculation-row">
+                        <span class="calculation-label">تخفیف محصولات (۱۰٪)</span>
+                        <span class="calculation-value" style="color: var(--success);">-۷,۳۳۰,۰۰۰ تومان</span>
+                    </div>
+
+                    <div class="calculation-row">
+                        <span class="calculation-label">هزینه ارسال</span>
+                        <span class="calculation-value">۱۵۰,۰۰۰ تومان</span>
+                    </div>
+
+                    <div class="calculation-row">
+                        <span class="calculation-label">مالیات بر ارزش افزوده (۹٪)</span>
+                        <span class="calculation-value">۵,۹۴۰,۰۰۰ تومان</span>
+                    </div>
+
+                    <!-- بخش کد تخفیف -->
+                    <div class="discount-section">
+                        <input type="text" class="discount-input" placeholder="کد تخفیف خود را وارد کنید">
+                        <button class="apply-discount">اعمال تخفیف</button>
+                    </div>
+
+                    <!-- نمایش کد تخفیف اعمال شده -->
+                    <div class="discount-applied" style="display: none;">
+                        <span>کد تخفیف "WELCOME10" اعمال شد</span>
+                        <button class="remove-discount"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <div class="total-row">
+                        <span>مبلغ قابل پرداخت</span>
+                        <span>۷۲,۰۶۰,۰۰۰ تومان</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بخش فرم اطلاعات -->
+            <div class="invoice-form">
+                <h2 class="section-title"><i class="fas fa-user-edit"></i> اطلاعات ارسال</h2>
+
+                <form id="invoiceForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="fullName">نام کامل</label>
+                            <input type="text" id="fullName" class="form-input" placeholder="نام و نام خانوادگی" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="phone">شماره تماس</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="09xxxxxxxxx" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="address">آدرس کامل</label>
+                        <textarea id="address" class="form-textarea" placeholder="آدرس کامل پستی شامل خیابان، کوچه، پلاک، واحد و ..." required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="city">شهر</label>
+                            <input type="text" id="city" class="form-input" placeholder="نام شهر" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="province">استان</label>
+                            <input type="text" id="province" class="form-input" placeholder="نام استان" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="postalCode">کد پستی</label>
+                            <input type="text" id="postalCode" class="form-input" placeholder="۱۰ رقمی" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">ایمیل (اختیاری)</label>
+                            <input type="email" id="email" class="form-input" placeholder="example@domain.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="description">توضیحات اضافی (اختیاری)</label>
+                        <textarea id="description" class="form-textarea" placeholder="توضیحات مربوط به آدرس، زمان تحویل و ..."></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-outline">
+                            <i class="fas fa-arrow-right"></i>
+                            بازگشت به سبد خرید
+                        </button>
+                        <button type="submit" class="btn btn-primary pulse">
+                            <i class="fas fa-credit-card"></i>
+                            پرداخت و تکمیل سفارش
                         </button>
                     </div>
-
-                    <div class="section-content">
-                        <div class="plan-card">
-                            <div class="plan-badge">پیشنهاد ویژه</div>
-                            <div class="plan-name">پلن حرفه‌ای</div>
-                            <div class="plan-description">
-                                کامل‌ترین پلن خدمات دیجی‌استند با امکانات پیشرفته برای کسب‌وکارهای آنلاین.
-                                این پلن شامل تمامی ویژگی‌های مورد نیاز برای راه‌اندازی و مدیریت یک فروشگاه آنلاین حرفه‌ای می‌باشد.
-                            </div>
-
-                            <div class="plan-price">
-                                <span class="price-amount">۴۹۹,۰۰۰</span>
-                                <span class="price-period">تومان / ماهانه</span>
-                            </div>
-
-                            <ul class="plan-features">
-                                <li><i class="fas fa-check"></i> ۵۰ گیگابایت فضای ذخیره‌سازی ابری</li>
-                                <li><i class="fas fa-check"></i> پشتیبانی از ۱۰۰ محصول و خدمات</li>
-                                <li><i class="fas fa-check"></i> ۱۰ قالب حرفه‌ای و قابل تنظیم</li>
-                                <li><i class="fas fa-check"></i> پشتیبانی تلفنی و ایمیلی ۲۴/۷</li>
-                                <li><i class="fas fa-check"></i> گزارش‌های تحلیلی پیشرفته</li>
-                                <li><i class="fas fa-check"></i> سیستم مدیریت موجودی و انبار</li>
-                                <li><i class="fas fa-check"></i> درگاه پرداخت اختصاصی</li>
-                                <li><i class="fas fa-check"></i> سئو و بهینه‌سازی پیشرفته</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stands Section -->
-                <div class="stands-section" id="stands-section">
-                    <div class="stands-header">
-                        <div>
-                            <h2 class="stands-title">
-                                <i class="fas fa-store"></i>
-                                استندهای فروشگاهی
-                            </h2>
-                            <p class="stands-subtitle">قالب‌های آماده برای راه‌اندازی سریع فروشگاه آنلاین</p>
-                        </div>
-                    </div>
-
-                    <div class="stands-content">
-                        <div class="stands-grid">
-                            <!-- Stand 1 -->
-                            <div class="stand-card" data-stand="minimal" data-price="159000">
-                                <div class="stand-image">
-                                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="استند مینیمال">
-                                </div>
-                                <div class="stand-info">
-                                    <h3 class="stand-name">استند مینیمال</h3>
-                                    <p class="stand-description">طراحی ساده و شیک با تمرکز بر روی محصولات</p>
-                                    <div class="stand-footer">
-                                        <span class="stand-price">۱۵۹,۰۰۰ تومان</span>
-                                        <button class="add-stand" data-stand="minimal">
-                                            <i class="fas fa-plus"></i>
-                                            افزودن
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stand 2 -->
-                            <div class="stand-card" data-stand="modern" data-price="299000">
-                                <div class="stand-image">
-                                    <img src="https://images.unsplash.com/photo-1556655852-ef3b2c8d703f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="استند مدرن">
-                                </div>
-                                <div class="stand-info">
-                                    <h3 class="stand-name">استند مدرن</h3>
-                                    <p class="stand-description">طراحی امروزی با امکانات پیشرفته و رابط کاربری حرفه‌ای</p>
-                                    <div class="stand-footer">
-                                        <span class="stand-price">۲۹۹,۰۰۰ تومان</span>
-                                        <button class="add-stand" data-stand="modern">
-                                            <i class="fas fa-plus"></i>
-                                            افزودن
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stand 3 -->
-                            <div class="stand-card" data-stand="premium" data-price="499000">
-                                <div class="stand-image">
-                                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="استند پریمیوم">
-                                </div>
-                                <div class="stand-info">
-                                    <h3 class="stand-name">استند پریمیوم</h3>
-                                    <p class="stand-description">طراحی لوکس و کاملاً سفارشی با قابلیت‌های منحصر به فرد</p>
-                                    <div class="stand-footer">
-                                        <span class="stand-price">۴۹۹,۰۰۰ تومان</span>
-                                        <button class="add-stand" data-stand="premium">
-                                            <i class="fas fa-plus"></i>
-                                            افزودن
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stand 4 -->
-                            <div class="stand-card" data-stand="elegant" data-price="229000">
-                                <div class="stand-image">
-                                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="استند Elegant">
-                                </div>
-                                <div class="stand-info">
-                                    <h3 class="stand-name">استند Elegant</h3>
-                                    <p class="stand-description">طراحی شیک و مدرن با المان‌های ظریف</p>
-                                    <div class="stand-footer">
-                                        <span class="stand-price">۲۲۹,۰۰۰ تومان</span>
-                                        <button class="add-stand" data-stand="elegant">
-                                            <i class="fas fa-plus"></i>
-                                            افزودن
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Summary Column -->
-            <div class="summary-column">
-                <div class="summary-section">
-                    <h2 class="summary-title">خلاصه سفارش</h2>
-
-                    <div class="selected-plan-summary">
-                        <div class="selected-plan-name">
-                            <i class="fas fa-cube"></i>
-                            پلن حرفه‌ای
-                        </div>
-                        <div class="selected-plan-price">۴۹۹,۰۰۰ تومان / ماهانه</div>
-                    </div>
-
-                    <div class="summary-row">
-                        <span class="summary-label">هزینه پلن (ماهانه)</span>
-                        <span class="summary-value" id="plan-cost">۴۹۹,۰۰۰ تومان</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span class="summary-label">هزینه استند‌ها</span>
-                        <span class="summary-value" id="stands-cost">۰ تومان</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span class="summary-label">مالیات بر ارزش افزوده (۹٪)</span>
-                        <span class="summary-value" id="tax-cost">۴۴,۹۱۰ تومان</span>
-                    </div>
-
-                    <div class="summary-total">
-                        <span>مبلغ قابل پرداخت</span>
-                        <span class="total-price" id="total-cost">۵۴۳,۹۱۰ تومان</span>
-                    </div>
-
-                    <button class="btn btn-primary" id="continue-payment">
-                        <i class="fas fa-credit-card"></i>
-                        پرداخت و فعال‌سازی
-                    </button>
-
-                    <button class="btn btn-outline" id="save-cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        ذخیره در سبد خرید
-                    </button>
-
-                    <!-- Selected Stands -->
-                    <div class="selected-stands" id="selected-stands-container" style="display: none;">
-                        <div class="selected-stands-title">
-                            <i class="fas fa-store"></i>
-                            استند‌های انتخاب شده
-                        </div>
-                        <div id="selected-stands-list">
-                            <!-- Selected stands will be added here dynamically -->
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
-    </div>
-
-    <!-- Mobile Payment Bar -->
-    <div class="mobile-payment-bar" id="mobile-payment-bar">
-        <div class="mobile-total">
-            <span class="mobile-total-label">مبلغ قابل پرداخت</span>
-            <span class="mobile-total-price" id="mobile-total-cost">۵۴۳,۹۱۰ تومان</span>
-        </div>
-        <button class="mobile-pay-btn" id="mobile-pay-btn">
-            <i class="fas fa-credit-card"></i>
-            پرداخت
-        </button>
     </div>
 
     <script>
-        // Selected stands array
-        let selectedStands = [];
+        // مدیریت کد تخفیف
+        document.querySelector('.apply-discount').addEventListener('click', function() {
+            const discountInput = document.querySelector('.discount-input');
+            const discountApplied = document.querySelector('.discount-applied');
 
-        // Add stand functionality
-        document.querySelectorAll('.add-stand').forEach(button => {
-            button.addEventListener('click', function() {
-                const standCard = this.closest('.stand-card');
-                const standId = standCard.getAttribute('data-stand');
-                const standName = standCard.querySelector('.stand-name').textContent;
-                const standPrice = parseInt(standCard.getAttribute('data-price'));
+            if (discountInput.value.trim() !== '') {
+                discountApplied.style.display = 'flex';
+                discountInput.value = '';
 
-                // Check if stand is already selected
-                if (selectedStands.find(stand => stand.id === standId)) {
-                    alert('این استند قبلاً انتخاب شده است');
-                    return;
-                }
-
-                // Add to selected stands
-                selectedStands.push({
-                    id: standId,
-                    name: standName,
-                    price: standPrice
-                });
-
-                // Update UI
-                updateSelectedStands();
-                updateSummary();
-
-                // Change button to remove
-                this.innerHTML = '<i class="fas fa-times"></i> حذف';
-                this.classList.remove('add-stand');
-                this.classList.add('remove-stand');
-                standCard.classList.add('selected');
-
-                // Update click event
-                this.onclick = function() {
-                    removeStand(standId);
-                };
-            });
-        });
-
-        // Remove stand function
-        function removeStand(standId) {
-            selectedStands = selectedStands.filter(stand => stand.id !== standId);
-            updateSelectedStands();
-            updateSummary();
-
-            // Update button
-            const standCard = document.querySelector(`[data-stand="${standId}"]`);
-            const button = standCard.querySelector('.remove-stand');
-            button.innerHTML = '<i class="fas fa-plus"></i> افزودن';
-            button.classList.remove('remove-stand');
-            button.classList.add('add-stand');
-            standCard.classList.remove('selected');
-
-            // Restore click event
-            button.onclick = function() {
-                const standCard = this.closest('.stand-card');
-                const standId = standCard.getAttribute('data-stand');
-                const standName = standCard.querySelector('.stand-name').textContent;
-                const standPrice = parseInt(standCard.getAttribute('data-price'));
-
-                selectedStands.push({
-                    id: standId,
-                    name: standName,
-                    price: standPrice
-                });
-
-                updateSelectedStands();
-                updateSummary();
-
-                this.innerHTML = '<i class="fas fa-times"></i> حذف';
-                this.classList.remove('add-stand');
-                this.classList.add('remove-stand');
-                standCard.classList.add('selected');
-
-                this.onclick = function() {
-                    removeStand(standId);
-                };
-            };
-        }
-
-        // Update selected stands UI
-        function updateSelectedStands() {
-            const container = document.getElementById('selected-stands-container');
-            const list = document.getElementById('selected-stands-list');
-
-            if (selectedStands.length > 0) {
-                container.style.display = 'block';
-                list.innerHTML = '';
-
-                selectedStands.forEach(stand => {
-                    const standItem = document.createElement('div');
-                    standItem.className = 'selected-stand-item';
-                    standItem.innerHTML = `
-                        <span class="selected-stand-name">${stand.name}</span>
-                        <span class="selected-stand-price">${formatNumber(stand.price)} تومان</span>
-                    `;
-                    list.appendChild(standItem);
-                });
+                // نمایش پیام موفقیت
+                alert('کد تخفیف با موفقیت اعمال شد!');
             } else {
-                container.style.display = 'none';
+                alert('لطفاً کد تخفیف را وارد کنید.');
             }
-        }
-
-        // Update summary function
-        function updateSummary() {
-            const planCost = 499000;
-            const standsCost = selectedStands.reduce((total, stand) => total + stand.price, 0);
-            const tax = Math.round((planCost + standsCost) * 0.09);
-            const total = planCost + standsCost + tax;
-
-            // Update costs in summary
-            document.getElementById('plan-cost').textContent = `${formatNumber(planCost)} تومان`;
-            document.getElementById('stands-cost').textContent = `${formatNumber(standsCost)} تومان`;
-            document.getElementById('tax-cost').textContent = `${formatNumber(tax)} تومان`;
-            document.getElementById('total-cost').textContent = `${formatNumber(total)} تومان`;
-
-            // Update mobile payment bar
-            document.getElementById('mobile-total-cost').textContent = `${formatNumber(total)} تومان`;
-        }
-
-        // Format number function
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        // Continue to payment
-        document.getElementById('continue-payment').addEventListener('click', function() {
-            // In a real application, you would redirect to payment page
-            alert('در حال انتقال به صفحه پرداخت...');
-            // window.location.href = '/payment';
         });
 
-        // Save to cart
-        document.getElementById('save-cart').addEventListener('click', function() {
-            alert('سفارش شما به سبد خرید اضافه شد');
+        // حذف کد تخفیف
+        document.querySelector('.remove-discount').addEventListener('click', function() {
+            document.querySelector('.discount-applied').style.display = 'none';
         });
 
-        // Mobile pay button
-        document.getElementById('mobile-pay-btn').addEventListener('click', function() {
-            alert('در حال انتقال به صفحه پرداخت...');
+        // مدیریت ارسال فرم
+        document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // در اینجا می‌توانید اطلاعات فرم را پردازش کنید
+            alert('سفارش شما با موفقیت ثبت شد! در حال انتقال به درگاه پرداخت...');
+
+            // انتقال به درگاه پرداخت
+            // window.location.href = 'payment-gateway-url';
         });
 
-        // Stands promotion button
-        document.getElementById('stands-promotion').addEventListener('click', function() {
-            document.getElementById('stands-section').scrollIntoView({
-                behavior: 'smooth'
+        // انیمیشن برای آیتم‌ها
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.1)';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'var(--shadow)';
             });
         });
-
-        // Initialize summary on page load
-        updateSummary();
     </script>
+</body>
+</html>
