@@ -10,8 +10,6 @@ from django.utils import timezone
 from .models import Plan, PlanOrder
 from apps.product.models import Product
 
-@login_required
-
 
 
 def plan_list(request):
@@ -54,6 +52,9 @@ def purchase_plan(request, plan_slug):
 
 
 # apps/plan/views.py
+# apps/plan/views.py
+from apps.menu.models.menufreemodels.models import Restaurant
+
 @login_required
 def shop_cart(request):
     """
@@ -62,10 +63,10 @@ def shop_cart(request):
     # دریافت آخرین پلن پرداخت نشده کاربر
     latest_plan_order = PlanOrder.objects.filter(
         user=request.user,
-        isPaid=False  # فقط پلن‌های پرداخت نشده
-    ).select_related('plan').order_by('-createdAt').first()
+        isPaid=False
+    ).select_related('plan', 'restaurant').order_by('-createdAt').first()
 
-    # دریافت محصولات فعال به همراه گالری و ویژگی‌ها
+    # دریافت محصولات فعال
     products = Product.objects.filter(
         is_active=True
     ).prefetch_related(
@@ -73,15 +74,23 @@ def shop_cart(request):
         'gallery'
     ).order_by('-publish_date')
 
+    # دریافت رستوران‌های کاربر
+    user_restaurants = Restaurant.objects.filter(owner=request.user)
+
     selected_plan = None
     plan_cost = 0
     stands_cost = 0
     tax_cost = 0
     total_cost = 0
+    needs_restaurant_selection = False
 
     if latest_plan_order:
         selected_plan = latest_plan_order.plan
         plan_cost = selected_plan.price if selected_plan.price else 0
+
+        # بررسی آیا رستوران انتخاب شده است یا نه
+        if not latest_plan_order.restaurant and user_restaurants.exists():
+            needs_restaurant_selection = True
 
         # محاسبات مالی
         stands_cost = 0
@@ -95,10 +104,58 @@ def shop_cart(request):
         'tax_cost': tax_cost,
         'total_cost': total_cost,
         'latest_plan_order': latest_plan_order,
-        'products': products,  # اضافه کردن محصولات به context
+        'products': products,
+        'user_restaurants': user_restaurants,
+        'has_restaurants': user_restaurants.exists(),
+        'needs_restaurant_selection': needs_restaurant_selection,  # فیلد جدید
     }
 
     return render(request, 'plan_app/shop_cart.html', context)
+
+
+
+@login_required
+def assign_restaurant_to_plan(request):
+    """
+    انتساب رستوران به پلن انتخابی
+    """
+    if request.method == 'POST':
+        restaurant_id = request.POST.get('restaurant_id')
+
+        # دریافت آخرین پلن پرداخت نشده کاربر
+        latest_plan_order = PlanOrder.objects.filter(
+            user=request.user,
+            isPaid=False
+        ).first()
+
+        if not latest_plan_order:
+            return JsonResponse({
+                'success': False,
+                'message': 'پلن انتخابی یافت نشد'
+            })
+
+        try:
+            restaurant = Restaurant.objects.get(id=restaurant_id, owner=request.user)
+            latest_plan_order.restaurant = restaurant
+            latest_plan_order.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': f'رستوران "{restaurant.title}" با موفقیت انتخاب شد',
+                'restaurant_name': restaurant.title
+            })
+
+        except Restaurant.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'رستوران یافت نشد'
+            })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'درخواست نامعتبر'
+    })
+
 
 
 # views.py
@@ -273,5 +330,3 @@ def get_cart_summary(request):
     })
 
 
-
-    

@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
 <style>
-    /* تمام استایل‌های قبلی شما دقیقاً همینجا قرار می‌گیرد */
     :root {
         --primary: #3a86ff;
         --primary-dark: #2667cc;
@@ -37,7 +36,6 @@
         padding: 0 20px;
     }
 
-    /* Header Styles */
     .header-content {
         display: flex;
         justify-content: space-between;
@@ -75,7 +73,6 @@
         opacity: 0.8;
     }
 
-    /* Main Content */
     .main-wrapper {
         display: flex;
         gap: 2rem;
@@ -90,7 +87,6 @@
         }
     }
 
-    /* Content Column */
     .content-column {
         flex: 1;
         display: flex;
@@ -98,7 +94,6 @@
         gap: 2rem;
     }
 
-    /* Summary Column */
     .summary-column {
         width: 400px;
         position: sticky;
@@ -114,7 +109,6 @@
         }
     }
 
-    /* Plan Section */
     .plan-section {
         background-color: white;
         border-radius: var(--radius);
@@ -145,7 +139,6 @@
         padding: 1.5rem;
     }
 
-    /* Single Plan */
     .plan-card {
         border: 2px solid var(--primary);
         border-radius: var(--radius);
@@ -198,7 +191,6 @@
         font-size: 1.1rem;
     }
 
-    /* Plan Features Grid - Desktop */
     .plan-features {
         list-style: none;
         margin-bottom: 2rem;
@@ -231,7 +223,6 @@
         flex-shrink: 0;
     }
 
-    /* Mobile Features - Horizontal Scroll */
     .mobile-features-container {
         display: none;
         margin-bottom: 2rem;
@@ -302,7 +293,6 @@
         line-height: 1.5;
     }
 
-    /* Responsive adjustments for plan features */
     @media (max-width: 1024px) {
         .plan-features {
             grid-template-columns: repeat(2, 1fr);
@@ -331,7 +321,6 @@
         }
     }
 
-    /* Stands Promotion Button */
     .stands-promotion {
         background: linear-gradient(135deg, var(--secondary), #a855f7);
         color: white;
@@ -365,7 +354,6 @@
         }
     }
 
-    /* Summary Section */
     .summary-section {
         background-color: white;
         border-radius: var(--radius);
@@ -431,7 +419,6 @@
         color: var(--primary);
     }
 
-    /* Buttons */
     .btn {
         padding: 1rem 1.5rem;
         border-radius: 8px;
@@ -468,7 +455,6 @@
         background-color: rgba(58, 134, 255, 0.1);
     }
 
-    /* Stands Section */
     .stands-section {
         background-color: white;
         border-radius: var(--radius);
@@ -623,7 +609,6 @@
         background-color: #d93a5f;
     }
 
-    /* Selected Stands */
     .selected-stands {
         margin-top: 1.5rem;
         background-color: rgba(131, 56, 236, 0.05);
@@ -662,7 +647,6 @@
         font-size: 0.9rem;
     }
 
-    /* Animation */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -672,7 +656,6 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Mobile Optimization */
     @media (max-width: 768px) {
         .container {
             padding: 0 15px;
@@ -709,7 +692,6 @@
             justify-content: center;
         }
 
-        /* Mobile Payment Bar */
         .mobile-payment-bar {
             position: fixed;
             bottom: 0;
@@ -761,9 +743,6 @@
         }
     }
 
-    /* اضافه کردن استایل‌های جدید برای محصولات و مودال */
-
-    /* Products Section */
     .products-section {
         background-color: white;
         border-radius: var(--radius);
@@ -938,7 +917,6 @@
         background: #7229d9;
     }
 
-    /* Modal Styles */
     .modal {
         display: none;
         position: fixed;
@@ -1166,7 +1144,6 @@
         background: #7229d9;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         .products-grid {
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -1205,7 +1182,6 @@
         }
     }
 
-    /* استایل‌های جدید برای دکمه‌ها */
     .btn, .mobile-pay-btn {
         transition: all 0.3s ease;
     }
@@ -1215,7 +1191,6 @@
         cursor: not-allowed;
     }
 
-    /* انیمیشن برای تغییر وضعیت دکمه */
     @keyframes buttonPulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -1224,6 +1199,31 @@
 
     .btn-updating {
         animation: buttonPulse 0.5s ease-in-out;
+    }
+
+    /* استایل‌های مودال رستوران */
+    .restaurant-card {
+        transition: all 0.3s ease;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        cursor: pointer;
+        background: white;
+        margin-bottom: 1rem;
+    }
+
+    .restaurant-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .restaurant-card.selected {
+        border-color: var(--primary);
+        background: rgba(58, 134, 255, 0.05);
+    }
+
+    .selection-indicator {
+        transition: opacity 0.3s ease;
     }
 </style>
 
@@ -1392,7 +1392,7 @@
                 </div>
             </div>
 
-            <!-- Products Section - بخش جدید اضافه شده -->
+            <!-- Products Section -->
             <div class="products-section" id="products-section">
                 <div class="products-header">
                     <h2 class="products-title">
@@ -1495,7 +1495,6 @@
                     <span class="total-price" id="total-cost">{{ total_cost|intcomma }} تومان</span>
                 </div>
 
-                <!-- تغییر اصلی: دکمه پرداخت داینامیک -->
                 <a href="/panel/" class="btn btn-primary" id="continue-payment">
                     <i class="fas fa-rocket"></i>
                     فعالسازی 30 روز رایگان
@@ -1557,7 +1556,94 @@
     </div>
 </div>
 
-<!-- اضافه کردن CSRF Token در اینجا -->
+<!-- Restaurant Selection Modal -->
+<div id="restaurantModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <span class="close-modal" onclick="closeRestaurantModal()">&times;</span>
+        <div class="modal-body">
+            <div style="padding: 2rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <i class="fas fa-utensils" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h2 style="color: var(--dark); margin-bottom: 0.5rem;">انتخاب رستوران</h2>
+                    <p style="color: var(--gray);">لطفاً رستورانی که می‌خواهید پلن برای آن فعال شود را انتخاب کنید</p>
+                </div>
+
+                <div class="restaurant-search" style="margin-bottom: 2rem;">
+                    <div style="position: relative;">
+                        <input type="text" id="restaurantSearch" placeholder="جستجوی بین رستوران‌ها..."
+                               style="width: 100%; padding: 12px 45px 12px 15px; border: 2px solid var(--border); border-radius: 50px; font-size: 1rem;">
+                        <i class="fas fa-search" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                    </div>
+                </div>
+
+                <div class="restaurants-grid" style="max-height: 400px; overflow-y: auto; padding: 1rem;">
+                    {% for restaurant in user_restaurants %}
+                    <div class="restaurant-card" data-restaurant-id="{{ restaurant.id }}"
+                         onclick="selectRestaurant(this, {{ restaurant.id }})">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            {% if restaurant.logo %}
+                            <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title }}"
+                                 style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 60px; height: 60px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-utensils" style="color: white; font-size: 1.5rem;"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h3 style="font-weight: 700; margin-bottom: 0.25rem; color: var(--dark);">{{ restaurant.title }}</h3>
+                                {% if restaurant.english_name %}
+                                <p style="color: var(--gray); font-size: 0.9rem; margin: 0;">{{ restaurant.english_name }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                {% if restaurant.phone %}
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <i class="fas fa-phone" style="color: var(--gray); font-size: 0.9rem;"></i>
+                                    <span style="font-size: 0.9rem; color: var(--gray);">{{ restaurant.phone }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if restaurant.address %}
+                                <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                                    <i class="fas fa-map-marker-alt" style="color: var(--gray); font-size: 0.9rem; margin-top: 0.2rem;"></i>
+                                    <span style="font-size: 0.8rem; color: var(--gray); line-height: 1.4;">{{ restaurant.address|truncatewords:10 }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="selection-indicator" style="opacity: 0;">
+                                <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-utensils" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--gray);">هیچ رستورانی یافت نشد</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center;">
+                    <button id="confirmRestaurantBtn" onclick="confirmRestaurantSelection()"
+                            class="btn btn-primary" style="width: auto; padding: 12px 30px;" disabled>
+                        <i class="fas fa-check"></i>
+                        تأیید انتخاب رستوران
+                    </button>
+                    <button onclick="closeRestaurantModal()"
+                            class="btn btn-outline" style="width: auto; padding: 12px 25px; margin-right: 10px;">
+                        <i class="fas fa-times"></i>
+                        انصراف
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% csrf_token %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
@@ -1601,7 +1687,141 @@
         return '';
     }
 
-    // افزودن به سبد خرید - نسخه اصلاح شده
+    // نمایش مودال رستوران بعد از لود صفحه - فقط در شرایط خاص
+    document.addEventListener('DOMContentLoaded', function() {
+        // بررسی اینکه آیا کاربر رستوران دارد و آیا قبلاً انتخاب کرده یا نه
+        const userHasRestaurants = {{ user_restaurants|length }} > 0;
+        const hasSelectedRestaurant = {{ has_selected_restaurant|yesno:"true,false" }};
+
+        // فقط اگر کاربر رستوران دارد و هنوز انتخاب نکرده، مودال نمایش داده شود
+        if (userHasRestaurants && !hasSelectedRestaurant) {
+            setTimeout(() => {
+                openRestaurantModal();
+            }, 1000);
+        }
+
+        // بارگذاری اولیه سبد خرید
+        loadCartDetails();
+    });
+
+    // توابع مودال رستوران
+    let selectedRestaurantId = null;
+
+    function openRestaurantModal() {
+        const modal = document.getElementById('restaurantModal');
+        if (modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeRestaurantModal() {
+        const modal = document.getElementById('restaurantModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            selectedRestaurantId = null;
+        }
+    }
+
+    function selectRestaurant(element, restaurantId) {
+        // حذف انتخاب قبلی
+        document.querySelectorAll('.restaurant-card').forEach(card => {
+            card.classList.remove('selected');
+            card.querySelector('.selection-indicator').style.opacity = '0';
+        });
+
+        // انتخاب جدید
+        element.classList.add('selected');
+        element.querySelector('.selection-indicator').style.opacity = '1';
+        selectedRestaurantId = restaurantId;
+
+        // فعال کردن دکمه تأیید
+        document.getElementById('confirmRestaurantBtn').disabled = false;
+    }
+
+    async function confirmRestaurantSelection() {
+        if (!selectedRestaurantId) {
+            showNotification('لطفاً یک رستوران انتخاب کنید', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('{% url "plan:assign_restaurant" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: `restaurant_id=${selectedRestaurantId}`
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification(data.message, 'success');
+                closeRestaurantModal();
+
+                // ذخیره در localStorage که کاربر انتخاب کرده
+                localStorage.setItem('restaurantSelected', 'true');
+                localStorage.setItem('selectedRestaurantId', selectedRestaurantId);
+
+                // بروزرسانی صفحه
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error assigning restaurant:', error);
+            showNotification('خطا در انتخاب رستوران', 'error');
+        }
+    }
+
+    // جستجوی رستوران‌ها
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('restaurantSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const restaurantCards = document.querySelectorAll('.restaurant-card');
+
+                restaurantCards.forEach(card => {
+                    const restaurantName = card.querySelector('h3').textContent.toLowerCase();
+                    const englishName = card.querySelector('p') ? card.querySelector('p').textContent.toLowerCase() : '';
+
+                    if (restaurantName.includes(searchTerm) || englishName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+
+    // بستن مودال با کلید ESC و کلیک خارج
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeRestaurantModal();
+            closeProductModal();
+        }
+    });
+
+    window.addEventListener('click', function(event) {
+        const restaurantModal = document.getElementById('restaurantModal');
+        const productModal = document.getElementById('productModal');
+
+        if (event.target === restaurantModal) {
+            closeRestaurantModal();
+        }
+        if (event.target === productModal) {
+            closeProductModal();
+        }
+    });
+
+    // توابع مربوط به محصولات و سبد خرید
     async function addToCart(productId, quantity = 1) {
         try {
             const response = await fetch('{% url "product:add_to_cart" %}', {
@@ -1620,14 +1840,8 @@
 
             if (data.success) {
                 showNotification(`"${data.product_name}" به سبد خرید اضافه شد`, 'success');
-
-                // نمایش جزئیات سبد خرید بدون رفرش صفحه
                 await loadCartDetails();
-
-                // بروزرسانی وضعیت دکمه پرداخت
                 updatePaymentButton(true);
-
-                // بستن مودال اگر باز است
                 closeProductModal();
             } else {
                 showNotification(data.message, 'error');
@@ -1638,7 +1852,6 @@
         }
     }
 
-    // بروزرسانی تعداد محصول در سبد
     async function updateCartQuantity(productId, quantity) {
         try {
             const response = await fetch('{% url "product:update_cart_item" %}', {
@@ -1656,7 +1869,6 @@
             const data = await response.json();
 
             if (data.success) {
-                // بروزرسانی صفحه
                 await loadCartDetails();
                 updatePaymentButton(true);
             } else {
@@ -1668,7 +1880,6 @@
         }
     }
 
-    // حذف از سبد خرید - نسخه اصلاح شده
     async function removeFromCart(productId) {
         try {
             const response = await fetch('{% url "product:remove_from_cart" %}', {
@@ -1686,11 +1897,7 @@
 
             if (data.success) {
                 showNotification('محصول از سبد خرید حذف شد', 'success');
-
-                // بروزرسانی صفحه بدون رفرش
                 await loadCartDetails();
-
-                // اگر سبد خالی شد، وضعیت دکمه را تغییر بده
                 if (data.items_count === 0) {
                     updatePaymentButton(false);
                 }
@@ -1703,7 +1910,6 @@
         }
     }
 
-    // بارگذاری جزئیات سبد خرید
     async function loadCartDetails() {
         try {
             const response = await fetch('{% url "product:get_cart_details" %}');
@@ -1717,7 +1923,6 @@
         }
     }
 
-    // نمایش آیتم‌های سبد خرید - نسخه اصلاح شده
     function displayCartItems(cartData) {
         const container = document.getElementById('selected-stands-container');
         const list = document.getElementById('selected-stands-list');
@@ -1755,33 +1960,25 @@
                 list.appendChild(itemElement);
             });
 
-            // بروزرسانی قیمت‌ها در خلاصه
             updateSummaryWithCart(cartData);
-
-            // بروزرسانی وضعیت دکمه پرداخت
             updatePaymentButton(true);
         } else {
             container.style.display = 'none';
-            // بازنشانی قیمت‌ها
             resetSummary();
-            // بروزرسانی وضعیت دکمه پرداخت
             updatePaymentButton(false);
         }
     }
 
-    // بروزرسانی وضعیت دکمه پرداخت - نسخه اصلاح شده
     function updatePaymentButton(hasProducts = null) {
         const container = document.getElementById('selected-stands-container');
         const continuePaymentBtn = document.getElementById('continue-payment');
         const mobilePayBtn = document.getElementById('mobile-pay-btn');
 
-        // اگر مقدار hasProducts مشخص نشده، از وضعیت فعلی استفاده کن
         if (hasProducts === null) {
             hasProducts = container.style.display !== 'none' && container.style.display !== '';
         }
 
         if (hasProducts) {
-            // اگر محصول وجود دارد: "پرداخت و ساخت منو"
             if (continuePaymentBtn) {
                 continuePaymentBtn.innerHTML = '<i class="fas fa-credit-card"></i> پرداخت و ساخت منو';
                 continuePaymentBtn.href = "{% url 'product:create_checkout' %}";
@@ -1791,7 +1988,6 @@
                 mobilePayBtn.href = "{% url 'product:create_checkout' %}";
             }
         } else {
-            // اگر محصولی وجود ندارد: "فعالسازی 30 روز رایگان"
             if (continuePaymentBtn) {
                 continuePaymentBtn.innerHTML = '<i class="fas fa-rocket"></i> فعالسازی 30 روز رایگان';
                 continuePaymentBtn.href = "/panel/";
@@ -1803,24 +1999,19 @@
         }
     }
 
-    // بروزرسانی خلاصه با اطلاعات سبد خرید
     function updateSummaryWithCart(cartData) {
         const planCost = {{ plan_cost|default:0 }};
         const productsCost = cartData.items.reduce((total, item) => total + (item.price * item.quantity), 0);
         const tax = Math.round((planCost + productsCost) * 0.09);
         const total = planCost + productsCost + tax;
 
-        // بروزرسانی هزینه‌ها
         document.getElementById('plan-cost').textContent = `${formatNumber(planCost)} تومان`;
         document.getElementById('stands-cost').textContent = `${formatNumber(productsCost)} تومان`;
         document.getElementById('tax-cost').textContent = `${formatNumber(tax)} تومان`;
         document.getElementById('total-cost').textContent = `${formatNumber(total)} تومان`;
-
-        // بروزرسانی نوار پرداخت موبایل
         document.getElementById('mobile-total-cost').textContent = `${formatNumber(total)} تومان`;
     }
 
-    // بازنشانی خلاصه به حالت اولیه
     function resetSummary() {
         const planCost = {{ plan_cost|default:0 }};
         const tax = Math.round(planCost * 0.09);
@@ -1830,13 +2021,10 @@
         document.getElementById('stands-cost').textContent = `0 تومان`;
         document.getElementById('tax-cost').textContent = `${formatNumber(tax)} تومان`;
         document.getElementById('total-cost').textContent = `${formatNumber(total)} تومان`;
-
         document.getElementById('mobile-total-cost').textContent = `${formatNumber(total)} تومان`;
     }
 
-    // نمایش نوتیفیکیشن
     function showNotification(message, type = 'info') {
-        // ایجاد یک نوتیفیکیشن ساده
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed;
@@ -1861,59 +2049,22 @@
         }, 3000);
     }
 
-    // Format number function
     function formatNumber(num) {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-    // تغییر در تابع خرید محصول
     function buyProduct(productId) {
         const product = productsData[productId];
         if (!product) return;
 
         if (confirm(`آیا از خرید محصول "${product.name}" به مبلغ ${formatNumber(product.price)} تومان اطمینان دارید؟`)) {
             addToCart(productId, 1).then(() => {
-                // بعد از اضافه شدن به سبد، کاربر را به صفحه پرداخت هدایت کن
                 setTimeout(() => {
                     window.location.href = "{% url 'product:create_checkout' %}";
                 }, 1000);
             });
         }
     }
-
-    // جلوگیری از رفرش صفحه هنگام کلیک روی دکمه‌ها
-    document.addEventListener('DOMContentLoaded', function() {
-        // برای دکمه‌های افزودن به سبد خرید
-        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const productId = this.closest('.product-card').dataset.productId;
-                addToCart(parseInt(productId));
-            });
-        });
-
-        // برای دکمه‌های داخل مودال
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('btn-cart') || e.target.closest('.btn-cart')) {
-                e.preventDefault();
-                const productId = currentProductId;
-                if (productId) {
-                    addToCart(productId);
-                }
-            }
-
-            if (e.target.classList.contains('btn-buy') || e.target.closest('.btn-buy')) {
-                e.preventDefault();
-                const productId = currentProductId;
-                if (productId) {
-                    buyProduct(productId);
-                }
-            }
-        });
-
-        // بارگذاری اولیه سبد خرید
-        loadCartDetails();
-    });
 
     // توابع مودال محصول
     let currentProductId = null;
@@ -2004,19 +2155,33 @@
         });
     }
 
-    // بستن مودال با کلید ESC
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeProductModal();
-        }
-    });
+    // جلوگیری از رفرش صفحه هنگام کلیک روی دکمه‌ها
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const productId = this.closest('.product-card').dataset.productId;
+                addToCart(parseInt(productId));
+            });
+        });
 
-    // بستن مودال با کلیک خارج از آن
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('productModal');
-        if (event.target === modal) {
-            closeProductModal();
-        }
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-cart') || e.target.closest('.btn-cart')) {
+                e.preventDefault();
+                const productId = currentProductId;
+                if (productId) {
+                    addToCart(productId);
+                }
+            }
+
+            if (e.target.classList.contains('btn-buy') || e.target.closest('.btn-buy')) {
+                e.preventDefault();
+                const productId = currentProductId;
+                if (productId) {
+                    buyProduct(productId);
+                }
+            }
+        });
     });
 </script>
 

@@ -12,6 +12,7 @@ class PlanFeatureInline(admin.TabularInline):
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
     list_display = [
+
         'name',
         'display_price',
         'expiryDays',
@@ -27,6 +28,7 @@ class PlanAdmin(admin.ModelAdmin):
     fieldsets = (
         ('اطلاعات اصلی', {
             'fields': (
+
                 'name',
                 'slug',
                 'description',
@@ -102,7 +104,7 @@ from .models import Plan, PlanFeature, PlanOrder
 
 @admin.register(PlanOrder)
 class PlanOrderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'plan', 'finalPrice', 'isPaid', 'createdAt', 'expiryDate', 'is_expired']
+    list_display = ['restaurant','user', 'plan', 'finalPrice', 'isPaid', 'createdAt', 'expiryDate', 'is_expired']
     list_filter = ['isPaid', 'createdAt', 'plan']
     search_fields = ['user__username', 'user__email', 'plan__name']
     readonly_fields = ['createdAt']

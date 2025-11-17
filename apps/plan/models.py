@@ -4,8 +4,11 @@ from django.urls import reverse
 import utils
 from apps.user.models import CustomUser
 from django.utils import timezone
+from apps.menu.models.menufreemodels.models import Restaurant
 
 class Plan(models.Model):
+
+
     name = models.CharField(max_length=255, verbose_name="نام پلن")
     slug = models.SlugField(max_length=255, unique=True, verbose_name="اسلاگ")
     description = models.TextField(blank=True, null=True, verbose_name="توضیحات پلن")
@@ -66,6 +69,8 @@ class PlanFeature(models.Model):
 
 
 class PlanOrder(models.Model):
+    restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE,verbose_name='رستوران',blank=True,null=True)
+
     plan = models.ForeignKey(
         Plan,
         on_delete=models.CASCADE,

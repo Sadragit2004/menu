@@ -583,7 +583,7 @@ function processPayment(orderType, orderId) {
 // لغو سفارش
 function cancelOrder(orderType, orderId) {
     if (confirm('آیا از لغو این سفارش مطمئن هستید؟')) {
-        fetch(`/panel/orders/${orderType}/${orderId}/cancel/`, {
+        fetch(`/panel/${orderType}/${orderId}/cancel/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

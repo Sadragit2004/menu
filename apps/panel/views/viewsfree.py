@@ -45,7 +45,7 @@ def panel(request):
 
     # دریافت تمام سفارشات کاربر از انواع مختلف
     user_orders = Ordermenu.objects.filter(restaurant__owner=request.user).select_related('restaurant').prefetch_related('images')
-    plan_orders = PlanOrder.objects.filter(user=request.user).select_related('plan')
+    plan_orders = PlanOrder.objects.filter(user=request.user,isActive=True).select_related('plan')
     product_orders = ProductOrder.objects.filter(user=request.user).select_related('plan').prefetch_related('items')
 
     # محاسبه آمار کلی
