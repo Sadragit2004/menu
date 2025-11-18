@@ -1,0 +1,183 @@
+<!-- table/templates/table/dashboard.html -->
+{% extends 'table_template.html' %}
+
+{% block title %}داشبورد - سیستم رزرو{% endblock %}
+{% block page_title %}داشبورد مدیریت رزرو{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- کارت آمار کلی -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-blue-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">کل میزها</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ total_tables }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-chair text-blue-600 text-xl"></i>
+            </div>
+        </div>
+        <p class="text-green-600 text-sm mt-2">
+            <i class="fas fa-arrow-up"></i>
+            {{ active_tables }} میز فعال
+        </p>
+    </div>
+
+    <!-- رزروهای امروز -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-green-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">رزروهای امروز</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ today_stats.total }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-calendar-day text-green-600 text-xl"></i>
+            </div>
+        </div>
+        <div class="flex justify-between text-xs mt-2">
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded">{{ today_stats.confirmed }} تأیید شده</span>
+            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">{{ today_stats.seated }} حاضر</span>
+        </div>
+    </div>
+
+    <!-- رزروهای فردا -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-yellow-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">رزروهای فردا</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ tomorrow_reservations }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-calendar-alt text-yellow-600 text-xl"></i>
+            </div>
+        </div>
+        <p class="text-gray-500 text-sm mt-2">آماده‌سازی برای فردا</p>
+    </div>
+
+    <!-- رزروهای آینده -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-purple-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">رزروهای هفته آینده</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ upcoming_reservations }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-calendar-week text-purple-600 text-xl"></i>
+            </div>
+        </div>
+        <p class="text-gray-500 text-sm mt-2">۷ روز آینده</p>
+    </div>
+</div>
+
+<!-- بخش‌های سریع دسترسی -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- اقدامات سریع -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">اقدامات سریع</h3>
+        <div class="grid grid-cols-2 gap-4">
+            <a href="{% url 'table:table_create' %}" class="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 text-center transition duration-200">
+                <i class="fas fa-plus-circle text-blue-600 text-2xl mb-2"></i>
+                <p class="text-blue-800 font-semibold">ایجاد میز جدید</p>
+            </a>
+
+            <a href="{% url 'table:reservation_list' %}?date={{ today|date:'Y-m-d' }}" class="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-4 text-center transition duration-200">
+                <i class="fas fa-list text-green-600 text-2xl mb-2"></i>
+                <p class="text-green-800 font-semibold">مشاهده رزروهای امروز</p>
+            </a>
+
+            <a href="{% url 'table:working_time_management' %}" class="bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-lg p-4 text-center transition duration-200">
+                <i class="fas fa-clock text-yellow-600 text-2xl mb-2"></i>
+                <p class="text-yellow-800 font-semibold">تنظیم ساعات کاری</p>
+            </a>
+
+            <a href="{% url 'table:reservation_settings' %}" class="bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-4 text-center transition duration-200">
+                <i class="fas fa-cog text-purple-600 text-2xl mb-2"></i>
+                <p class="text-purple-800 font-semibold">تنظیمات سیستم</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- تقویم امروز -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">رزروهای امروز</h3>
+            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{{ today|date:"Y/m/d" }}</span>
+        </div>
+
+        {% if today_stats.total > 0 %}
+        <div class="space-y-3">
+            {% for reservation in today_reservations|slice:":5" %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                <div class="flex items-center">
+                    <!-- اصلاح شده: استفاده از if برای تعیین رنگ -->
+                    <div class="w-10 h-10
+                        {% if reservation.reservation_status == 'confirmed' %}bg-blue-100
+                        {% elif reservation.reservation_status == 'seated' %}bg-green-100
+                        {% else %}bg-gray-100{% endif %}
+                        rounded-full flex items-center justify-center mr-3">
+
+                        <i class="fas
+                            {% if reservation.reservation_status == 'confirmed' %}fa-check text-blue-600
+                            {% elif reservation.reservation_status == 'seated' %}fa-user text-green-600
+                            {% else %}fa-clock text-gray-600{% endif %}">
+                        </i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">{{ reservation.customer_full_name }}</p>
+                        <p class="text-sm text-gray-600">میز {{ reservation.table.table_number }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold">{{ reservation.start_time|time:"H:i" }} - {{ reservation.end_time|time:"H:i" }}</p>
+                    <span class="text-xs px-2 py-1 rounded-full
+                        {% if reservation.reservation_status == 'confirmed' %}bg-blue-100 text-blue-800
+                        {% elif reservation.reservation_status == 'seated' %}bg-green-100 text-green-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ reservation.get_reservation_status_display }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if today_stats.total > 5 %}
+        <div class="mt-4 text-center">
+            <a href="{% url 'table:reservation_list' %}?date={{ today|date:'Y-m-d' }}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                مشاهده همه {{ today_stats.total }} رزرو
+                <i class="fas fa-chevron-left mr-1"></i>
+            </a>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-8">
+            <i class="fas fa-calendar-times text-gray-300 text-4xl mb-3"></i>
+            <p class="text-gray-500">هیچ رزروی برای امروز وجود ندارد</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- نمودار وضعیت رزروهای امروز -->
+<div class="mt-6 bg-white rounded-lg shadow-md p-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">وضعیت رزروهای امروز</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-600">{{ today_stats.confirmed }}</div>
+            <div class="text-blue-800">تأیید شده</div>
+        </div>
+        <div class="text-center p-4 bg-green-50 rounded-lg">
+            <div class="text-2xl font-bold text-green-600">{{ today_stats.seated }}</div>
+            <div class="text-green-800">حاضر در رستوران</div>
+        </div>
+        <div class="text-center p-4 bg-gray-50 rounded-lg">
+            <div class="text-2xl font-bold text-gray-600">{{ today_stats.completed }}</div>
+            <div class="text-gray-800">تکمیل شده</div>
+        </div>
+        <div class="text-center p-4 bg-red-50 rounded-lg">
+            <div class="text-2xl font-bold text-red-600">{{ today_stats.cancelled }}</div>
+            <div class="text-red-800">لغو شده</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

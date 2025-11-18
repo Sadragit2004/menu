@@ -144,7 +144,7 @@ class Restaurant(BaseModel):
     isSeo = models.BooleanField(default=False,verbose_name='ایا سئو شده',blank=True,null=True)
 
     expireDate = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ انقضا")
-
+   
     def save(self, *args, **kwargs):
         # ✅ جلوگیری از خطای رشته خالی در TimeField
         if self.openingTime == "":

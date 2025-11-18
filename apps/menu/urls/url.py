@@ -1,6 +1,8 @@
 from django.urls import path
 from ..views.freemenuviews.views import digital_menu, get_foods_by_category, search_foods, change_language
 
+
+
 app_name = 'menu'
 urlpatterns = [
     path('<slug:restaurant_slug>/', digital_menu, name='digital_menu'),

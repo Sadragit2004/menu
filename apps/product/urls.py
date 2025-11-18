@@ -12,6 +12,6 @@ urlpatterns = [
 
     # صفحات checkout با ID سفارش
     path('checkout/<int:order_id>/', views.checkout_view, name='checkout'),
-    path('checkout/<int:order_id>/apply-discount/', views.apply_discount, name='apply_discount'),
+    path('checkout/<int:order_id>/apply-discount/', views.apply_discount, name='apply_diQscount'),
     path('checkout/<int:order_id>/complete-order/', views.complete_order, name='complete_order'),
 ]

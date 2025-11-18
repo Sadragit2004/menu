@@ -1,0 +1,126 @@
+<!-- table/templates/table/table_list.html -->
+{% extends 'table_template.html' %}
+
+{% block title %}مدیریت میزها - سیستم رزرو{% endblock %}
+{% block page_title %}مدیریت میزها{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+    <div>
+        <h2 class="text-xl font-semibold text-gray-800">لیست میزهای رستوران</h2>
+        <p class="text-gray-600">مدیریت و مشاهده وضعیت میزها</p>
+    </div>
+    <a href="{% url 'table:table_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
+        <i class="fas fa-plus ml-2"></i>
+        ایجاد میز جدید
+    </a>
+</div>
+
+<!-- فیلترها -->
+<div class="bg-white rounded-lg shadow-md p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-4 items-center">
+        <select name="table_type" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">همه نوع میز</option>
+            {% for type_value, type_name in table_types %}
+            <option value="{{ type_value }}" {% if request.GET.table_type == type_value %}selected{% endif %}>{{ type_name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="is_active" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">همه وضعیت‌ها</option>
+            <option value="true" {% if request.GET.is_active == 'true' %}selected{% endif %}>فعال</option>
+            <option value="false" {% if request.GET.is_active == 'false' %}selected{% endif %}>غیرفعال</option>
+        </select>
+
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-filter ml-2"></i>
+            فیلتر
+        </button>
+
+        <a href="{% url 'table:table_list' %}" class="text-gray-600 hover:text-gray-800 px-3 py-2 border border-gray-300 rounded-lg">
+            حذف فیلتر
+        </a>
+    </form>
+</div>
+
+<!-- لیست میزها -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for table in tables %}
+    <div class="bg-white rounded-lg shadow-md border hover:shadow-lg transition duration-200">
+        <div class="p-4 border-b">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">میز {{ table.table_number }}</h3>
+                    <p class="text-gray-600 text-sm">{{ table.get_table_type_display }}</p>
+                </div>
+                <span class="px-2 py-1 rounded-full text-xs font-semibold {% if table.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                    {{ table.is_active|yesno:"فعال,غیرفعال" }}
+                </span>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                <span>ظرفیت: {{ table.capacity }} نفر</span>
+                <span>حداقل زمان: {{ table.min_reservation_duration }} دقیقه</span>
+            </div>
+
+            {% if table.description %}
+            <p class="text-gray-700 text-sm mb-4">{{ table.description|truncatewords:10 }}</p>
+            {% endif %}
+
+            <!-- وضعیت فعلی -->
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-sm font-semibold mb-1">وضعیت فعلی:</p>
+                {% with status=table.current_status %}
+                <div class="flex items-center justify-between">
+                    <span class="text-sm {% if status.status == 'available' %}text-green-600{% elif status.status == 'reserved' %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {% if status.status == 'available' %}
+                            <i class="fas fa-check-circle ml-1"></i> آزاد
+                        {% elif status.status == 'reserved' %}
+                            <i class="fas fa-clock ml-1"></i> رزرو شده
+                        {% else %}
+                            <i class="fas fa-users ml-1"></i> اشغال شده
+                        {% endif %}
+                    </span>
+                    {% if status.status != 'available' %}
+                    <span class="text-xs text-gray-500">{{ status.customer_name }}</span>
+                    {% endif %}
+                </div>
+                {% endwith %}
+            </div>
+
+            <!-- دکمه‌های اقدام -->
+            <div class="flex justify-between">
+                <a href="{% url 'table:table_detail' table.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center">
+                    <i class="fas fa-eye ml-1"></i>
+                    مشاهده
+                </a>
+                <div class="flex space-x-2 space-x-reverse">
+                    <a href="{% url 'table:table_edit' table.id %}" class="text-yellow-600 hover:text-yellow-800 text-sm font-semibold flex items-center">
+                        <i class="fas fa-edit ml-1"></i>
+                        ویرایش
+                    </a>
+                    {% if table.is_active %}
+                    <a href="{% url 'table:table_delete' table.id %}" class="text-red-600 hover:text-red-800 text-sm font-semibold flex items-center" onclick="return confirm('آیا از حذف این میز مطمئنید؟')">
+                        <i class="fas fa-trash ml-1"></i>
+                        حذف
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+        <i class="fas fa-chair text-gray-300 text-5xl mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-500 mb-2">هیچ میزی یافت نشد</h3>
+        <p class="text-gray-400 mb-4">می‌توانید اولین میز را ایجاد کنید</p>
+        <a href="{% url 'table:table_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-flex items-center">
+            <i class="fas fa-plus ml-2"></i>
+            ایجاد میز جدید
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

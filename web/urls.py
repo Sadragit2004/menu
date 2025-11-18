@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    
     path('admin/', admin.site.urls),
     path('',include('apps.main.urls'),name='main'),
     path('accounts/',include('apps.user.urls',namespace='account')),
@@ -16,6 +17,7 @@ urlpatterns = [
     path('order/',include('apps.order.urls',namespace='order')),
     path('plan/',include('apps.plan.urls',namespace='plan')),
     path('peyment/',include('apps.peyment.urls',namespace='peyment')),
-    path('product/',include('apps.product.urls',namespace='product'))
+    path('product/',include('apps.product.urls',namespace='product')),
+    path('table/',include('apps.table.urls',namespace='table')),
 
 ]+static(sett.MEDIA_URL,document_root = sett.MEDIA_ROOT)

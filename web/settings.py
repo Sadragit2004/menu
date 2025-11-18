@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'apps.main.apps.MainConfig',
     'django_celery_results',
     'django_celery_beat',
+    'apps.table.apps.TableConfig'
+
 ]
 
 

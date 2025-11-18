@@ -1,0 +1,141 @@
+<!-- table/templates/table/reservation_settings.html -->
+{% extends 'table_template.html' %}
+
+{% block title %}تنظیمات رزرو - سیستم رزرو{% endblock %}
+{% block page_title %}تنظیمات سیستم رزرو{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">تنظیمات پیشرفته رزرو</h3>
+            <p class="text-gray-600">تنظیمات و قوانین سیستم رزرو رستوران</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- تنظیمات زمانی -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-semibold text-gray-800 border-b pb-2">تنظیمات زمانی</h4>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">حداکثر روزهای پیش‌رو برای رزرو</label>
+                        <input type="number" name="max_advance_days" value="{{ settings.max_advance_days }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               min="1" max="365">
+                        <p class="text-xs text-gray-500 mt-1">حداکثر تعداد روزهای پیش‌رویی که می‌توان رزرو کرد</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">حداقل ساعت‌های پیش‌رو برای رزرو</label>
+                        <input type="number" name="min_advance_hours" value="{{ settings.min_advance_hours }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               min="1" max="24">
+                        <p class="text-xs text-gray-500 mt-1">حداقل ساعاتی که باید قبل از رزرو رعایت شود</p>
+                    </div>
+                </div>
+
+                <!-- تنظیمات ظرفیت -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-semibold text-gray-800 border-b pb-2">تنظیمات ظرفیت</h4>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">حداکثر تعداد مهمان در هر رزرو</label>
+                        <input type="number" name="max_guests_per_reservation" value="{{ settings.max_guests_per_reservation }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               min="1" max="100">
+                        <p class="text-xs text-gray-500 mt-1">حداکثر تعداد نفرات مجاز در یک رزرو</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">مدت زمان پیش‌فرض رزرو (دقیقه)</label>
+                        <input type="number" name="default_reservation_duration" value="{{ settings.default_reservation_duration }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               min="30" max="480" step="30">
+                        <p class="text-xs text-gray-500 mt-1">مدت زمان پیش‌فرض برای هر رزرو</p>
+                    </div>
+                </div>
+
+                <!-- تنظیمات فنی -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-semibold text-gray-800 border-b pb-2">تنظیمات فنی</h4>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">مدت زمان هر اسلات (دقیقه)</label>
+                        <input type="number" name="slot_duration" value="{{ settings.slot_duration }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               min="15" max="60" step="15">
+                        <p class="text-xs text-gray-500 mt-1">مدت زمان هر بازه زمانی برای نمایش</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">حداکثر رزرو همزمان در هر اسلات</label>
+                        <input type="number" name="max_reservations_per_time_slot" value="{{ settings.max_reservations_per_time_slot }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               min="1" max="10">
+                        <p class="text-xs text-gray-500 mt-1">حداکثر تعداد رزرو همزمان در یک بازه زمانی</p>
+                    </div>
+                </div>
+
+                <!-- تنظیمات تأیید -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-semibold text-gray-800 border-b pb-2">تنظیمات تأیید</h4>
+
+                    <div class="flex items-center">
+                        <input type="checkbox" name="auto_confirm_reservations" id="auto_confirm_reservations"
+                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                               {% if settings.auto_confirm_reservations %}checked{% endif %}>
+                        <label for="auto_confirm_reservations" class="mr-2 text-sm text-gray-700">تأیید خودکار رزروها</label>
+                    </div>
+                    <p class="text-xs text-gray-500">رزروها به صورت خودکار تأیید می‌شوند و نیاز به تأیید دستی ندارند</p>
+
+                    <div class="flex items-center">
+                        <input type="checkbox" name="require_phone_verification" id="require_phone_verification"
+                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                               {% if settings.require_phone_verification %}checked{% endif %}>
+                        <label for="require_phone_verification" class="mr-2 text-sm text-gray-700">نیاز به تأیید شماره تماس</label>
+                    </div>
+                    <p class="text-xs text-gray-500">مشتریان باید شماره تماس خود را با کد تأیید کنند</p>
+
+                    <div class="flex items-center">
+                        <input type="checkbox" name="allow_same_day_reservations" id="allow_same_day_reservations"
+                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                               {% if settings.allow_same_day_reservations %}checked{% endif %}>
+                        <label for="allow_same_day_reservations" class="mr-2 text-sm text-gray-700">اجازه رزرو در همان روز</label>
+                    </div>
+                    <p class="text-xs text-gray-500">امکان رزرو برای تاریخ امروز فراهم باشد</p>
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="mt-8 flex justify-end space-x-3 space-x-reverse">
+                <a href="{% url 'table:dashboard' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-200">
+                    انصراف
+                </a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center transition duration-200">
+                    <i class="fas fa-save ml-2"></i>
+                    ذخیره تنظیمات
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- تنظیمات فعلی -->
+    <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+        <h4 class="text-green-800 font-semibold mb-3">
+            <i class="fas fa-check-circle ml-1"></i>
+            تنظیمات فعلی سیستم
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div><span class="font-semibold">حداکثر پیش‌روی رزرو:</span> {{ settings.max_advance_days }} روز</div>
+            <div><span class="font-semibold">حداقل زمان پیش‌روی:</span> {{ settings.min_advance_hours }} ساعت</div>
+            <div><span class="font-semibold">حداکثر مهمان:</span> {{ settings.max_guests_per_reservation }} نفر</div>
+            <div><span class="font-semibold">مدت زمان پیش‌فرض:</span> {{ settings.default_reservation_duration }} دقیقه</div>
+            <div><span class="font-semibold">تأیید خودکار:</span> {{ settings.auto_confirm_reservations|yesno:"فعال,غیرفعال" }}</div>
+            <div><span class="font-semibold">تأیید تلفن:</span> {{ settings.require_phone_verification|yesno:"ضروری,غیرضروری" }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
