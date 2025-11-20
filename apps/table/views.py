@@ -5,61 +5,70 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db.models import Q, Count
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 import json
-from .models import Restaurant, Table, Reservation, WorkingTime, WorkingDay, ReservationSettings
+import jdatetime
+from .models import (
+    Restaurant, Table, Reservation, WorkingTime, WorkingDay,
+    ReservationSettings, Customer
+)
 
 # ----------------------------
 # Decorators
 # ----------------------------
 
 def restaurant_owner_required(view_func):
-    """
-    دکوراتور برای بررسی مالک رستوران
-    """
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
-
-        # اگر کاربر مالک رستوران نباشد
-        if not request.user.restaurants.exists():
+        if not hasattr(request.user, 'restaurants') or not request.user.restaurants.exists():
             messages.error(request, "شما دسترسی به این بخش را ندارید")
             return redirect('dashboard')
-
         return view_func(request, *args, **kwargs)
     return wrapper
 
 def get_restaurant_for_user(user):
-    """
-    دریافت رستوران کاربر
-    """
+    """دریافت رستوران کاربر جاری"""
     return user.restaurants.first()
 
+def get_current_jalali_date():
+    """دریافت تاریخ شمسی جاری"""
+    return jdatetime.date.today()
+
+def validate_jalali_date(jalali_date_str):
+    """اعتبارسنجی تاریخ شمسی"""
+    try:
+        year, month, day = map(int, jalali_date_str.split('/'))
+        jalali_date = jdatetime.JalaliDate(year, month, day)
+        return jalali_date, True
+    except (ValueError, AttributeError):
+        return None, False
+
 # ----------------------------
-# Dashboard & Overview
+# Dashboard
 # ----------------------------
 
 @login_required
 @restaurant_owner_required
 def reservation_dashboard(request):
-    """
-    داشبورد مدیریت رزروها
-    """
+    """داشبورد مدیریت رزرو"""
     restaurant = get_restaurant_for_user(request.user)
-    today = date.today()
+    today_jalali = get_current_jalali_date()
+    today_jalali_str = today_jalali.strftime('%Y/%m/%d')
 
     # آمار کلی
     total_tables = Table.objects.filter(restaurant=restaurant).count()
     active_tables = Table.objects.filter(restaurant=restaurant, is_active=True).count()
 
-    # رزروهای امروز
+    # آمار رزروهای امروز
     today_reservations = Reservation.objects.filter(
         table__restaurant=restaurant,
-        reservation_date=today
+        reservation_jalali_date=today_jalali_str
     )
 
     today_stats = {
         'total': today_reservations.count(),
+        'pending': today_reservations.filter(reservation_status='pending').count(),
         'confirmed': today_reservations.filter(reservation_status='confirmed').count(),
         'seated': today_reservations.filter(reservation_status='seated').count(),
         'completed': today_reservations.filter(reservation_status='completed').count(),
@@ -67,20 +76,19 @@ def reservation_dashboard(request):
     }
 
     # رزروهای فردا
-    tomorrow = today + timedelta(days=1)
+    tomorrow_jalali = today_jalali + jdatetime.timedelta(days=1)
+    tomorrow_jalali_str = tomorrow_jalali.strftime('%Y/%m/%d')
+
     tomorrow_reservations = Reservation.objects.filter(
         table__restaurant=restaurant,
-        reservation_date=tomorrow,
+        reservation_jalali_date=tomorrow_jalali_str,
         reservation_status__in=['confirmed', 'pending']
     ).count()
 
-    # رزروهای آینده (7 روز آینده)
-    next_week = today + timedelta(days=7)
-    upcoming_reservations = Reservation.objects.filter(
-        table__restaurant=restaurant,
-        reservation_date__range=[today, next_week],
-        reservation_status__in=['confirmed', 'pending']
-    ).count()
+    # آخرین رزروها
+    recent_reservations = Reservation.objects.filter(
+        table__restaurant=restaurant
+    ).select_related('table', 'customer').order_by('-created_jalali')[:5]
 
     context = {
         'restaurant': restaurant,
@@ -88,10 +96,9 @@ def reservation_dashboard(request):
         'active_tables': active_tables,
         'today_stats': today_stats,
         'tomorrow_reservations': tomorrow_reservations,
-        'upcoming_reservations': upcoming_reservations,
-        'today': today,
+        'today_jalali': today_jalali_str,
+        'recent_reservations': recent_reservations,
     }
-
     return render(request, 'table_app/dashboard.html', context)
 
 # ----------------------------
@@ -101,9 +108,7 @@ def reservation_dashboard(request):
 @login_required
 @restaurant_owner_required
 def table_list(request):
-    """
-    لیست میزهای رستوران
-    """
+    """لیست میزها"""
     restaurant = get_restaurant_for_user(request.user)
     tables = Table.objects.filter(restaurant=restaurant).order_by('table_number')
 
@@ -116,48 +121,48 @@ def table_list(request):
     if is_active is not None:
         tables = tables.filter(is_active=(is_active == 'true'))
 
+    # آمار برای هر میز
+    for table in tables:
+        table.reservation_count = table.reservations.count()
+        table.active_reservations = table.reservations.filter(
+            reservation_status__in=['pending', 'confirmed', 'seated']
+        ).count()
+
     context = {
         'tables': tables,
         'table_types': Table.TABLE_TYPES,
     }
-
     return render(request, 'table_app/table_list.html', context)
 
 @login_required
 @restaurant_owner_required
 def table_detail(request, table_id):
-    """
-    جزئیات میز و رزروهای آن
-    """
+    """جزئیات میز"""
     restaurant = get_restaurant_for_user(request.user)
     table = get_object_or_404(Table, id=table_id, restaurant=restaurant)
 
-    # رزروهای این میز
-    reservations = Reservation.objects.filter(table=table).order_by('-reservation_date', '-start_time')
+    # دریافت رزروها با فیلتر تاریخ شمسی
+    reservations = table.reservations.all().order_by('-reservation_jalali_date', '-start_time')
 
-    # فیلتر بر اساس تاریخ
     date_filter = request.GET.get('date')
     if date_filter:
-        try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            reservations = reservations.filter(reservation_date=filter_date)
-        except ValueError:
-            messages.error(request, "تاریخ نامعتبر است")
+        reservations = reservations.filter(reservation_jalali_date=date_filter)
+
+    status_filter = request.GET.get('status')
+    if status_filter:
+        reservations = reservations.filter(reservation_status=status_filter)
 
     context = {
         'table': table,
         'reservations': reservations,
-        'today': date.today(),
+        'status_choices': Reservation.RESERVATION_STATUS,
     }
-
     return render(request, 'table_app/table_detail.html', context)
 
 @login_required
 @restaurant_owner_required
 def table_create(request):
-    """
-    ایجاد میز جدید
-    """
+    """ایجاد میز جدید"""
     restaurant = get_restaurant_for_user(request.user)
 
     if request.method == 'POST':
@@ -166,31 +171,33 @@ def table_create(request):
                 restaurant=restaurant,
                 table_number=request.POST.get('table_number'),
                 table_type=request.POST.get('table_type'),
-                capacity=request.POST.get('capacity'),
-                description=request.POST.get('description'),
-                min_reservation_duration=request.POST.get('min_reservation_duration', 60),
+                capacity=int(request.POST.get('capacity', 2)),
+                description=request.POST.get('description', ''),
+                min_reservation_duration=int(request.POST.get('min_reservation_duration', 60)),
+                max_reservation_duration=int(request.POST.get('max_reservation_duration', 240)),
+                has_view=request.POST.get('has_view') == 'on',
+                is_smoking=request.POST.get('is_smoking') == 'on',
+                is_vip=request.POST.get('is_vip') == 'on',
+                floor=int(request.POST.get('floor', 1)),
+                section=request.POST.get('section', ''),
                 is_active=request.POST.get('is_active') == 'on'
             )
             table.save()
-
             messages.success(request, "میز با موفقیت ایجاد شد")
             return redirect('table:table_list')
-
         except Exception as e:
             messages.error(request, f"خطا در ایجاد میز: {str(e)}")
 
     context = {
         'table_types': Table.TABLE_TYPES,
+        'action': 'create'
     }
-
     return render(request, 'table_app/table_form.html', context)
 
 @login_required
 @restaurant_owner_required
 def table_edit(request, table_id):
-    """
-    ویرایش میز
-    """
+    """ویرایش میز"""
     restaurant = get_restaurant_for_user(request.user)
     table = get_object_or_404(Table, id=table_id, restaurant=restaurant)
 
@@ -198,35 +205,38 @@ def table_edit(request, table_id):
         try:
             table.table_number = request.POST.get('table_number')
             table.table_type = request.POST.get('table_type')
-            table.capacity = request.POST.get('capacity')
-            table.description = request.POST.get('description')
-            table.min_reservation_duration = request.POST.get('min_reservation_duration', 60)
+            table.capacity = int(request.POST.get('capacity', 2))
+            table.description = request.POST.get('description', '')
+            table.min_reservation_duration = int(request.POST.get('min_reservation_duration', 60))
+            table.max_reservation_duration = int(request.POST.get('max_reservation_duration', 240))
+            table.has_view = request.POST.get('has_view') == 'on'
+            table.is_smoking = request.POST.get('is_smoking') == 'on'
+            table.is_vip = request.POST.get('is_vip') == 'on'
+            table.floor = int(request.POST.get('floor', 1))
+            table.section = request.POST.get('section', '')
             table.is_active = request.POST.get('is_active') == 'on'
             table.save()
 
             messages.success(request, "میز با موفقیت ویرایش شد")
             return redirect('table:table_list')
-
         except Exception as e:
             messages.error(request, f"خطا در ویرایش میز: {str(e)}")
 
     context = {
         'table': table,
         'table_types': Table.TABLE_TYPES,
+        'action': 'edit'
     }
-
     return render(request, 'table_app/table_form.html', context)
 
 @login_required
 @restaurant_owner_required
 def table_delete(request, table_id):
-    """
-    حذف میز
-    """
+    """حذف میز"""
     restaurant = get_restaurant_for_user(request.user)
     table = get_object_or_404(Table, id=table_id, restaurant=restaurant)
 
-    # بررسی وجود رزروهای فعال
+    # بررسی رزروهای فعال
     active_reservations = table.reservations.filter(
         reservation_status__in=['confirmed', 'pending', 'seated']
     ).exists()
@@ -240,17 +250,73 @@ def table_delete(request, table_id):
     return redirect('table:table_list')
 
 # ----------------------------
+# Customer Management
+# ----------------------------
+
+@login_required
+@restaurant_owner_required
+def customer_list(request):
+    """لیست مشتریان"""
+    restaurant = get_restaurant_for_user(request.user)
+
+    # دریافت مشتریانی که در این رستوران رزرو داشته‌اند
+    customer_ids = Reservation.objects.filter(
+        table__restaurant=restaurant
+    ).values_list('customer_id', flat=True).distinct()
+
+    customers = Customer.objects.filter(id__in=customer_ids).order_by('-created_jalali')
+
+    # فیلترها
+    is_vip = request.GET.get('is_vip')
+    search = request.GET.get('search')
+
+    if is_vip is not None:
+        customers = customers.filter(is_vip=(is_vip == 'true'))
+
+    if search:
+        customers = customers.filter(
+            Q(full_name__icontains=search) |
+            Q(phone_number__icontains=search) |
+            Q(national_code__icontains=search)
+        )
+
+    context = {
+        'customers': customers,
+    }
+    return render(request, 'table_app/customer_list.html', context)
+
+@login_required
+@restaurant_owner_required
+def customer_detail(request, customer_id):
+    """جزئیات مشتری"""
+    restaurant = get_restaurant_for_user(request.user)
+
+    customer = get_object_or_404(Customer, id=customer_id)
+
+    # دریافت رزروهای مشتری در این رستوران
+    reservations = Reservation.objects.filter(
+        customer=customer,
+        table__restaurant=restaurant
+    ).order_by('-reservation_jalali_date', '-start_time')
+
+    context = {
+        'customer': customer,
+        'reservations': reservations,
+    }
+    return render(request, 'table_app/customer_detail.html', context)
+
+# ----------------------------
 # Reservation Management
 # ----------------------------
 
 @login_required
 @restaurant_owner_required
 def reservation_list(request):
-    """
-    لیست تمام رزروها با فیلترهای پیشرفته
-    """
+    """لیست رزروها"""
     restaurant = get_restaurant_for_user(request.user)
-    reservations = Reservation.objects.filter(table__restaurant=restaurant).order_by('-reservation_date', '-start_time')
+    reservations = Reservation.objects.filter(
+        table__restaurant=restaurant
+    ).select_related('table', 'customer').order_by('-reservation_jalali_date', '-start_time')
 
     # فیلترها
     date_filter = request.GET.get('date')
@@ -259,11 +325,7 @@ def reservation_list(request):
     customer_name_filter = request.GET.get('customer_name')
 
     if date_filter:
-        try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            reservations = reservations.filter(reservation_date=filter_date)
-        except ValueError:
-            messages.error(request, "تاریخ نامعتبر است")
+        reservations = reservations.filter(reservation_jalali_date=date_filter)
 
     if status_filter:
         reservations = reservations.filter(reservation_status=status_filter)
@@ -272,23 +334,20 @@ def reservation_list(request):
         reservations = reservations.filter(table__table_number__icontains=table_filter)
 
     if customer_name_filter:
-        reservations = reservations.filter(customer_full_name__icontains=customer_name_filter)
+        reservations = reservations.filter(customer__full_name__icontains=customer_name_filter)
 
     context = {
         'reservations': reservations,
         'status_choices': Reservation.RESERVATION_STATUS,
         'tables': Table.objects.filter(restaurant=restaurant),
-        'today': date.today(),
+        'today_jalali': get_current_jalali_date().strftime('%Y/%m/%d'),
     }
-
     return render(request, 'table_app/reservation_list.html', context)
 
 @login_required
 @restaurant_owner_required
 def reservation_detail(request, reservation_id):
-    """
-    جزئیات رزرو
-    """
+    """جزئیات رزرو"""
     restaurant = get_restaurant_for_user(request.user)
     reservation = get_object_or_404(
         Reservation,
@@ -299,15 +358,70 @@ def reservation_detail(request, reservation_id):
     context = {
         'reservation': reservation,
     }
-
     return render(request, 'table_app/reservation_detail.html', context)
 
 @login_required
 @restaurant_owner_required
+def reservation_create(request):
+    """ایجاد رزرو جدید"""
+    restaurant = get_restaurant_for_user(request.user)
+
+    if request.method == 'POST':
+        try:
+            # پیدا کردن یا ایجاد مشتری
+            national_code = request.POST.get('national_code')
+            customer, created = Customer.objects.get_or_create(
+                national_code=national_code,
+                defaults={
+                    'full_name': request.POST.get('full_name'),
+                    'phone_number': request.POST.get('phone_number'),
+                    'email': request.POST.get('email', ''),
+                }
+            )
+
+            # اگر مشتری از قبل وجود داشت، اطلاعاتش را آپدیت کن
+            if not created:
+                customer.full_name = request.POST.get('full_name')
+                customer.phone_number = request.POST.get('phone_number')
+                if request.POST.get('email'):
+                    customer.email = request.POST.get('email')
+                customer.save()
+
+            # ایجاد رزرو
+            reservation = Reservation(
+                table_id=request.POST.get('table_id'),
+                customer=customer,
+                reservation_jalali_date=request.POST.get('reservation_date'),
+                start_time=request.POST.get('start_time'),
+                end_time=request.POST.get('end_time'),
+                guest_count=int(request.POST.get('guest_count', 2)),
+                special_requests=request.POST.get('special_requests', ''),
+                reservation_status='confirmed'  # رزرو دستی مستقیم تأیید می‌شود
+            )
+            reservation.save()
+
+            messages.success(request, f"رزرو با کد {reservation.reservation_code} با موفقیت ایجاد شد")
+            return redirect('table:reservation_list')
+
+        except Exception as e:
+            messages.error(request, f"خطا در ایجاد رزرو: {str(e)}")
+
+    # دریافت میزهای فعال
+    tables = Table.objects.filter(restaurant=restaurant, is_active=True)
+
+    # تاریخ پیش‌فرض (امروز)
+    today_jalali = get_current_jalali_date().strftime('%Y/%m/%d')
+
+    context = {
+        'tables': tables,
+        'today_jalali': today_jalali,
+    }
+    return render(request, 'table_app/reservation_form.html', context)
+
+@login_required
+@restaurant_owner_required
 def reservation_confirm(request, reservation_id):
-    """
-    تأیید رزرو توسط رستوران
-    """
+    """تأیید رزرو"""
     restaurant = get_restaurant_for_user(request.user)
     reservation = get_object_or_404(
         Reservation,
@@ -316,10 +430,7 @@ def reservation_confirm(request, reservation_id):
     )
 
     if reservation.reservation_status == 'pending':
-        reservation.reservation_status = 'confirmed'
-        reservation.is_confirmed = True
-        reservation.save()
-
+        reservation.confirm_reservation()
         messages.success(request, "رزرو با موفقیت تأیید شد")
     else:
         messages.warning(request, "این رزرو قبلاً تأیید شده است")
@@ -329,9 +440,7 @@ def reservation_confirm(request, reservation_id):
 @login_required
 @restaurant_owner_required
 def reservation_cancel(request, reservation_id):
-    """
-    لغو رزرو توسط رستوران
-    """
+    """لغو رزرو"""
     restaurant = get_restaurant_for_user(request.user)
     reservation = get_object_or_404(
         Reservation,
@@ -340,9 +449,7 @@ def reservation_cancel(request, reservation_id):
     )
 
     if reservation.reservation_status in ['pending', 'confirmed']:
-        reservation.reservation_status = 'cancelled'
-        reservation.save()
-
+        reservation.cancel_reservation()
         messages.success(request, "رزرو با موفقیت لغو شد")
     else:
         messages.warning(request, "امکان لغو این رزرو وجود ندارد")
@@ -352,9 +459,7 @@ def reservation_cancel(request, reservation_id):
 @login_required
 @restaurant_owner_required
 def reservation_mark_seated(request, reservation_id):
-    """
-    علامت‌گذاری حضور مشتری
-    """
+    """علامت‌گذاری حضور مشتری"""
     restaurant = get_restaurant_for_user(request.user)
     reservation = get_object_or_404(
         Reservation,
@@ -363,11 +468,7 @@ def reservation_mark_seated(request, reservation_id):
     )
 
     if reservation.reservation_status == 'confirmed':
-        reservation.reservation_status = 'seated'
-        reservation.customer_arrived = True
-        reservation.arrival_time = timezone.now()
-        reservation.save()
-
+        reservation.mark_customer_arrived()
         messages.success(request, "حضور مشتری ثبت شد")
     else:
         messages.warning(request, "امکان ثبت حضور برای این رزرو وجود ندارد")
@@ -377,9 +478,7 @@ def reservation_mark_seated(request, reservation_id):
 @login_required
 @restaurant_owner_required
 def reservation_mark_completed(request, reservation_id):
-    """
-    تکمیل رزرو
-    """
+    """تکمیل رزرو"""
     restaurant = get_restaurant_for_user(request.user)
     reservation = get_object_or_404(
         Reservation,
@@ -388,21 +487,18 @@ def reservation_mark_completed(request, reservation_id):
     )
 
     if reservation.reservation_status in ['confirmed', 'seated']:
-        reservation.reservation_status = 'completed'
-        reservation.save()
-
+        reservation.complete_reservation()
         messages.success(request, "رزرو به وضعیت تکمیل شده تغییر یافت")
     else:
         messages.warning(request, "امکان تکمیل این رزرو وجود ندارد")
 
     return redirect('table:reservation_list')
 
+
 @login_required
 @restaurant_owner_required
 def reservation_mark_no_show(request, reservation_id):
-    """
-    علامت‌گذاری عدم حضور مشتری
-    """
+    """ثبت عدم حضور مشتری"""
     restaurant = get_restaurant_for_user(request.user)
     reservation = get_object_or_404(
         Reservation,
@@ -411,9 +507,7 @@ def reservation_mark_no_show(request, reservation_id):
     )
 
     if reservation.reservation_status in ['confirmed', 'pending']:
-        reservation.reservation_status = 'no_show'
-        reservation.save()
-
+        reservation.mark_no_show()
         messages.success(request, "عدم حضور مشتری ثبت شد")
     else:
         messages.warning(request, "امکان ثبت عدم حضور برای این رزرو وجود ندارد")
@@ -423,34 +517,26 @@ def reservation_mark_no_show(request, reservation_id):
 # ----------------------------
 # Working Time Management
 # ----------------------------
+
+
 @login_required
 @restaurant_owner_required
 def working_time_management(request):
-    """
-    مدیریت ساعات کاری رستوران
-    """
+    """مدیریت ساعات کاری"""
     restaurant = get_restaurant_for_user(request.user)
 
     if request.method == 'POST':
         try:
-            # ذخیره ساعت شروع و پایان در مدل رستوران
-            opening_time = request.POST.get('opening_time')
-            closing_time = request.POST.get('closing_time')
-            slot_duration = request.POST.get('slot_duration')
+            # دریافت ساعات کاری
+            opening_hour = int(request.POST.get('opening_hour', 9))
+            opening_minute = int(request.POST.get('opening_minute', 0))
+            closing_hour = int(request.POST.get('closing_hour', 23))
+            closing_minute = int(request.POST.get('closing_minute', 0))
 
-            if opening_time:
-                restaurant.openingTime = opening_time
-            if closing_time:
-                restaurant.closingTime = closing_time
-            restaurant.save()
+            opening_time = time(opening_hour, opening_minute)
+            closing_time = time(closing_hour, closing_minute)
 
-            # ذخیره مدت زمان در تنظیمات
-            settings, created = ReservationSettings.objects.get_or_create(restaurant=restaurant)
-            if slot_duration:
-                settings.slot_duration = int(slot_duration)
-            settings.save()
-
-            # ذخیره روزهای فعال
+            # به‌روزرسانی ساعات کاری برای روزهای فعال
             active_days = request.POST.getlist('active_days')
             for day in WorkingDay.objects.all():
                 working_time, created = WorkingTime.objects.get_or_create(
@@ -458,6 +544,9 @@ def working_time_management(request):
                     day=day
                 )
                 working_time.is_active = str(day.id) in active_days
+                if working_time.is_active:
+                    working_time.start_time = opening_time
+                    working_time.end_time = closing_time
                 working_time.save()
 
             messages.success(request, "ساعات کاری با موفقیت ذخیره شد")
@@ -466,17 +555,17 @@ def working_time_management(request):
         except Exception as e:
             messages.error(request, f"خطا در ذخیره ساعات کاری: {str(e)}")
 
-    # دریافت ساعات کاری فعلی
     working_times = WorkingTime.objects.filter(restaurant=restaurant)
+    settings = ReservationSettings.objects.filter(restaurant=restaurant).first()
 
     context = {
         'restaurant': restaurant,
         'days': WorkingDay.objects.all(),
         'working_times': working_times,
-        'settings': ReservationSettings.objects.filter(restaurant=restaurant).first(),
+        'settings': settings,
     }
-
     return render(request, 'table_app/working_time_management.html', context)
+
 # ----------------------------
 # Settings
 # ----------------------------
@@ -484,38 +573,34 @@ def working_time_management(request):
 @login_required
 @restaurant_owner_required
 def reservation_settings(request):
-    """
-    تنظیمات رزرو رستوران
-    """
+    """تنظیمات رزرو"""
     restaurant = get_restaurant_for_user(request.user)
-
-    # ایجاد تنظیمات پیش‌فرض اگر وجود نداشته باشد
     settings, created = ReservationSettings.objects.get_or_create(restaurant=restaurant)
 
     if request.method == 'POST':
         try:
-            settings.max_advance_days = request.POST.get('max_advance_days', 30)
-            settings.min_advance_hours = request.POST.get('min_advance_hours', 2)
-            settings.max_guests_per_reservation = request.POST.get('max_guests_per_reservation', 20)
-            settings.default_reservation_duration = request.POST.get('default_reservation_duration', 120)
-            settings.slot_duration = request.POST.get('slot_duration', 30)
+            settings.max_advance_days = int(request.POST.get('max_advance_days', 30))
+            settings.min_advance_hours = int(request.POST.get('min_advance_hours', 2))
+            settings.max_guests_per_reservation = int(request.POST.get('max_guests_per_reservation', 20))
+            settings.default_reservation_duration = int(request.POST.get('default_reservation_duration', 120))
+            settings.slot_duration = int(request.POST.get('slot_duration', 30))
             settings.auto_confirm_reservations = request.POST.get('auto_confirm_reservations') == 'on'
             settings.require_phone_verification = request.POST.get('require_phone_verification') == 'on'
-            settings.max_reservations_per_time_slot = request.POST.get('max_reservations_per_time_slot', 1)
+            settings.max_reservations_per_time_slot = int(request.POST.get('max_reservations_per_time_slot', 1))
             settings.allow_same_day_reservations = request.POST.get('allow_same_day_reservations') == 'on'
+            settings.friday_off = request.POST.get('friday_off') == 'on'
+            settings.thursday_evening_off = request.POST.get('thursday_evening_off') == 'on'
+            settings.special_holidays = request.POST.get('special_holidays', '')
 
             settings.save()
-
             messages.success(request, "تنظیمات با موفقیت ذخیره شد")
             return redirect('table:reservation_settings')
-
         except Exception as e:
             messages.error(request, f"خطا در ذخیره تنظیمات: {str(e)}")
 
     context = {
         'settings': settings,
     }
-
     return render(request, 'table_app/reservation_settings.html', context)
 
 # ----------------------------
@@ -524,10 +609,129 @@ def reservation_settings(request):
 
 @login_required
 @restaurant_owner_required
+def get_table_availability_ajax(request, table_id):
+    """دریافت وضعیت دسترسی میز برای تاریخ مشخص (AJAX)"""
+    restaurant = get_restaurant_for_user(request.user)
+    table = get_object_or_404(Table, id=table_id, restaurant=restaurant)
+
+    jalali_date = request.GET.get('date')
+    if not jalali_date:
+        return JsonResponse({'error': 'تاریخ مشخص نشده'}, status=400)
+
+    availability = table.get_jalali_availability(jalali_date)
+    return JsonResponse(availability)
+
+@login_required
+@restaurant_owner_required
+def get_daily_calendar_ajax(request):
+    """دریافت تقویم روزانه برای تمام میزها (AJAX) - نسخه شمسی"""
+    restaurant = get_restaurant_for_user(request.user)
+
+    selected_date = request.GET.get('date')
+    if not selected_date:
+        return JsonResponse({'error': 'تاریخ مشخص نشده'}, status=400)
+
+    try:
+        # اعتبارسنجی تاریخ شمسی
+        jalali_date_obj, is_valid = validate_jalali_date(selected_date)
+        if not is_valid:
+            return JsonResponse({'error': 'تاریخ شمسی نامعتبر'}, status=400)
+
+        tables = Table.objects.filter(restaurant=restaurant, is_active=True)
+        reservations = Reservation.objects.filter(
+            table__restaurant=restaurant,
+            reservation_jalali_date=selected_date
+        ).select_related('table', 'customer')
+
+        calendar_data = []
+        for table in tables:
+            table_reservations = [r for r in reservations if r.table_id == table.id]
+
+            table_data = {
+                'table_id': table.id,
+                'table_number': table.table_number,
+                'capacity': table.capacity,
+                'table_type': table.get_table_type_display(),
+                'table_type_class': table.table_type,
+                'reservations': []
+            }
+
+            for reservation in table_reservations:
+                table_data['reservations'].append({
+                    'id': reservation.id,
+                    'reservation_code': reservation.reservation_code,
+                    'customer_name': reservation.customer.full_name,
+                    'customer_phone': reservation.customer.phone_number,
+                    'start_time': reservation.start_time.strftime('%H:%M'),
+                    'end_time': reservation.end_time.strftime('%H:%M'),
+                    'status': reservation.reservation_status,
+                    'status_display': reservation.get_persian_status(),
+                    'guest_count': reservation.guest_count,
+                    'jalali_date': reservation.reservation_jalali_date,
+                    'duration_minutes': reservation.duration_minutes,
+                })
+
+            calendar_data.append(table_data)
+
+        return JsonResponse({
+            'jalali_date': selected_date,
+            'tables': calendar_data
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': f'خطا در پردازش: {str(e)}'}, status=400)
+
+@login_required
+@restaurant_owner_required
+def get_available_tables_ajax(request):
+    """دریافت میزهای آزاد برای تاریخ و زمان مشخص (AJAX)"""
+    restaurant = get_restaurant_for_user(request.user)
+
+    jalali_date = request.GET.get('date')
+    start_time = request.GET.get('start_time')
+    end_time = request.GET.get('end_time')
+    guest_count = int(request.GET.get('guest_count', 2))
+
+    if not all([jalali_date, start_time, end_time]):
+        return JsonResponse({'error': 'پارامترهای لازم ارسال نشده'}, status=400)
+
+    try:
+        # تبدیل زمان‌ها
+        start_time_obj = datetime.strptime(start_time, '%H:%M').time()
+        end_time_obj = datetime.strptime(end_time, '%H:%M').time()
+
+        # پیدا کردن میزهای آزاد
+        available_tables = []
+        tables = Table.objects.filter(
+            restaurant=restaurant,
+            is_active=True,
+            capacity__gte=guest_count
+        )
+
+        for table in tables:
+            if table.is_available(jalali_date, start_time_obj, end_time_obj):
+                available_tables.append({
+                    'id': table.id,
+                    'table_number': table.table_number,
+                    'capacity': table.capacity,
+                    'table_type': table.get_table_type_display(),
+                    'min_duration': table.min_reservation_duration,
+                    'max_duration': table.max_reservation_duration,
+                })
+
+        return JsonResponse({
+            'available_tables': available_tables,
+            'count': len(available_tables)
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': f'خطا در پردازش: {str(e)}'}, status=400)
+
+
+@login_required
+@restaurant_owner_required
 def get_table_reservations_ajax(request, table_id):
-    """
-    دریافت رزروهای یک میز برای تاریخ مشخص (AJAX)
-    """
+    """دریافت رزروهای یک میز برای تاریخ مشخص (AJAX)"""
     restaurant = get_restaurant_for_user(request.user)
     table = get_object_or_404(Table, id=table_id, restaurant=restaurant)
 
@@ -536,84 +740,53 @@ def get_table_reservations_ajax(request, table_id):
         return JsonResponse({'error': 'تاریخ مشخص نشده'}, status=400)
 
     try:
-        filter_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'error': 'تاریخ نامعتبر'}, status=400)
+        # اگر تاریخ میلادی است، تبدیل به شمسی کنیم
+        if '-' in selected_date:
+            # تاریخ میلادی - تبدیل به شمسی
+            gregorian_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            jalali_date_obj = jdatetime.date.fromgregorian(date=gregorian_date)
+            jalali_date = jalali_date_obj.strftime('%Y/%m/%d')
+        else:
+            # تاریخ شمسی
+            jalali_date = selected_date
+            jalali_date_obj, is_valid = validate_jalali_date(jalali_date)
+            if not is_valid:
+                return JsonResponse({'error': 'تاریخ شمسی نامعتبر'}, status=400)
+            gregorian_date = jalali_date_obj.togregorian()
 
-    reservations = Reservation.objects.filter(
-        table=table,
-        reservation_date=filter_date
-    ).order_by('start_time')
+        # دریافت رزروها
+        reservations = Reservation.objects.filter(
+            table=table,
+            reservation_jalali_date=jalali_date
+        ).select_related('customer').order_by('start_time')
 
-    reservations_data = []
-    for reservation in reservations:
-        reservations_data.append({
-            'id': reservation.id,
-            'reservation_code': reservation.reservation_code,
-            'customer_name': reservation.customer_full_name,
-            'start_time': reservation.start_time.strftime('%H:%M'),
-            'end_time': reservation.end_time.strftime('%H:%M'),
-            'status': reservation.reservation_status,
-            'status_display': reservation.get_reservation_status_display(),
-            'guest_count': reservation.guest_count,
-        })
-
-    return JsonResponse({
-        'table_number': table.table_number,
-        'date': selected_date,
-        'reservations': reservations_data
-    })
-
-@login_required
-@restaurant_owner_required
-def get_daily_calendar_ajax(request):
-    """
-    دریافت تقویم روزانه برای تمام میزها (AJAX)
-    """
-    restaurant = get_restaurant_for_user(request.user)
-
-    selected_date = request.GET.get('date')
-    if not selected_date:
-        return JsonResponse({'error': 'تاریخ مشخص نشده'}, status=400)
-
-    try:
-        filter_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'error': 'تاریخ نامعتبر'}, status=400)
-
-    tables = Table.objects.filter(restaurant=restaurant, is_active=True)
-    reservations = Reservation.objects.filter(
-        table__restaurant=restaurant,
-        reservation_date=filter_date
-    ).select_related('table')
-
-    calendar_data = []
-    for table in tables:
-        table_reservations = [r for r in reservations if r.table_id == table.id]
-
-        table_data = {
-            'table_id': table.id,
-            'table_number': table.table_number,
-            'capacity': table.capacity,
-            'table_type': table.get_table_type_display(),
-            'reservations': []
-        }
-
-        for reservation in table_reservations:
-            table_data['reservations'].append({
+        reservations_data = []
+        for reservation in reservations:
+            reservations_data.append({
                 'id': reservation.id,
                 'reservation_code': reservation.reservation_code,
-                'customer_name': reservation.customer_full_name,
+                'customer_name': reservation.customer.full_name,
+                'customer_phone': reservation.customer.phone_number,
                 'start_time': reservation.start_time.strftime('%H:%M'),
                 'end_time': reservation.end_time.strftime('%H:%M'),
                 'status': reservation.reservation_status,
-                'status_display': reservation.get_reservation_status_display(),
+                'status_display': reservation.get_persian_status(),
                 'guest_count': reservation.guest_count,
+                'duration_minutes': reservation.duration_minutes,
+                'special_requests': reservation.special_requests or '',
             })
 
-        calendar_data.append(table_data)
+        return JsonResponse({
+            'table_number': table.table_number,
+            'table_capacity': table.capacity,
+            'table_type': table.get_table_type_display(),
+            'jalali_date': jalali_date,
+            'gregorian_date': gregorian_date.strftime('%Y-%m-%d'),
+            'reservations': reservations_data,
+            'reservations_count': len(reservations_data)
+        })
 
-    return JsonResponse({
-        'date': selected_date,
-        'tables': calendar_data
-    })
+    except ValueError as e:
+        return JsonResponse({'error': f'تاریخ نامعتبر: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'خطا در پردازش: {str(e)}'}, status=400)

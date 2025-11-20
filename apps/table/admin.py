@@ -1,29 +1,92 @@
 # table/admin.py
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import WorkingDay, WorkingTime, Table, Reservation, ReservationSettings
+from .models import WorkingDay, WorkingTime, Table, Reservation, ReservationSettings, Customer
 
 # ----------------------------
-# Admin Customizations
+# Customer Admin
 # ----------------------------
 
-class WorkingTimeInline(admin.TabularInline):
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
     """
-    اینلاین برای نمایش ساعات کاری در پنل رستوران
+    پنل ادمین برای مشتریان
     """
-    model = WorkingTime
-    extra = 0
-    fields = ['day', 'start_time', 'end_time', 'is_active']
-    ordering = ['day__display_order']
+    list_display = [
+        'national_code',
+        'full_name',
+        'phone_number',
+        'is_vip',
+        'total_reservations',
+        'success_rate_display',
+        'created_jalali'
+    ]
 
-class TableInline(admin.TabularInline):
-    """
-    اینلاین برای نمایش میزها در پنل رستوران
-    """
-    model = Table
-    extra = 0
-    fields = ['table_number', 'table_type', 'capacity', 'is_active']
-    ordering = ['table_number']
+    list_filter = [
+        'is_vip',
+        'is_active',
+        'created_jalali'
+    ]
+
+    list_editable = ['is_vip']
+
+    search_fields = [
+        'national_code',
+        'full_name',
+        'phone_number'
+    ]
+
+    readonly_fields = [
+        'total_reservations',
+        'successful_reservations',
+        'cancellation_count',
+        'created_jalali',
+        'updated_at'
+    ]
+
+    ordering = ['-created_jalali']
+
+    fieldsets = (
+        ('اطلاعات هویتی', {
+            'fields': (
+                'national_code',
+                'full_name',
+                'phone_number',
+                'email'
+            )
+        }),
+        ('اطلاعات اضافی', {
+            'fields': (
+                'birth_date',
+                'is_vip',
+                'special_notes'
+            )
+        }),
+        ('آمار رزرو', {
+            'fields': (
+                'total_reservations',
+                'successful_reservations',
+                'cancellation_count',
+            )
+        }),
+        ('وضعیت', {
+            'fields': (
+                'is_active',
+                'created_jalali',
+                'updated_at'
+            )
+        }),
+    )
+
+    def success_rate_display(self, obj):
+        rate = obj.get_success_rate()
+        color = 'green' if rate >= 80 else 'orange' if rate >= 60 else 'red'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}%</span>',
+            color,
+            rate
+        )
+    success_rate_display.short_description = 'نرخ موفقیت'
 
 # ----------------------------
 # Working Day Admin
@@ -34,8 +97,8 @@ class WorkingDayAdmin(admin.ModelAdmin):
     """
     پنل ادمین برای روزهای کاری
     """
-    list_display = ['name_display', 'display_order', 'is_used']
-    list_editable = ['display_order']
+    list_display = ['name_display', 'display_order', 'is_weekend', 'is_active', 'is_used']
+    list_editable = ['display_order', 'is_active']
     ordering = ['display_order']
     search_fields = ['name']
 
@@ -57,15 +120,27 @@ class WorkingTimeAdmin(admin.ModelAdmin):
     """
     پنل ادمین برای ساعات کاری
     """
-    list_display = ['restaurant', 'day_display', 'start_time', 'end_time', 'is_active', 'duration']
+    list_display = ['restaurant_name', 'day_name', 'start_time_display', 'end_time_display', 'is_active', 'duration']
     list_filter = ['restaurant', 'day', 'is_active']
     list_editable = ['is_active']
     search_fields = ['restaurant__title', 'day__name']
     ordering = ['restaurant', 'day__display_order']
 
-    def day_display(self, obj):
+    def restaurant_name(self, obj):
+        return obj.restaurant.title
+    restaurant_name.short_description = 'رستوران'
+
+    def day_name(self, obj):
         return obj.day.get_name_display()
-    day_display.short_description = 'روز'
+    day_name.short_description = 'روز'
+
+    def start_time_display(self, obj):
+        return obj.start_time.strftime('%H:%M') if obj.start_time else '-'
+    start_time_display.short_description = 'ساعت شروع'
+
+    def end_time_display(self, obj):
+        return obj.end_time.strftime('%H:%M') if obj.end_time else '-'
+    end_time_display.short_description = 'ساعت پایان'
 
     def duration(self, obj):
         if obj.start_time and obj.end_time:
@@ -90,26 +165,31 @@ class TableAdmin(admin.ModelAdmin):
     """
     list_display = [
         'table_number',
-        'restaurant',
+        'restaurant_name',
         'table_type_display',
         'capacity',
         'is_active',
         'reservation_count',
-        'created_at'
+        'created_jalali'
     ]
+
     list_filter = [
         'restaurant',
         'table_type',
         'is_active',
-        'created_at'
+        'created_jalali'
     ]
+
     list_editable = ['is_active', 'capacity']
+
     search_fields = [
         'table_number',
         'restaurant__title',
         'description'
     ]
-    readonly_fields = ['created_at', 'updated_at']
+
+    readonly_fields = ['created_jalali', 'updated_at']
+
     ordering = ['restaurant', 'table_number']
 
     fieldsets = (
@@ -119,23 +199,36 @@ class TableAdmin(admin.ModelAdmin):
                 'table_number',
                 'table_type',
                 'capacity',
-                'min_reservation_duration'
+                'description'
             )
         }),
-        ('توضیحات و وضعیت', {
+        ('مدت زمان رزرو', {
             'fields': (
-                'description',
-                'is_active'
+                'min_reservation_duration',
+                'max_reservation_duration'
             )
         }),
-        ('تاریخ‌ها', {
+        ('ویژگی‌های میز', {
             'fields': (
-                'created_at',
+                'has_view',
+                'is_smoking',
+                'is_vip',
+                'floor',
+                'section'
+            )
+        }),
+        ('وضعیت', {
+            'fields': (
+                'is_active',
+                'created_jalali',
                 'updated_at'
-            ),
-            'classes': ('collapse',)
+            )
         }),
     )
+
+    def restaurant_name(self, obj):
+        return obj.restaurant.title
+    restaurant_name.short_description = 'رستوران'
 
     def table_type_display(self, obj):
         return obj.get_table_type_display()
@@ -166,6 +259,23 @@ class ReservationStatusFilter(admin.SimpleListFilter):
             return queryset.filter(reservation_status=self.value())
         return queryset
 
+class JalaliDateFilter(admin.SimpleListFilter):
+    """
+    فیلتر تاریخ شمسی
+    """
+    title = 'تاریخ رزرو شمسی'
+    parameter_name = 'reservation_jalali_date'
+
+    def lookups(self, request, model_admin):
+        # لیست تاریخ‌های منحصربه‌فرد برای فیلتر
+        dates = Reservation.objects.values_list('reservation_jalali_date', flat=True).distinct().order_by('-reservation_jalali_date')[:10]
+        return [(date, date) for date in dates]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(reservation_jalali_date=self.value())
+        return queryset
+
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
     """
@@ -180,24 +290,24 @@ class ReservationAdmin(admin.ModelAdmin):
         'status_display',
         'is_confirmed',
         'customer_arrived',
-        'created_at'
+        'created_jalali'
     ]
 
     list_filter = [
         ReservationStatusFilter,
-        'reservation_date',
+        JalaliDateFilter,
         'is_confirmed',
         'customer_arrived',
         'table__restaurant',
-        'created_at'
+        'created_jalali'
     ]
 
     list_editable = ['is_confirmed']
 
     search_fields = [
         'reservation_code',
-        'customer_full_name',
-        'customer_phone',
+        'customer__full_name',
+        'customer__phone_number',
         'table__table_number',
         'table__restaurant__title'
     ]
@@ -206,30 +316,30 @@ class ReservationAdmin(admin.ModelAdmin):
         'reservation_code',
         'confirmation_code',
         'duration_minutes',
-        'created_at',
-        'updated_at',
-        'arrival_time'
+        'created_jalali',
+        'created_jalali_time',
+        'updated_jalali',
+        'arrival_jalali_time'
     ]
 
-    ordering = ['-created_at']
+    ordering = ['-created_jalali', '-start_time']
 
     fieldsets = (
         ('اطلاعات رزرو', {
             'fields': (
                 'reservation_code',
                 'table',
-                'reservation_date',
+                'reservation_jalali_date',
                 'start_time',
                 'end_time',
                 'duration_minutes',
-                'guest_count'
+                'guest_count',
+                'special_requests'
             )
         }),
         ('اطلاعات مشتری', {
             'fields': (
-                'customer_full_name',
-                'customer_phone',
-                'special_requests'
+                'customer',
             )
         }),
         ('وضعیت و تأیید', {
@@ -239,13 +349,14 @@ class ReservationAdmin(admin.ModelAdmin):
                 'confirmation_code',
                 'is_verified',
                 'customer_arrived',
-                'arrival_time'
+                'arrival_jalali_time'
             )
         }),
-        ('تاریخ‌ها', {
+        ('تاریخ‌های شمسی', {
             'fields': (
-                'created_at',
-                'updated_at'
+                'created_jalali',
+                'created_jalali_time',
+                'updated_jalali'
             ),
             'classes': ('collapse',)
         }),
@@ -260,26 +371,29 @@ class ReservationAdmin(admin.ModelAdmin):
 
     def customer_info(self, obj):
         return format_html(
-            '<strong>{}</strong><br><small>{}</small>',
-            obj.customer_full_name,
-            obj.customer_phone
+            '<strong>{}</strong><br><small>{}</small><br><small>کدملی: {}</small>',
+            obj.customer.full_name,
+            obj.customer.phone_number,
+            obj.customer.national_code
         )
     customer_info.short_description = 'مشتری'
 
     def table_info(self, obj):
         return format_html(
-            'میز {}<br><small>{}</small>',
+            'میز {}<br><small>{}</small><br><small>ظرفیت: {}</small>',
             obj.table.table_number,
-            obj.table.restaurant.title
+            obj.table.restaurant.title,
+            obj.table.capacity
         )
     table_info.short_description = 'میز'
 
     def date_time_info(self, obj):
         return format_html(
-            '{}<br><small>{} - {}</small>',
-            obj.reservation_date,
-            obj.start_time,
-            obj.end_time
+            '{}<br><small>{} - {}</small><br><small>مدت: {} دقیقه</small>',
+            obj.reservation_jalali_date,
+            obj.start_time.strftime('%H:%M'),
+            obj.end_time.strftime('%H:%M'),
+            obj.duration_minutes
         )
     date_time_info.short_description = 'تاریخ و زمان'
 
@@ -296,7 +410,7 @@ class ReservationAdmin(admin.ModelAdmin):
         return format_html(
             '<span style="color: {}; font-weight: bold;">{}</span>',
             color,
-            obj.get_reservation_status_display()
+            obj.get_persian_status()
         )
     status_display.short_description = 'وضعیت'
 
@@ -318,10 +432,13 @@ class ReservationAdmin(admin.ModelAdmin):
 
     def mark_as_seated(self, request, queryset):
         from django.utils import timezone
+        import jdatetime
+
+        now_jalali = jdatetime.datetime.now().strftime('%Y/%m/%d %H:%M')
         updated = queryset.filter(reservation_status='confirmed').update(
             reservation_status='seated',
             customer_arrived=True,
-            arrival_time=timezone.now()
+            arrival_jalali_time=now_jalali
         )
         self.message_user(request, f'{updated} رزرو به وضعیت حاضر تغییر یافت.')
     mark_as_seated.short_description = 'علامت‌گذاری به عنوان حاضر'
@@ -334,7 +451,11 @@ class ReservationAdmin(admin.ModelAdmin):
     mark_as_completed.short_description = 'علامت‌گذاری به عنوان تکمیل شده'
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('table', 'table__restaurant')
+        return super().get_queryset(request).select_related(
+            'table',
+            'table__restaurant',
+            'customer'
+        )
 
 # ----------------------------
 # Reservation Settings Admin
@@ -346,23 +467,24 @@ class ReservationSettingsAdmin(admin.ModelAdmin):
     پنل ادمین برای تنظیمات رزرو
     """
     list_display = [
-        'restaurant',
+        'restaurant_name',
         'max_advance_days',
         'min_advance_hours',
         'max_guests_per_reservation',
         'auto_confirm_reservations',
-        'updated_at'
+        'updated_jalali'
     ]
 
     list_filter = [
         'auto_confirm_reservations',
         'require_phone_verification',
-        'allow_same_day_reservations'
+        'allow_same_day_reservations',
+        'friday_off'
     ]
 
     search_fields = ['restaurant__title']
 
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_jalali', 'updated_jalali']
 
     fieldsets = (
         ('تنظیمات عمومی', {
@@ -391,32 +513,22 @@ class ReservationSettingsAdmin(admin.ModelAdmin):
                 'allow_same_day_reservations'
             )
         }),
-        ('تاریخ‌ها', {
+        ('تعطیلی‌ها', {
             'fields': (
-                'created_at',
-                'updated_at'
+                'friday_off',
+                'thursday_evening_off',
+                'special_holidays'
+            )
+        }),
+        ('تاریخ‌های شمسی', {
+            'fields': (
+                'created_jalali',
+                'updated_jalali'
             ),
             'classes': ('collapse',)
         }),
     )
 
-# ----------------------------
-# Admin Site Customization
-# ----------------------------
-
-
-# گروه‌بندی مدل‌ها در پنل ادمین
-from django.contrib.admin import AdminSite
-
-class TableAdminSite(AdminSite):
-    site_header = 'مدیریت سیستم رزرو'
-    site_title = 'پنل مدیریت رزرو'
-    index_title = 'مدیریت رزرو میزهای رستوران'
-
-# اگر می‌خواهید پنل جداگانه داشته باشید:
-# table_admin_site = TableAdminSite(name='table_admin')
-# table_admin_site.register(WorkingDay, WorkingDayAdmin)
-# table_admin_site.register(WorkingTime, WorkingTimeAdmin)
-# table_admin_site.register(Table, TableAdmin)
-# table_admin_site.register(Reservation, ReservationAdmin)
-# table_admin_site.register(ReservationSettings, ReservationSettingsAdmin)
+    def restaurant_name(self, obj):
+        return obj.restaurant.title
+    restaurant_name.short_description = 'رستوران'

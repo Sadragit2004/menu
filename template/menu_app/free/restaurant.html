@@ -1365,52 +1365,66 @@
     <div class="overlay"></div>
 
     <!-- نوار بالایی اصلی -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="hamburger-icon cursor-pointer text-gray-600">
-                        <i class="fas fa-bars text-lg"></i>
-                    </div>
-                    <div class="logo-container">
-                        {% if restaurant.logo %}
-                        <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title }}"
-                             class="w-10 h-10 rounded-xl object-cover border border-gray-200">
-                        {% else %}
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                            {{ restaurant.title|first }}
-                        </div>
-                        {% endif %}
-                        <div class="restaurant-info">
-                            <div class="restaurant-name">{{ restaurant.title }}</div>
-                            <div class="restaurant-subtitle">منوی دیجیتال</div>
-                        </div>
-                    </div>
+ <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="hamburger-icon cursor-pointer text-gray-600">
+                    <i class="fas fa-bars text-lg"></i>
                 </div>
-                <div class="header-actions">
-                    <!-- دکمه تغییر زبان به انگلیسی -->
-                    <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline">
-                        <span class="lang-text">EN</span>
-                    </a>
-                    <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600">
-                        <i class="fas fa-moon text-base"></i>
-                    </button>
+                <div class="logo-container flex items-center gap-3">
+                    <!-- لوگو -->
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                        ر
+                    </div>
+                    <!-- اطلاعات رستوران -->
+                    <div class="restaurant-info">
+                        <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap">
+                            رستوران نمونه
+                        </div>
+                        <div class="restaurant-subtitle text-xs text-gray-500 hidden sm:block">
+                            منوی دیجیتال
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- نوار جستجو -->
-        <div class="search-container bg-white py-3 border-t border-gray-100">
-            <div class="container mx-auto px-4">
-                <div class="search-box bg-gray-50 rounded-xl px-4 py-2 flex items-center gap-3 border border-gray-200">
-                    <i class="fas fa-search text-gray-400 text-sm"></i>
-                    <input type="text" placeholder="جستجوی غذا..."
-                           class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-sm">
-                </div>
+            <div class="header-actions flex items-center gap-2">
+                <!-- دکمه رزرو میز -->
+             <!-- در هر جایی که دکمه رزرو قرار دارد -->
+<!-- دکمه رزرو میز -->
+<a href="javascript:void(0);"
+   class="reservation-btn bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+   data-bs-toggle="modal"
+   data-bs-target="#reservationModal">
+    <i class="fas fa-chair text-xs"></i>
+    <span class="hidden sm:inline">رزرو میز</span>
+    <span class="sm:hidden">رزرو</span>
+</a>
+                <!-- دکمه تغییر زبان - با لینک اصلی -->
+                <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline w-9 h-9 rounded-lg flex items-center justify-center text-sm hover:bg-gray-200 transition-colors">
+                    <span class="lang-text font-medium">EN</span>
+                </a>
+
+                <!-- دکمه تم -->
+                <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600 w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-moon text-sm"></i>
+                </button>
             </div>
         </div>
-    </header>
+    </div>
 
+
+    <div class="search-container bg-white py-3 border-t border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="search-box bg-gray-50 rounded-xl px-4 py-2 flex items-center gap-3 border border-gray-200">
+                <i class="fas fa-search text-gray-400 text-sm"></i>
+                <input type="text" placeholder="جستجوی غذا..."
+                       class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-sm">
+            </div>
+        </div>
+    </div>
+</header>
     <!-- منوی هامبورگر -->
     <div class="hamburger-menu fixed inset-0 z-50 hidden flex-col justify-center items-center p-6">
         <div class="close-icon absolute top-4 left-4 text-white text-xl cursor-pointer p-2 hover:bg-white/10 rounded-full">
@@ -1716,6 +1730,9 @@
     </div>
 
     {% endif %}
+
+
+{% include "table_app/reservation/modal_reservation.html" %}
 
     <script>
         const restaurantSlug = "{{ restaurant.slug }}";
