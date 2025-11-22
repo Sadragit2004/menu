@@ -90,7 +90,7 @@ def check_availability_ajax(request, restaurant_slug):
                     'table_number': table.table_number,
                     'capacity': table.capacity,
                     'table_type': table.get_table_type_display(),
-                    'available_slots': availability['slots'][:6],
+                    'available_slots': availability['slots'][:20],
                     'working_hours': availability['working_hours']
                 })
                 print(f"✅ میز {table.table_number} قابل رزرو است")

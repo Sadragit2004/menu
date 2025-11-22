@@ -128,8 +128,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # settings.py
 TIME_ZONE = 'Asia/Tehran'
 USE_TZ = True
+
+
 USE_L10N = True
-USE_I18N = True
+USE_THOUSAND_SEPARATOR = True  # این خط مهم است
+NUMBER_GROUPING = 3
+THOUSAND_SEPARATOR = ','
 
 LANGUAGE_CODE = 'fa-ir'
 

@@ -1,0 +1,964 @@
+<script>
+    // ==================== متغیرهای سراسری ====================
+    const restaurantSlug = "{{ restaurant.slug }}";
+    let currentAudio = null;
+    let selectedFoods = JSON.parse(localStorage.getItem('selectedFoods_' + restaurantSlug)) || [];
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+
+    // متغیرهای رزرو
+    let currentReservation = {
+        tableId: null,
+        date: null,
+        startTime: null,
+        endTime: null,
+        guestCount: 2,
+        reservationCode: null
+    };
+
+    // ==================== مدیریت تم ====================
+    function initializeTheme() {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+
+            // بارگذاری تم ذخیره شده
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.querySelector('i').classList.remove('fa-moon');
+                themeToggle.querySelector('i').classList.add('fa-sun');
+            }
+        }
+    }
+
+    // ==================== مدیریت دسته‌بندی‌ها ====================
+    function initializeCategories() {
+        const categoryButtons = document.querySelectorAll('.category-bottom-item, .slider-category-item');
+        const foodItems = document.querySelectorAll('.food-item');
+
+        function filterByCategory(categoryId) {
+            // به‌روزرسانی UI
+            categoryButtons.forEach(btn => {
+                btn.classList.remove('category-bottom-active', 'slider-category-active');
+            });
+
+            // فعال کردن دکمه‌های مربوطه
+            document.querySelectorAll(`[data-category="${categoryId}"]`).forEach(btn => {
+                if(btn.classList.contains('category-bottom-item')) {
+                    btn.classList.add('category-bottom-active');
+                } else {
+                    btn.classList.add('slider-category-active');
+                }
+            });
+
+            // فیلتر غذاها
+            foodItems.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                if (categoryId === 'all' || itemCategory === categoryId) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const categoryId = this.getAttribute('data-category');
+                filterByCategory(categoryId);
+
+                // بستن منوی کشویی اگر باز است
+                const categoriesSlider = document.querySelector('.categories-slider');
+                if(categoriesSlider && categoriesSlider.classList.contains('open')) {
+                    toggleCategoriesSlider();
+                }
+            });
+        });
+
+        // فعال کردن دسته "همه" به صورت پیش‌فرض
+        const allCategoryBtn = document.querySelector('[data-category="all"]');
+        if (allCategoryBtn) {
+            filterByCategory('all');
+        }
+    }
+
+    // ==================== مدیریت جستجو ====================
+    function initializeSearch() {
+        const searchInput = document.querySelector('.search-box input');
+        const foodItems = document.querySelectorAll('.food-item');
+        let searchTimeout;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim().toLowerCase();
+                clearTimeout(searchTimeout);
+
+                searchTimeout = setTimeout(() => {
+                    foodItems.forEach(item => {
+                        const title = item.querySelector('.food-title').textContent.toLowerCase();
+                        const description = item.querySelector('.food-description').textContent.toLowerCase();
+
+                        if (title.includes(query) || description.includes(query)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // اگر جستجو خالی شد، دسته‌بندی فعال را نشان بده
+                    if (query === '') {
+                        const activeCategory = document.querySelector('.category-bottom-active');
+                        if (activeCategory) {
+                            const categoryId = activeCategory.getAttribute('data-category');
+                            const categoryButtons = document.querySelectorAll('.category-bottom-item, .slider-category-item');
+                            categoryButtons.forEach(btn => {
+                                if (btn.getAttribute('data-category') === categoryId) {
+                                    btn.click();
+                                }
+                            });
+                        }
+                    }
+                }, 300);
+            });
+        }
+    }
+
+    // ==================== مدیریت منوی کشویی دسته‌بندی‌ها ====================
+    function initializeCategoriesSlider() {
+        const categoriesSlider = document.querySelector('.categories-slider');
+        const categoriesToggle = document.querySelector('.categories-toggle');
+        const sliderClose = document.querySelector('.slider-close');
+        const overlay = document.querySelector('.overlay');
+        const dragHandle = document.querySelector('.drag-handle');
+
+        if (!categoriesSlider || !categoriesToggle) return;
+
+        function toggleCategoriesSlider() {
+            categoriesSlider.classList.toggle('open');
+            overlay.classList.toggle('active');
+
+            const icon = categoriesToggle.querySelector('i');
+            if (categoriesSlider.classList.contains('open')) {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            } else {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            }
+        }
+
+        // Event Listeners
+        categoriesToggle.addEventListener('click', toggleCategoriesSlider);
+        if (sliderClose) {
+            sliderClose.addEventListener('click', toggleCategoriesSlider);
+        }
+        if (overlay) {
+            overlay.addEventListener('click', toggleCategoriesSlider);
+        }
+
+        // قابلیت کشیدن
+        if (dragHandle) {
+            dragHandle.addEventListener('mousedown', startDrag);
+            dragHandle.addEventListener('touchstart', startDrag);
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            currentX = startX;
+
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('touchmove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+
+            categoriesSlider.style.transition = 'none';
+        }
+
+        function onDrag(e) {
+            if (!isDragging) return;
+
+            e.preventDefault();
+            currentX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            const diff = startX - currentX;
+
+            if (diff < 0) {
+                const newRight = Math.min(0, -diff);
+                categoriesSlider.style.right = `${newRight}px`;
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+
+            isDragging = false;
+            categoriesSlider.style.transition = 'right 0.3s ease';
+
+            const diff = startX - currentX;
+            const threshold = 100;
+
+            if (diff > threshold) {
+                categoriesSlider.style.right = '-320px';
+                setTimeout(() => {
+                    categoriesSlider.classList.remove('open');
+                    overlay.classList.remove('active');
+
+                    const icon = categoriesToggle.querySelector('i');
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                }, 300);
+            } else {
+                categoriesSlider.style.right = '0';
+            }
+
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('touchmove', onDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+        }
+    }
+
+    // ==================== مدیریت صدا ====================
+    function initializeSound() {
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.sound-btn')) {
+                const soundBtn = e.target.closest('.sound-btn');
+                const soundUrl = soundBtn.getAttribute('data-sound');
+
+                if (!soundUrl) {
+                    showNotification('توضیحات صوتی برای این غذا موجود نیست');
+                    return;
+                }
+
+                // اگر همین صدا در حال پخش است، متوقف کن
+                if (currentAudio && soundBtn.classList.contains('playing')) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    soundBtn.classList.remove('playing');
+                    showNotification('پخش صدا متوقف شد');
+                    return;
+                }
+
+                // اگر صداهای دیگر در حال پخش هستند، متوقف کن
+                if (currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    document.querySelectorAll('.sound-btn').forEach(btn => {
+                        btn.classList.remove('playing');
+                    });
+                }
+
+                // پخش صدا
+                try {
+                    currentAudio = new Audio(soundUrl);
+                    currentAudio.play().then(() => {
+                        soundBtn.classList.add('playing');
+                        showNotification('در حال پخش توضیحات صوتی...');
+                    }).catch(error => {
+                        console.error('Error playing sound:', error);
+                        showNotification('خطا در پخش صدا');
+                    });
+
+                    currentAudio.addEventListener('ended', () => {
+                        soundBtn.classList.remove('playing');
+                        showNotification('پخش توضیحات صوتی به پایان رسید');
+                    });
+
+                    currentAudio.addEventListener('error', () => {
+                        soundBtn.classList.remove('playing');
+                        showNotification('خطا در پخش فایل صوتی');
+                    });
+
+                } catch (error) {
+                    console.error('Error creating audio:', error);
+                    showNotification('خطا در ایجاد پخش کننده صدا');
+                }
+            }
+        });
+    }
+
+    // ==================== مدیریت لیست انتخاب غذا ====================
+    function initializeSelectionList() {
+        const selectionListBtn = document.querySelector('.selection-list-btn');
+        const selectionListPanel = document.querySelector('.selection-list-panel');
+        const selectionListClose = document.querySelector('.selection-list-close');
+        const selectionListShow = document.querySelector('.selection-list-show');
+        const selectionListClear = document.querySelector('.selection-list-clear');
+        const selectionDisplay = document.querySelector('.selection-display');
+        const selectionDisplayClose = document.querySelector('.selection-display-close');
+        const selectionDisplayBack = document.querySelector('.selection-display-back');
+        const selectionDisplayCall = document.querySelector('.selection-display-call');
+        const overlay = document.querySelector('.overlay');
+
+        // باز کردن/بستن پنل لیست انتخاب
+        if (selectionListBtn) {
+            selectionListBtn.addEventListener('click', () => {
+                selectionListPanel.classList.add('open');
+                overlay.classList.add('active');
+            });
+        }
+
+        if (selectionListClose) {
+            selectionListClose.addEventListener('click', () => {
+                selectionListPanel.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+
+        // نمایش به گارسون
+        if (selectionListShow) {
+            selectionListShow.addEventListener('click', () => {
+                if (selectedFoods.length === 0) {
+                    showNotification('لیست انتخاب شما خالی است');
+                    return;
+                }
+                selectionListPanel.classList.remove('open');
+                selectionDisplay.classList.add('open');
+                updateSelectionDisplay();
+            });
+        }
+
+        // بستن صفحه نمایش
+        if (selectionDisplayClose) {
+            selectionDisplayClose.addEventListener('click', () => {
+                selectionDisplay.classList.remove('open');
+            });
+        }
+
+        // بازگشت از صفحه نمایش
+        if (selectionDisplayBack) {
+            selectionDisplayBack.addEventListener('click', () => {
+                selectionDisplay.classList.remove('open');
+                selectionListPanel.classList.add('open');
+                overlay.classList.add('active');
+            });
+        }
+
+        // فراخوانی گارسون
+        if (selectionDisplayCall) {
+            selectionDisplayCall.addEventListener('click', () => {
+                showNotification('گارسون به میز شما فراخوانده شد');
+                setTimeout(() => {
+                    selectionDisplay.classList.remove('open');
+                    overlay.classList.remove('active');
+                }, 2000);
+            });
+        }
+
+        // پاک کردن لیست
+        if (selectionListClear) {
+            selectionListClear.addEventListener('click', () => {
+                if (selectedFoods.length === 0) {
+                    showNotification('لیست انتخاب شما از قبل خالی است');
+                    return;
+                }
+
+                if (confirm('آیا از پاک کردن لیست انتخاب خود مطمئن هستید؟')) {
+                    selectedFoods = [];
+                    saveSelectionList();
+                    updateSelectionList();
+                    updateOrderButtons();
+                    showNotification('لیست انتخاب شما پاک شد');
+                }
+            });
+        }
+
+        // مدیریت کلیک روی دکمه‌های سفارش
+        document.addEventListener('click', (e) => {
+            // سفارش غذا
+            if (e.target.closest('.order-btn')) {
+                handleOrderButtonClick(e.target.closest('.order-btn'));
+            }
+
+            // مدیریت تعداد
+            if (e.target.closest('.quantity-btn')) {
+                handleQuantityButtonClick(e.target.closest('.quantity-btn'));
+            }
+
+            // حذف آیتم
+            if (e.target.closest('.selection-list-item-remove')) {
+                handleRemoveItemClick(e.target.closest('.selection-list-item-remove'));
+            }
+        });
+
+        function handleOrderButtonClick(orderBtn) {
+            const foodId = orderBtn.getAttribute('data-food-id');
+            const foodTitle = orderBtn.getAttribute('data-food-title');
+            const foodPrice = parseInt(orderBtn.getAttribute('data-food-price'));
+            const foodImage = orderBtn.getAttribute('data-food-image');
+
+            const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
+
+            if (existingIndex === -1) {
+                selectedFoods.push({
+                    id: foodId,
+                    title: foodTitle,
+                    price: foodPrice,
+                    image: foodImage,
+                    quantity: 1
+                });
+
+                orderBtn.classList.add('added');
+                orderBtn.innerHTML = '<i class="fas fa-check"></i><span class="order-text">سفارش شده</span>';
+
+                showNotification(`"${foodTitle}" به لیست انتخاب اضافه شد`);
+            } else {
+                selectedFoods[existingIndex].quantity += 1;
+                showNotification(`تعداد "${foodTitle}" به ${selectedFoods[existingIndex].quantity} افزایش یافت`);
+            }
+
+            saveSelectionList();
+            updateSelectionList();
+        }
+
+        function handleQuantityButtonClick(quantityBtn) {
+            const foodItem = quantityBtn.closest('.selection-list-item');
+            if (!foodItem) return;
+
+            const removeBtn = foodItem.querySelector('.selection-list-item-remove');
+            if (!removeBtn) return;
+
+            const foodId = removeBtn.getAttribute('data-food-id');
+            const isIncrease = quantityBtn.classList.contains('increase');
+
+            const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
+            if (existingIndex !== -1) {
+                const foodTitle = selectedFoods[existingIndex].title;
+
+                if (isIncrease) {
+                    selectedFoods[existingIndex].quantity += 1;
+                    showNotification(`تعداد "${foodTitle}" افزایش یافت`);
+                } else {
+                    if (selectedFoods[existingIndex].quantity > 1) {
+                        selectedFoods[existingIndex].quantity -= 1;
+                        showNotification(`تعداد "${foodTitle}" کاهش یافت`);
+                    } else {
+                        selectedFoods.splice(existingIndex, 1);
+                        showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
+                        updateOrderButtons();
+                    }
+                }
+
+                saveSelectionList();
+                updateSelectionList();
+            }
+        }
+
+        function handleRemoveItemClick(removeBtn) {
+            const foodId = removeBtn.getAttribute('data-food-id');
+            const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
+
+            if (existingIndex !== -1) {
+                const foodTitle = selectedFoods[existingIndex].title;
+                selectedFoods.splice(existingIndex, 1);
+
+                saveSelectionList();
+                updateSelectionList();
+                updateOrderButtons();
+
+                showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
+            }
+        }
+    }
+
+    // ==================== توابع کمکی لیست انتخاب ====================
+    function saveSelectionList() {
+        localStorage.setItem('selectedFoods_' + restaurantSlug, JSON.stringify(selectedFoods));
+    }
+
+    function updateSelectionList() {
+        const badge = document.querySelector('.selection-list-badge');
+        const selectionListItems = document.querySelector('.selection-list-items');
+        const selectionListEmpty = document.querySelector('.selection-list-empty');
+
+        if (!badge || !selectionListItems || !selectionListEmpty) return;
+
+        const totalItems = selectedFoods.reduce((total, food) => total + food.quantity, 0);
+        badge.textContent = totalItems;
+
+        if (selectedFoods.length === 0) {
+            selectionListEmpty.style.display = 'flex';
+            selectionListItems.innerHTML = '';
+        } else {
+            selectionListEmpty.style.display = 'none';
+
+            let itemsHTML = '';
+            selectedFoods.forEach(food => {
+                itemsHTML += `
+                    <div class="selection-list-item">
+                        ${food.image ?
+                            `<img src="${food.image}" alt="${food.title}" class="selection-list-item-image">` :
+                            `<div class="selection-list-item-image bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-400">
+                                <i class="fas fa-utensils"></i>
+                            </div>`
+                        }
+                        <div class="selection-list-item-details">
+                            <div class="selection-list-item-title">${food.title}</div>
+                            <div class="selection-list-item-price">${food.price.toLocaleString()} تومان</div>
+                            <div class="selection-list-item-quantity">
+                                <div class="quantity-btn decrease">-</div>
+                                <div class="quantity-value">${food.quantity}</div>
+                                <div class="quantity-btn increase">+</div>
+                            </div>
+                        </div>
+                        <div class="selection-list-item-remove" data-food-id="${food.id}">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+            });
+
+            selectionListItems.innerHTML = itemsHTML;
+        }
+    }
+
+    function updateOrderButtons() {
+        const orderBtns = document.querySelectorAll('.order-btn');
+        orderBtns.forEach(btn => {
+            const foodId = btn.getAttribute('data-food-id');
+            const isSelected = selectedFoods.some(food => food.id === foodId);
+
+            if (isSelected) {
+                btn.classList.add('added');
+                btn.innerHTML = '<i class="fas fa-check"></i><span class="order-text">سفارش شده</span>';
+            } else {
+                btn.classList.remove('added');
+                btn.innerHTML = '<span class="order-text">سفارش</span>';
+            }
+        });
+    }
+
+    function updateSelectionDisplay() {
+        const selectionDisplayItems = document.querySelector('.selection-display-items');
+        const selectionDisplayTotal = document.querySelector('.selection-display-total-price');
+
+        if (!selectionDisplayItems || !selectionDisplayTotal) return;
+
+        let itemsHTML = '';
+        let totalPrice = 0;
+
+        selectedFoods.forEach(food => {
+            const foodTotal = food.price * food.quantity;
+            totalPrice += foodTotal;
+
+            itemsHTML += `
+                <div class="selection-display-item">
+                    ${food.image ?
+                        `<img src="${food.image}" alt="${food.title}" class="selection-display-item-image">` :
+                        `<div class="selection-display-item-image bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-400">
+                            <i class="fas fa-utensils"></i>
+                        </div>`
+                    }
+                    <div class="selection-display-item-details">
+                        <div class="selection-display-item-title">${food.title}</div>
+                        <div class="selection-display-item-price">${food.price.toLocaleString()} تومان</div>
+                        <div class="selection-display-item-quantity">تعداد: ${food.quantity}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        selectionDisplayItems.innerHTML = itemsHTML;
+        selectionDisplayTotal.textContent = totalPrice.toLocaleString() + ' تومان';
+    }
+
+    // ==================== مدیریت رزرو ====================
+    function initializeReservation() {
+        // وقتی مودال باز می‌شود
+        const reservationModal = document.getElementById('reservationModal');
+        if (reservationModal) {
+            reservationModal.addEventListener('show.bs.modal', function () {
+                resetReservationForm();
+            });
+        }
+
+        // اعتبارسنجی فیلدها
+        const phoneNumber = document.getElementById('phoneNumber');
+        const nationalCode = document.getElementById('nationalCode');
+        const confirmationCode = document.getElementById('confirmationCode');
+
+        if (phoneNumber) {
+            phoneNumber.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        if (nationalCode) {
+            nationalCode.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        if (confirmationCode) {
+            confirmationCode.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+    }
+
+    // بازنشانی فرم رزرو
+    function resetReservationForm() {
+        currentReservation = {
+            tableId: null,
+            date: null,
+            startTime: null,
+            endTime: null,
+            guestCount: 2,
+            reservationCode: null
+        };
+
+        document.getElementById('reservationDate').value = '';
+        document.getElementById('guestCount').value = '2';
+        document.getElementById('fullName').value = '';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('nationalCode').value = '';
+        document.getElementById('specialRequests').value = '';
+        document.getElementById('confirmationCode').value = '';
+
+        showStep(1);
+    }
+
+    // نمایش مرحله مورد نظر رزرو
+    function showStep(stepNumber) {
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step3').classList.add('hidden');
+        document.getElementById('step4').classList.add('hidden');
+        document.getElementById(`step${stepNumber}`).classList.remove('hidden');
+    }
+
+    // بررسی دسترسی رزرو
+    function checkAvailability() {
+        const date = document.getElementById('reservationDate').value.trim();
+        const guestCount = document.getElementById('guestCount').value;
+
+        if (!date) {
+            showAlert('لطفا تاریخ را وارد کنید', 'error');
+            return;
+        }
+
+        if (!/^\d{4}\/\d{2}\/\d{2}$/.test(date)) {
+            showAlert('فرمت تاریخ نامعتبر است. مثال: 1403/01/01', 'error');
+            return;
+        }
+
+        currentReservation.date = date;
+        currentReservation.guestCount = guestCount;
+
+        // نمایش لودینگ
+        document.getElementById('availabilityResults').innerHTML = `
+            <div class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                <p class="text-gray-600 mt-3">در حال بررسی دسترسی میزها...</p>
+            </div>
+        `;
+
+        // درخواست AJAX داینامیک
+        fetch(`/table/{{ restaurant.slug }}/check-availability/?date=${date}&guest_count=${guestCount}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.available) {
+                    showAvailabilityResults(data.tables);
+                    showStep(2);
+                } else {
+                    document.getElementById('availabilityResults').innerHTML = `
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                            <i class="fas fa-info-circle text-yellow-500 text-xl mb-2"></i>
+                            <p class="text-yellow-700">${data.message || 'متأسفانه در این تاریخ میز خالی موجود نیست'}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('availabilityResults').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-xl mb-2"></i>
+                        <p class="text-red-700">خطا در بررسی دسترسی</p>
+                    </div>
+                `;
+            });
+    }
+
+    // نمایش نتایج دسترسی رزرو
+    function showAvailabilityResults(tables) {
+        if (tables.length === 0) {
+            document.getElementById('availabilityResults').innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                    <i class="fas fa-info-circle text-yellow-500 text-xl mb-2"></i>
+                    <p class="text-yellow-700">هیچ میزی برای تاریخ انتخاب شده موجود نیست</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="space-y-4">';
+
+        tables.forEach(table => {
+            html += `
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h6 class="font-semibold text-gray-800">میز ${table.table_number}</h6>
+                            <p class="text-sm text-gray-600">ظرفیت: ${table.capacity} نفر • نوع: ${table.table_type}</p>
+                            <p class="text-xs text-blue-600 mt-1">ساعات کاری: ${table.working_hours}</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                            ${table.available_slots.length} اسلات آزاد
+                        </span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 bg-gray-50 rounded-lg">
+            `;
+
+            table.available_slots.forEach(slot => {
+                const isEvening = parseInt(slot.start.split(':')[0]) >= 16;
+                const timeClass = isEvening
+                    ? 'bg-purple-100 border-purple-300 text-purple-700 hover:bg-purple-200'
+                    : 'bg-white border-orange-200 text-orange-600 hover:bg-orange-50';
+
+                html += `
+                    <button type="button"
+                            class="slot-btn ${timeClass} border px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                            onclick="selectTimeSlot(${table.id}, '${slot.start}', '${slot.end}', '${slot.display}')">
+                        ${slot.display}
+                        ${isEvening ? '🌙' : '☀️'}
+                    </button>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        document.getElementById('availabilityResults').innerHTML = html;
+    }
+
+    // انتخاب زمان رزرو
+    function selectTimeSlot(tableId, startTime, endTime, displayTime) {
+        const formatTime = (timeStr) => {
+            if (timeStr.length === 5) {
+                return timeStr + ':00';
+            }
+            return timeStr;
+        };
+
+        currentReservation.tableId = tableId;
+        currentReservation.startTime = formatTime(startTime);
+        currentReservation.endTime = formatTime(endTime);
+
+        showAlert(`زمان ${displayTime} انتخاب شد`, 'success');
+        showStep(3);
+    }
+
+    // بازگشت به مرحله ۱ رزرو
+    function backToStep1() {
+        showStep(1);
+    }
+
+    // بازگشت به مرحله ۲ رزرو
+    function backToStep2() {
+        showStep(2);
+    }
+
+    // ثبت رزرو
+    function submitReservation() {
+        const fullName = document.getElementById('fullName').value.trim();
+        const phoneNumber = document.getElementById('phoneNumber').value.trim();
+
+        if (!fullName || !phoneNumber) {
+            showAlert('لطفا نام کامل و شماره تماس را وارد کنید', 'error');
+            return;
+        }
+
+        if (phoneNumber.length < 10) {
+            showAlert('شماره تماس باید حداقل ۱۰ رقم باشد', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('table_id', currentReservation.tableId);
+        formData.append('reservation_date', currentReservation.date);
+        formData.append('start_time', currentReservation.startTime);
+        formData.append('end_time', currentReservation.endTime);
+        formData.append('guest_count', currentReservation.guestCount);
+        formData.append('full_name', fullName);
+        formData.append('phone_number', phoneNumber);
+        formData.append('national_code', document.getElementById('nationalCode').value.trim());
+        formData.append('special_requests', document.getElementById('specialRequests').value.trim());
+
+        // نمایش لودینگ
+        showStep(4);
+        document.getElementById('successMessage').innerHTML = `
+            <div class="text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-3"></div>
+                <p class="text-gray-600">در حال ثبت رزرو...</p>
+            </div>
+        `;
+
+        // درخواست AJAX داینامیک
+        fetch(`/table/{{ restaurant.slug }}/create-reservation/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentReservation.reservationCode = data.reservation_code;
+                showSuccessMessage(data);
+            } else {
+                showStep(3);
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStep(3);
+            showAlert('خطا در ثبت رزرو', 'error');
+        });
+    }
+
+    // نمایش پیام موفقیت رزرو
+    function showSuccessMessage(data) {
+        document.getElementById('successMessage').innerHTML = `
+            <h6 class="font-semibold text-gray-800 mb-2">✅ رزرو با موفقیت ثبت شد</h6>
+            <p class="text-sm text-gray-600 mb-1">کد رزرو: <span class="font-mono font-bold text-orange-600">${data.reservation_code}</span></p>
+            <p class="text-sm text-gray-600">کد تأیید: <span class="font-mono font-bold text-green-600">${data.confirmation_code}</span></p>
+            <p class="text-xs text-gray-500 mt-2">کد تأیید برای فعال‌سازی رزرو لازم است</p>
+        `;
+
+        document.getElementById('verificationSection').classList.remove('hidden');
+    }
+
+    // تأیید رزرو
+    function verifyReservation() {
+        const confirmationCode = document.getElementById('confirmationCode').value.trim();
+
+        if (!confirmationCode || confirmationCode.length !== 6) {
+            showAlert('لطفا کد تأیید ۶ رقمی را وارد کنید', 'error');
+            return;
+        }
+
+        fetch(`/table/verify/${currentReservation.reservationCode}/`, {
+            method: 'POST',
+            body: JSON.stringify({ confirmation_code: confirmationCode }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('verificationSection').classList.add('hidden');
+                document.getElementById('verifiedSection').classList.remove('hidden');
+                document.getElementById('finalMessage').innerHTML = `
+                    رزرو شما با کد <span class="font-mono font-bold">${currentReservation.reservationCode}</span>
+                    تأیید شد. منتظر حضور شما هستیم!
+                `;
+
+                // بستن خودکار مودال بعد از ۳ ثانیه
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('reservationModal'));
+                    modal.hide();
+                }, 3000);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('خطا در تأیید رزرو', 'error');
+        });
+    }
+
+    // ==================== توابع کمکی ====================
+    function showNotification(message) {
+        const existingNotification = document.querySelector('.notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = 'notification fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    function showAlert(message, type = 'info') {
+        const alertClass = {
+            'success': 'bg-green-50 border-green-200 text-green-700',
+            'error': 'bg-red-50 border-red-200 text-red-700',
+            'info': 'bg-blue-50 border-blue-200 text-blue-700',
+            'warning': 'bg-yellow-50 border-yellow-200 text-yellow-700'
+        }[type];
+
+        const iconClass = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-circle',
+            'info': 'fa-info-circle',
+            'warning': 'fa-exclamation-triangle'
+        }[type];
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `fixed top-4 right-4 ${alertClass} border rounded-lg p-4 shadow-lg z-50 max-w-sm`;
+        alertDiv.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fas ${iconClass}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    // ==================== مقداردهی اولیه ====================
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTheme();
+        initializeCategories();
+        initializeSearch();
+        initializeCategoriesSlider();
+        initializeSound();
+        initializeSelectionList();
+        initializeReservation();
+
+        // بارگذاری اولیه لیست انتخاب
+        updateSelectionList();
+        updateOrderButtons();
+
+        // توقف پخش صدا وقتی صفحه بسته می‌شود
+        window.addEventListener('beforeunload', () => {
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+            }
+        });
+    });
+</script>

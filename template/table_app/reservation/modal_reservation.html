@@ -226,6 +226,37 @@
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+
+/* اسکرول بار زیبا برای اسلات‌ها */
+.max-h-40::-webkit-scrollbar {
+    width: 6px;
+}
+.max-h-40::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+.max-h-40::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+.max-h-40::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* تفکیک بصری اسلات‌های عصر و روز */
+.bg-purple-100 {
+    background-color: #f3e8ff;
+}
+.bg-purple-200 {
+    background-color: #e9d5ff;
+}
+.border-purple-300 {
+    border-color: #d8b4fe;
+}
+.text-purple-700 {
+    color: #7e22ce;
+}
 </style>
 
 <script>
@@ -334,6 +365,7 @@ function checkAvailability() {
 }
 
 // نمایش نتایج دسترسی
+// نمایش نتایج دسترسی
 function showAvailabilityResults(tables) {
     if (tables.length === 0) {
         document.getElementById('availabilityResults').innerHTML = `
@@ -354,17 +386,28 @@ function showAvailabilityResults(tables) {
                     <div>
                         <h6 class="font-semibold text-gray-800">میز ${table.table_number}</h6>
                         <p class="text-sm text-gray-600">ظرفیت: ${table.capacity} نفر • نوع: ${table.table_type}</p>
+                        <p class="text-xs text-blue-600 mt-1">ساعات کاری: ${table.working_hours}</p>
                     </div>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                        ${table.available_slots.length} اسلات آزاد
+                    </span>
                 </div>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 bg-gray-50 rounded-lg">
         `;
 
+        // نمایش تمام اسلات‌ها بدون محدودیت
         table.available_slots.forEach(slot => {
+            const isEvening = parseInt(slot.start.split(':')[0]) >= 16;
+            const timeClass = isEvening
+                ? 'bg-purple-100 border-purple-300 text-purple-700 hover:bg-purple-200'
+                : 'bg-white border-orange-200 text-orange-600 hover:bg-orange-50';
+
             html += `
                 <button type="button"
-                        class="bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                        class="${timeClass} border px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                         onclick="selectTimeSlot(${table.id}, '${slot.start}', '${slot.end}', '${slot.display}')">
                     ${slot.display}
+                    ${isEvening ? '🌙' : '☀️'}
                 </button>
             `;
         });
@@ -573,3 +616,6 @@ document.getElementById('confirmationCode').addEventListener('input', function(e
     this.value = this.value.replace(/[^0-9]/g, '');
 });
 </script>
+
+
+

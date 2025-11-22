@@ -6,47 +6,33 @@
      <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
+
    {% if restaurant.isSeo %}
-
-
         <title>منوی دیجیتال {{ restaurant.title }} | سفارش آنلاین غذا</title>
-
-    <!-- متا تگ‌های اصلی SEO -->
-    <meta name="description" content="منوی دیجیتال رستوران {{ restaurant.title }} - {{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا با بهترین کیفیت و سریع‌ترین زمان آماده‌سازی' }}">
-
-    <!-- متا تگ‌های Open Graph برای شبکه‌های اجتماعی -->
-    <meta property="og:title" content="منوی دیجیتال {{ restaurant.title }}">
-    <meta property="og:description" content="{{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا از رستوران '|add:restaurant.title }}">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="fa_IR">
-    <meta property="og:site_name" content="{{ restaurant.title }}">
-
-    <!-- متا تگ Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="منوی دیجیتال {{ restaurant.title }}">
-    <meta name="twitter:description" content="{{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا از رستوران '|add:restaurant.title }}">
-
-    <!-- متا تگ‌های اضافی -->
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="{{ restaurant.title }}">
-    <meta name="copyright" content="{{ restaurant.title }}">
-    <meta name="language" content="fa">
-    <meta name="coverage" content="Worldwide">
-    <meta name="distribution" content="Global">
-    <meta name="rating" content="General">
-    <meta name="revisit-after" content="7 days">
-
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
-
-    <!-- متا تگ‌های موبایل -->
-    <meta name="format-detection" content="telephone=no">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="MobileOptimized" content="320">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-
+        <meta name="description" content="منوی دیجیتال رستوران {{ restaurant.title }} - {{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا با بهترین کیفیت و سریع‌ترین زمان آماده‌سازی' }}">
+        <meta property="og:title" content="منوی دیجیتال {{ restaurant.title }}">
+        <meta property="og:description" content="{{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا از رستوران '|add:restaurant.title }}">
+        <meta property="og:type" content="website">
+        <meta property="og:locale" content="fa_IR">
+        <meta property="og:site_name" content="{{ restaurant.title }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="منوی دیجیتال {{ restaurant.title }}">
+        <meta name="twitter:description" content="{{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا از رستوران '|add:restaurant.title }}">
+        <meta name="robots" content="index, follow">
+        <meta name="author" content="{{ restaurant.title }}">
+        <meta name="copyright" content="{{ restaurant.title }}">
+        <meta name="language" content="fa">
+        <meta name="coverage" content="Worldwide">
+        <meta name="distribution" content="Global">
+        <meta name="rating" content="General">
+        <meta name="revisit-after" content="7 days">
+        <link rel="canonical" href="{{ request.build_absolute_uri }}">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
    {% endif %}
 
     <!-- Favicon -->
@@ -59,11 +45,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Schema.org Structured Data -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     {% if restaurant.isSeo %}
-
       <script type="application/ld+json">
         {
         "@context": "https://schema.org",
@@ -122,1242 +106,79 @@
             ]
         }
         }
-</script>
-
+      </script>
     {% endif %}
 
+    <link rel="stylesheet" href="{% static 'assets/css/restaurant.css' %}">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
-
-        * {
-            font-family: 'Vazirmatn', sans-serif;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        body {
-            background-color: #f8fafc;
-            color: #1e293b;
-            padding-bottom: 80px;
-            overflow-x: hidden;
-        }
-
-        body.dark-mode {
-            background-color: #0f172a;
-            color: #e2e8f0;
-        }
-
-        .food-card {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border: 1px solid #f1f5f9;
-            height: calc(25vh - 20px);
-            min-height: 160px;
-        }
-
-        .dark-mode .food-card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-
-        .cooking-time {
-            display: flex;
-            align-items: center;
-            color: #6b7280;
-            font-size: 0.75rem;
-            gap: 4px;
-        }
-
-        .dark-mode .cooking-time {
-            color: #9ca3af;
-            background-color: #334155 !important;
-        }
-
-        /* استایل‌های جدید برای دسته‌بندی‌های پایین */
-        .categories-bottom {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: white;
-            border-top: 1px solid #e2e8f0;
-            z-index: 30;
-            padding: 8px 0;
-        }
-
-        .dark-mode .categories-bottom {
-            background-color: #1e293b;
-            border-top: 1px solid #334155;
-        }
-
-        .categories-scroll {
-            display: flex;
-            overflow-x: auto;
-            padding: 0 16px;
-            gap: 12px;
-        }
-
-        .category-bottom-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 12px;
-            min-width: 70px;
-            transition: all 0.2s ease;
-        }
-
-        .category-bottom-item:hover {
-            background-color: #f8fafc;
-        }
-
-        .dark-mode .category-bottom-item:hover {
-            background-color: #334155;
-        }
-
-        .category-bottom-active {
-            background-color: #3b82f6 !important;
-            color: white !important;
-        }
-
-        .dark-mode .category-bottom-active {
-            background-color: #1e40af !important;
-        }
-
-        .category-bottom-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
-
-        .category-bottom-name {
-            font-size: 0.65rem;
-            font-weight: 500;
-            text-align: center;
-            line-height: 1.2;
-            max-width: 70px;
-        }
-
-        /* منوی کشویی دسته‌بندی‌ها از سمت راست */
-        .categories-slider {
-            position: fixed;
-            top: 0;
-            right: -320px;
-            width: 320px;
-            height: 100vh;
-            background-color: white;
-            z-index: 50;
-            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .categories-slider.open {
-            right: 0;
-        }
-
-        .dark-mode .categories-slider {
-            background-color: #1e293b;
-            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .slider-header {
-            padding: 16px;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-        }
-
-        .dark-mode .slider-header {
-            border-bottom: 1px solid #334155;
-        }
-
-        .slider-title {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .dark-mode .slider-title {
-            color: #e2e8f0;
-        }
-
-        .slider-close {
-            padding: 4px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .slider-close:hover {
-            background-color: #f1f5f9;
-        }
-
-        .dark-mode .slider-close:hover {
-            background-color: #334155;
-        }
-
-        /* نشانگر کشیدن */
-        .drag-handle {
-            position: absolute;
-            top: 50%;
-            left: 8px;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 40px;
-            background-color: #cbd5e1;
-            border-radius: 2px;
-            cursor: grab;
-        }
-
-        .dark-mode .drag-handle {
-            background-color: #475569;
-        }
-
-        .slider-categories {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .slider-category-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 12px 16px;
-            border-radius: 12px;
-            transition: all 0.2s ease;
-            margin-bottom: 8px;
-        }
-
-        .slider-category-item:hover {
-            background-color: #f8fafc;
-        }
-
-        .dark-mode .slider-category-item:hover {
-            background-color: #334155;
-        }
-
-        .slider-category-active {
-            background-color: #3b82f6 !important;
-            color: white !important;
-        }
-
-        .dark-mode .slider-category-active {
-            background-color: #1e40af !important;
-        }
-
-        .slider-category-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .slider-category-name {
-            font-size: 0.9rem;
-            font-weight: 500;
-            flex: 1;
-        }
-
-        .dark-mode .slider-category-name {
-            color: #e2e8f0;
-        }
-
-        /* دکمه باز کردن منوی کشویی */
-        .categories-toggle {
-            position: fixed;
-            bottom: 70px;
-            left: 16px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            z-index: 35;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .categories-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
-        }
-
-        .categories-toggle i {
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .categories-toggle.open i {
-            transform: rotate(180deg);
-        }
-
-        /* بهبود نمایش غذاها */
-        .food-image {
-            border-radius: 12px 0 0 12px;
-        }
-
-        .food-content {
-            padding: 12px;
-        }
-
-        .food-title {
-            font-weight: 700;
-            font-size: 0.9rem;
-            line-height: 1.3;
-            color: #1e293b;
-        }
-
-        .dark-mode .food-title {
-            color: #f8fafc;
-        }
-
-        .food-price {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: #3b82f6;
-            white-space: nowrap;
-        }
-
-        .food-description {
-            color: #64748b;
-            font-size: 0.75rem;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .dark-mode .food-description {
-            color: #94a3b8;
-        }
-
-        /* استایل‌های هدر */
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .restaurant-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .restaurant-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            line-height: 1.2;
-            color: #1e293b;
-        }
-
-        .dark-mode .restaurant-name {
-            color: #f8fafc;
-        }
-
-        .restaurant-subtitle {
-            font-size: 0.75rem;
-            color: #64748b;
-            line-height: 1.2;
-        }
-
-        .dark-mode .restaurant-subtitle {
-            color: #94a3b8;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-icon {
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .header-icon:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .dark-mode .header-icon:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .hamburger-icon {
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hamburger-icon:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .dark-mode .hamburger-icon:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* منوی همبرگر */
-        .hamburger-menu {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            backdrop-filter: blur(20px);
-        }
-
-        .dark-mode .hamburger-menu {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        }
-
-        .menu-item {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
-
-        /* نوتیفیکیشن */
-        .notification {
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translate(-50%, -20px);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-        }
-
-        /* استایل‌های جدید برای آیکون صدا */
-        .sound-btn {
-            transition: all 0.2s ease;
-        }
-
-        .sound-btn.playing {
-            color: #3b82f6 !important;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        /* بهبود نمایش زمان در حالت تاریک */
-        .dark-mode .cooking-time {
-            background-color: #334155 !important;
-            color: #cbd5e1 !important;
-        }
-
-        /* استایل‌های جدید برای محتوای اصلی */
-        .main-content {
-            padding-top: 120px;
-            padding-bottom: 70px;
-        }
-
-        .food-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        @media (min-width: 640px) {
-            .food-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* استایل‌های برای نمایش 4 کارت در هر اسکرول */
-        .food-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .food-card-inner {
-            display: flex;
-            height: 100%;
-        }
-
-        .food-image-container {
-            width: 40%;
-            flex-shrink: 0;
-        }
-
-        .food-details {
-            width: 60%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        /* لایه محو برای پس‌زمینه وقتی منو باز است */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 45;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* استایل‌های جدید برای ویژگی لیست انتخاب غذا */
-        .selection-list-btn {
-            position: fixed;
-            bottom: 70px;
-            right: 16px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-            z-index: 35;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .selection-list-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
-        }
-
-        .selection-list-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background-color: #ef4444;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .selection-list-panel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70vh;
-            background-color: white;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            z-index: 60;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .selection-list-panel.open {
-            transform: translateY(0);
-        }
-
-        .dark-mode .selection-list-panel {
-            background-color: #1e293b;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .selection-list-header {
-            padding: 16px;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-        }
-
-        .dark-mode .selection-list-header {
-            border-bottom: 1px solid #334155;
-        }
-
-        .selection-list-title {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .dark-mode .selection-list-title {
-            color: #e2e8f0;
-        }
-
-        .selection-list-close {
-            padding: 4px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .selection-list-close:hover {
-            background-color: #f1f5f9;
-        }
-
-        .dark-mode .selection-list-close:hover {
-            background-color: #334155;
-        }
-
-        .selection-list-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .selection-list-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #64748b;
-            text-align: center;
-        }
-
-        .dark-mode .selection-list-empty {
-            color: #94a3b8;
-        }
-
-        .selection-list-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            background-color: #f8fafc;
-            transition: all 0.2s ease;
-        }
-
-        .dark-mode .selection-list-item {
-            background-color: #334155;
-        }
-
-        .selection-list-item-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .selection-list-item-details {
-            flex: 1;
-        }
-
-        .selection-list-item-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-        }
-
-        .dark-mode .selection-list-item-title {
-            color: #e2e8f0;
-        }
-
-        .selection-list-item-price {
-            color: #3b82f6;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .selection-list-item-quantity {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 4px;
-        }
-
-        .quantity-btn {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.7rem;
-        }
-
-        .dark-mode .quantity-btn {
-            background-color: #475569;
-            color: #e2e8f0;
-        }
-
-        .quantity-btn:hover {
-            background-color: #cbd5e1;
-        }
-
-        .dark-mode .quantity-btn:hover {
-            background-color: #64748b;
-        }
-
-        .quantity-value {
-            font-size: 0.8rem;
-            font-weight: 600;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .dark-mode .quantity-value {
-            color: #e2e8f0;
-        }
-
-        .selection-list-item-remove {
-            padding: 6px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #ef4444;
-        }
-
-        .selection-list-item-remove:hover {
-            background-color: #fef2f2;
-        }
-
-        .dark-mode .selection-list-item-remove:hover {
-            background-color: #7f1d1d;
-        }
-
-        .selection-list-actions {
-            padding: 16px;
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            gap: 12px;
-        }
-
-        .dark-mode .selection-list-actions {
-            border-top: 1px solid #334155;
-        }
-
-        .selection-list-action-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .selection-list-clear {
-            background-color: #fef2f2;
-            color: #dc2626;
-        }
-
-        .dark-mode .selection-list-clear {
-            background-color: #7f1d1d;
-            color: #fca5a5;
-        }
-
-        .selection-list-show {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .selection-list-clear:hover {
-            background-color: #fee2e2;
-        }
-
-        .dark-mode .selection-list-clear:hover {
-            background-color: #991b1b;
-        }
-
-        .selection-list-show:hover {
-            opacity: 0.9;
-        }
-
-        /* دکمه سفارش با حالت‌های مختلف */
-        .order-btn {
-            background-color: #3b82f6;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            min-width: 80px;
-        }
-
-        .order-btn:hover {
-            background-color: #2563eb;
-            transform: translateY(-1px);
-        }
-
-        .order-btn.added {
-            background-color: #10b981;
-        }
-
-        .order-btn.added:hover {
-            background-color: #059669;
-        }
-
-        .order-btn i {
-            font-size: 0.7rem;
-        }
-
-        /* صفحه نمایش لیست انتخاب */
-        .selection-display {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: white;
-            z-index: 70;
-            padding: 20px;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .selection-display.open {
-            transform: translateY(0);
-        }
-
-        .dark-mode .selection-display {
-            background-color: #0f172a;
-        }
-
-        .selection-display-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .dark-mode .selection-display-header {
-            border-bottom: 1px solid #334155;
-        }
-
-        .selection-display-title {
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .dark-mode .selection-display-title {
-            color: #e2e8f0;
-        }
-
-        .selection-display-close {
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .selection-display-close:hover {
-            background-color: #f1f5f9;
-        }
-
-        .dark-mode .selection-display-close:hover {
-            background-color: #334155;
-        }
-
-        .selection-display-items {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .selection-display-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 12px;
-            background-color: #f8fafc;
-        }
-
-        .dark-mode .selection-display-item {
-            background-color: #1e293b;
-        }
-
-        .selection-display-item-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .selection-display-item-details {
-            flex: 1;
-        }
-
-        .selection-display-item-title {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 4px;
-        }
-
-        .dark-mode .selection-display-item-title {
-            color: #e2e8f0;
-        }
-
-        .selection-display-item-price {
-            color: #3b82f6;
-            font-weight: 600;
-        }
-
-        .selection-display-item-quantity {
-            font-size: 0.9rem;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .dark-mode .selection-display-item-quantity {
-            color: #94a3b8;
-        }
-
-        .selection-display-total {
-            padding: 16px;
-            background-color: #f1f5f9;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .dark-mode .selection-display-total {
-            background-color: #1e293b;
-        }
-
-        .selection-display-total-label {
-            font-weight: 600;
-        }
-
-        .dark-mode .selection-display-total-label {
-            color: #e2e8f0;
-        }
-
-        .selection-display-total-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #3b82f6;
-        }
-
-        .selection-display-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .selection-display-action-btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .selection-display-back {
-            background-color: #f1f5f9;
-            color: #64748b;
-        }
-
-        .dark-mode .selection-display-back {
-            background-color: #334155;
-            color: #cbd5e1;
-        }
-
-        .selection-display-call {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .selection-display-back:hover {
-            background-color: #e2e8f0;
-        }
-
-        .dark-mode .selection-display-back:hover {
-            background-color: #475569;
-        }
-
-        .selection-display-call:hover {
-            opacity: 0.9;
-        }
-
-        /* استایل‌های جدید برای جعبه جستجو */
-        .search-container {
-            background-color: white;
-            border-top: 1px solid #f1f5f9;
+        /* رفع مشکل dark mode برای هدر */
+        .dark-mode header {
+            background-color: #1e293b !important;
+            border-bottom-color: #334155 !important;
         }
 
         .dark-mode .search-container {
-            background-color: #1e293b;
-            border-top: 1px solid #334155;
-        }
-
-        .search-box {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background-color: #1e293b !important;
+            border-top-color: #334155 !important;
         }
 
         .dark-mode .search-box {
-            background-color: #334155;
-            border: 1px solid #475569;
-        }
-
-        .search-box input {
-            color: #1e293b;
+            background-color: #334155 !important;
+            border-color: #475569 !important;
         }
 
         .dark-mode .search-box input {
-            color: #e2e8f0;
-        }
-
-        .search-box input::placeholder {
-            color: #64748b;
+            color: #e2e8f0 !important;
         }
 
         .dark-mode .search-box input::placeholder {
-            color: #94a3b8;
+            color: #94a3b8 !important;
         }
 
-        /* استایل‌های جدید برای هدر */
-        header {
-            background-color: white;
-            border-bottom: 1px solid #f1f5f9;
+        /* رفع مشکل فاصله جستجو */
+        .main-content {
+            padding-top: 140px !important;
         }
 
-        .dark-mode header {
+        /* استایل‌های مودال رزرو برای dark mode */
+        .dark-mode .modal-content {
             background-color: #1e293b;
-            border-bottom: 1px solid #334155;
+            color: #e2e8f0;
         }
 
-        .hamburger-icon {
-            color: #64748b;
+        .dark-mode .modal-header {
+            border-bottom-color: #334155;
         }
 
-        .dark-mode .hamburger-icon {
-            color: #cbd5e1;
-        }
-
-        .header-icon {
-            background-color: #f1f5f9;
-            color: #64748b;
-        }
-
-        .dark-mode .header-icon {
+        .dark-mode .form-control {
             background-color: #334155;
-            color: #cbd5e1;
+            border-color: #475569;
+            color: #e2e8f0;
         }
 
-        /* استایل‌های جدید برای دکمه زبان */
-        .lang-btn {
-            background-color: #f1f5f9;
-            color: #64748b;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .dark-mode .lang-btn {
+        .dark-mode .form-control:focus {
             background-color: #334155;
-            color: #cbd5e1;
+            border-color: #3b82f6;
+            color: #e2e8f0;
         }
 
-        /* استایل‌های جدید برای متن‌های مختلف */
-        .dark-mode .text-gray-600 {
-            color: #cbd5e1 !important;
+        .dark-mode .form-label {
+            color: #e2e8f0;
         }
 
-        .dark-mode .text-gray-300 {
-            color: #64748b !important;
+        .hidden {
+            display: none !important;
         }
 
-        .dark-mode .text-gray-400 {
-            color: #94a3b8 !important;
-        }
+        /* مطمئن شویم مودال رزرو پشت تقویم قرار می‌گیرد */
+#reservationModal {
+    z-index: 9990 !important;
+}
 
-        .dark-mode .text-gray-500 {
-            color: #64748b !important;
-        }
-
-        .dark-mode .text-gray-700 {
-            color: #cbd5e1 !important;
-        }
-
-        .dark-mode .bg-gray-100 {
-            background-color: #334155 !important;
-        }
-
-        .dark-mode .bg-gray-700 {
-            background-color: #475569 !important;
-        }
-
-        .dark-mode .bg-gray-800 {
-            background-color: #1e293b !important;
-        }
-
-        .dark-mode .border-gray-200 {
-            border-color: #334155 !important;
-        }
-
-        .dark-mode .border-gray-600 {
-            border-color: #475569 !important;
-        }
-
-        .dark-mode .border-gray-700 {
-            border-color: #475569 !important;
-        }
-
-        .dark-mode .bg-gray-50 {
-            background-color: #334155 !important;
-        }
-
-        .dark-mode .from-gray-100 {
-            --tw-gradient-from: #334155 !important;
-        }
-
-        .dark-mode .to-gray-200 {
-            --tw-gradient-to: #475569 !important;
-        }
-
-        .dark-mode .from-gray-700 {
-            --tw-gradient-from: #475569 !important;
-        }
-
-        .dark-mode .to-gray-600 {
-            --tw-gradient-to: #334155 !important;
-        }
-
-        .dark-mode .text-gray-400 {
-            color: #94a3b8 !important;
-        }
-
-        .dark-mode .text-gray-500 {
-            color: #64748b !important;
-        }
-
-        /* استایل‌های جدید برای بخش توضیحات رستوران */
-        .description-container {
-            background: #f8f9fa;
-            border: 1px solid #e5e7eb;
-        }
-
-        .dark-mode .description-container {
-            background: #374151;
-            border-color: #4b5563;
-        }
-
-        .description-header {
-            color: #374151;
-            transition: background-color 0.3s ease;
-        }
-
-        .dark-mode .description-header {
-            color: #e5e7eb;
-        }
-
-        .description-header:hover {
-            background-color: #f1f5f9;
-        }
-
-        .dark-mode .description-header:hover {
-            background-color: #4b5563;
-        }
-
-        .description-content div {
-            color: #4b5563;
-        }
-
-        .dark-mode .description-content div {
-            color: #d1d5db;
-        }
-
-        .description-container.expanded .description-content {
-            border-top-color: #e5e7eb;
-        }
-
-        .dark-mode .description-container.expanded .description-content {
-            border-top-color: #4b5563;
-        }
+.modal-backdrop {
+    z-index: 9980 !important;
+}
     </style>
 </head>
 <body>
@@ -1365,114 +186,59 @@
     <div class="overlay"></div>
 
     <!-- نوار بالایی اصلی -->
- <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
-    <div class="container mx-auto px-4 py-3">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="hamburger-icon cursor-pointer text-gray-600">
-                    <i class="fas fa-bars text-lg"></i>
-                </div>
-                <div class="logo-container flex items-center gap-3">
-                    <!-- لوگو -->
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                        ر
+    <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="hamburger-icon cursor-pointer text-gray-600">
+                        <i class="fas fa-bars text-lg"></i>
                     </div>
-                    <!-- اطلاعات رستوران -->
-                    <div class="restaurant-info">
-                        <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap">
-                            رستوران نمونه
+                    <div class="logo-container flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                            ر
                         </div>
-                        <div class="restaurant-subtitle text-xs text-gray-500 hidden sm:block">
-                            منوی دیجیتال
+                        <div class="restaurant-info">
+                            <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap">
+                                رستوران نمونه
+                            </div>
+                            <div class="restaurant-subtitle text-xs text-gray-500 hidden sm:block">
+                                منوی دیجیتال
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="header-actions flex items-center gap-2">
-                <!-- دکمه رزرو میز -->
-             <!-- در هر جایی که دکمه رزرو قرار دارد -->
-<!-- دکمه رزرو میز -->
-<a href="javascript:void(0);"
-   class="reservation-btn bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
-   data-bs-toggle="modal"
-   data-bs-target="#reservationModal">
-    <i class="fas fa-chair text-xs"></i>
-    <span class="hidden sm:inline">رزرو میز</span>
-    <span class="sm:hidden">رزرو</span>
-</a>
-                <!-- دکمه تغییر زبان - با لینک اصلی -->
-                <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline w-9 h-9 rounded-lg flex items-center justify-center text-sm hover:bg-gray-200 transition-colors">
-                    <span class="lang-text font-medium">EN</span>
-                </a>
+                <div class="header-actions flex items-center gap-2">
+                    <a href="javascript:void(0);"
+                       class="reservation-btn bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                       data-bs-toggle="modal"
+                       data-bs-target="#reservationModal">
+                        <i class="fas fa-chair text-xs"></i>
+                        <span class="hidden sm:inline">رزرو میز</span>
+                        <span class="sm:hidden">رزرو</span>
+                    </a>
 
-                <!-- دکمه تم -->
-                <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600 w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
-                    <i class="fas fa-moon text-sm"></i>
-                </button>
-            </div>
-        </div>
-    </div>
+                    <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline w-9 h-9 rounded-lg flex items-center justify-center text-sm hover:bg-gray-200 transition-colors">
+                        <span class="lang-text font-medium">EN</span>
+                    </a>
 
-
-    <div class="search-container bg-white py-3 border-t border-gray-100">
-        <div class="container mx-auto px-4">
-            <div class="search-box bg-gray-50 rounded-xl px-4 py-2 flex items-center gap-3 border border-gray-200">
-                <i class="fas fa-search text-gray-400 text-sm"></i>
-                <input type="text" placeholder="جستجوی غذا..."
-                       class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-sm">
-            </div>
-        </div>
-    </div>
-</header>
-    <!-- منوی هامبورگر -->
-    <div class="hamburger-menu fixed inset-0 z-50 hidden flex-col justify-center items-center p-6">
-        <div class="close-icon absolute top-4 left-4 text-white text-xl cursor-pointer p-2 hover:bg-white/10 rounded-full">
-            <i class="fas fa-times"></i>
-        </div>
-
-        <div class="hamburger-header absolute top-4 right-4 flex items-center gap-3 text-white">
-            {% if restaurant.logo %}
-            <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title }}"
-                 class="w-12 h-12 rounded-xl object-cover border-2 border-white/30">
-            {% else %}
-            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-lg border-2 border-white/30">
-                {{ restaurant.title|first }}
-            </div>
-            {% endif %}
-            <div class="restaurant-info">
-                <div class="restaurant-name font-bold text-white">{{ restaurant.title }}</div>
-                <div class="restaurant-subtitle text-blue-100">منوی دیجیتال</div>
+                    <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600 w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-moon text-sm"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="menu-items flex flex-col gap-3 w-full max-w-xs">
-            {% if restaurant.phone %}
-            <a href="tel:{{ restaurant.phone }}" class="menu-item text-white flex items-center gap-3">
-                <i class="fas fa-phone w-5 text-center text-blue-200"></i>
-                <span class="flex-1">{{ restaurant.phone }}</span>
-            </a>
-            {% endif %}
-
-            {% if restaurant.address %}
-            <a href="#" class="menu-item text-white flex items-center gap-3">
-                <i class="fas fa-map-marker-alt w-5 text-center text-blue-200"></i>
-                <span class="flex-1">آدرس رستوران</span>
-            </a>
-            {% endif %}
-
-            <div class="menu-item text-white flex items-center gap-3">
-                <i class="fas fa-clock w-5 text-center text-blue-200"></i>
-                <span class="flex-1">
-                    {% if restaurant.openingTime and restaurant.closingTime %}
-                    {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
-                    {% else %}
-                    ساعات کاری
-                    {% endif %}
-                </span>
+        <div class="search-container bg-white py-3 border-t border-gray-100">
+            <div class="container mx-auto px-4">
+                <div class="search-box bg-gray-50 rounded-xl px-4 py-2 flex items-center gap-3 border border-gray-200">
+                    <i class="fas fa-search text-gray-400 text-sm"></i>
+                    <input type="text" placeholder="جستجوی غذا..."
+                           class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-sm">
+                </div>
             </div>
         </div>
-    </div>
+    </header>
 
     <!-- محتوای اصلی -->
     <div class="main-content">
@@ -1510,7 +276,6 @@
                                             <i class="fas fa-clock text-xs"></i>
                                             <span class="text-xs font-medium">{{ food.preparationTime|default:"-" }} دقیقه</span>
                                         </div>
-                                        <!-- آیکون صدا برای همه غذاها -->
                                         <button class="sound-btn text-gray-400 hover:text-blue-500 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100 {% if food.sound %}cursor-pointer{% else %}cursor-not-allowed opacity-50{% endif %}"
                                                 {% if food.sound %}data-sound="{{ food.sound.url }}"{% endif %}
                                                 title="{% if food.sound %}پخش توضیحات صوتی{% else %}توضیحات صوتی موجود نیست{% endif %}">
@@ -1655,65 +420,201 @@
         </div>
     </div>
 
-    <!-- بخش توضیحات رستوران - قابل باز و بسته شدن -->
-    {% if restaurant.isSeo %}
+    <!-- مودال رزرو میز -->
+    <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                    <h5 class="modal-title font-bold" id="reservationModalLabel">
+                        <i class="fas fa-calendar-check ml-2"></i>
+                        رزرو میز در {{ restaurant.title }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
 
-      <div class="restaurant-description-section" style="
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 0 20px;
-    ">
-        <div class="description-container" style="
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 0;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-        ">
-            <!-- هدر قابل کلیک -->
-            <div class="description-header" style="
-                padding: 16px 20px;
-                cursor: pointer;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                transition: background-color 0.3s ease;
-            ">
-                <span style="
-                    font-size: 1rem;
-                    margin: 0;
-                    color: #374151;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                ">
+                    <!-- مرحله ۱: انتخاب تاریخ و تعداد مهمان -->
+                    <div id="step1">
+                        <div class="mb-4">
+                            <h6 class="font-semibold text-gray-700 mb-3">📅 انتخاب تاریخ و تعداد مهمان</h6>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="reservationDate" class="block text-sm font-medium text-gray-700 mb-2">
+                                        تاریخ رزرو
+                                    </label>
+                                    <div class="mb-3">
+
+    <div class="flex items-center gap-2">
+        <input type="text"
+               class="form-control flex-1"
+               id="reservationDate"
+               placeholder="برای انتخاب تاریخ کلیک کنید"
+               readonly
+               dir="ltr">
+        <button type="button"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+                id="openCalendarBtn">
+            <i class="fas fa-calendar-alt"></i>
+        </button>
+    </div>
+</div>
+                                    <p class="text-xs text-gray-500 mt-1">تاریخ را به صورت شمسی وارد کنید</p>
+                                </div>
+
+                                <div>
+                                    <label for="guestCount" class="block text-sm font-medium text-gray-700 mb-2">
+                                        تعداد مهمان
+                                    </label>
+                                    <select class="form-control" id="guestCount">
+                                        <option value="1">1 نفر</option>
+                                        <option value="2" selected>2 نفر</option>
+                                        <option value="3">3 نفر</option>
+                                        <option value="4">4 نفر</option>
+                                        <option value="5">5 نفر</option>
+                                        <option value="6">6 نفر</option>
+                                        <option value="7">7 نفر</option>
+                                        <option value="8">8 نفر</option>
+                                        <option value="9">9 نفر</option>
+                                        <option value="10">10 نفر</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="button"
+                                    class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
+                                    onclick="checkAvailability()">
+                                <i class="fas fa-search"></i>
+                                بررسی دسترسی
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- مرحله ۲: انتخاب میز و زمان -->
+                    <div id="step2" class="hidden">
+                        <div class="mb-4">
+                            <h6 class="font-semibold text-gray-700 mb-3">🪑 انتخاب میز و زمان</h6>
+                            <div id="availabilityResults" class="space-y-3 max-h-96 overflow-y-auto"></div>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button type="button"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
+                                    onclick="backToStep1()">
+                                <i class="fas fa-arrow-right"></i>
+                                بازگشت
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- مرحله ۳: اطلاعات مشتری -->
+                    <div id="step3" class="hidden">
+                        <div class="mb-4">
+                            <h6 class="font-semibold text-gray-700 mb-3">👤 اطلاعات تماس</h6>
+                            <form id="reservationForm">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="fullName" class="form-label">نام کامل *</label>
+                                        <input type="text" class="form-control" id="fullName" required>
+                                    </div>
+
+                                    <div>
+                                        <label for="phoneNumber" class="form-label">شماره تماس *</label>
+                                        <input type="tel" class="form-control" id="phoneNumber" required dir="ltr">
+                                    </div>
+
+                                    <div>
+                                        <label for="nationalCode" class="form-label">کد ملی (اختیاری)</label>
+                                        <input type="text" class="form-control" id="nationalCode" dir="ltr">
+                                    </div>
+
+                                    <div class="md:col-span-2">
+                                        <label for="specialRequests" class="form-label">درخواست‌های ویژه</label>
+                                        <textarea class="form-control" id="specialRequests" rows="3" placeholder="درخواست‌های خاص مانند جشن تولد، سالگرد و..."></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button type="button"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
+                                    onclick="backToStep2()">
+                                <i class="fas fa-arrow-right"></i>
+                                بازگشت
+                            </button>
+
+                            <button type="button"
+                                    class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
+                                    onclick="submitReservation()">
+                                <i class="fas fa-check"></i>
+                                ثبت رزرو
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- مرحله ۴: تأیید نهایی -->
+                    <div id="step4" class="hidden">
+                        <div class="text-center py-4">
+                            <div class="mb-4">
+                                <i class="fas fa-check-circle text-5xl text-green-500 mb-3"></i>
+                            </div>
+
+                            <div id="successMessage" class="mb-6"></div>
+
+                            <div id="verificationSection" class="hidden">
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                    <h6 class="font-semibold text-yellow-800 mb-2">📱 تأیید رزرو</h6>
+                                    <p class="text-sm text-yellow-700 mb-3">کد تأیید به شماره شما ارسال شد</p>
+
+                                    <div class="flex gap-2 justify-center">
+                                        <input type="text"
+                                               class="w-32 px-3 py-2 border border-yellow-300 rounded-lg text-center font-mono text-lg"
+                                               id="confirmationCode"
+                                               placeholder="______"
+                                               maxlength="6"
+                                               dir="ltr">
+                                        <button type="button"
+                                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300"
+                                                onclick="verifyReservation()">
+                                            تأیید
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="verifiedSection" class="hidden">
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <h6 class="font-semibold text-green-800 mb-2">✅ رزرو تأیید شد</h6>
+                                    <p class="text-sm text-green-700" id="finalMessage"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بخش توضیحات رستوران -->
+    {% if restaurant.isSeo %}
+      <div class="restaurant-description-section" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+        <div class="description-container" style="background: #f8f9fa; border-radius: 12px; padding: 0; overflow: hidden; border: 1px solid #e5e7eb;">
+            <div class="description-header" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease;">
+                <span style="font-size: 1rem; margin: 0; color: #374151; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
                      درباره {{ restaurant.title }}
                 </span>
-                <div class="toggle-icon" style="
-                    transition: transform 0.3s ease;
-                    color: #6b7280;
-                ">
+                <div class="toggle-icon" style="transition: transform 0.3s ease; color: #6b7280;">
                     <i class="fas fa-chevron-down"></i>
                 </div>
             </div>
 
-            <!-- محتوای قابل باز و بسته شدن -->
-            <div class="description-content" style="
-                padding: 0 20px;
-                max-height: 0;
-                overflow: hidden;
-                transition: all 0.4s ease;
-                border-top: 1px solid transparent;
-            ">
-                <div style="
-                    padding: 20px 0;
-                    text-align: justify;
-                    line-height: 1.7;
-                    color: #4b5563;
-                    font-size: 0.9rem;
-                ">
+            <div class="description-content" style="padding: 0 20px; max-height: 0; overflow: hidden; transition: all 0.4s ease; border-top: 1px solid transparent;">
+                <div style="padding: 20px 0; text-align: justify; line-height: 1.7; color: #4b5563; font-size: 0.9rem;">
                     {% if restaurant.text and restaurant.text != 'خالی' %}
                      {% autoescape off %}
                         <h2>درباره {{ restaurant.title }}</h2>
@@ -1728,593 +629,14 @@
             </div>
         </div>
     </div>
-
     {% endif %}
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-{% include "table_app/reservation/modal_reservation.html" %}
+    {% include "./resScript.html" %}
+    {% include "./persianCall.html" %}
 
-    <script>
-        const restaurantSlug = "{{ restaurant.slug }}";
-        let currentAudio = null;
-        let startX = 0;
-        let currentX = 0;
-        let isDragging = false;
-        let selectedFoods = JSON.parse(localStorage.getItem('selectedFoods_' + restaurantSlug)) || [];
 
-        // تغییر حالت روز/شب
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const icon = themeToggle.querySelector('i');
-            if (document.body.classList.contains('dark-mode')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
-        });
 
-        // بارگذاری تم ذخیره شده
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeToggle.querySelector('i').classList.remove('fa-moon');
-            themeToggle.querySelector('i').classList.add('fa-sun');
-        }
-
-        // فیلتر دسته‌بندی‌ها
-        const categoryButtons = document.querySelectorAll('.category-bottom-item, .slider-category-item');
-        const foodItems = document.querySelectorAll('.food-item');
-
-        function filterByCategory(categoryId) {
-            // به‌روزرسانی UI
-            categoryButtons.forEach(btn => {
-                btn.classList.remove('category-bottom-active', 'slider-category-active');
-            });
-
-            // فعال کردن دکمه‌های مربوطه در هر دو مکان
-            document.querySelectorAll(`[data-category="${categoryId}"]`).forEach(btn => {
-                if(btn.classList.contains('category-bottom-item')) {
-                    btn.classList.add('category-bottom-active');
-                } else {
-                    btn.classList.add('slider-category-active');
-                }
-            });
-
-            // فیلتر غذاها
-            foodItems.forEach(item => {
-                const itemCategory = item.getAttribute('data-category');
-                if (categoryId === 'all' || itemCategory === categoryId) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const categoryId = this.getAttribute('data-category');
-                filterByCategory(categoryId);
-
-                // بستن منوی کشویی اگر باز است
-                if(categoriesSlider.classList.contains('open')) {
-                    toggleCategoriesSlider();
-                }
-            });
-        });
-
-        // جستجو
-        const searchInput = document.querySelector('.search-box input');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toLowerCase();
-            clearTimeout(searchTimeout);
-
-            searchTimeout = setTimeout(() => {
-                foodItems.forEach(item => {
-                    const title = item.querySelector('.food-title').textContent.toLowerCase();
-                    const description = item.querySelector('.food-description').textContent.toLowerCase();
-
-                    if (title.includes(query) || description.includes(query)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-
-                // اگر جستجو خالی شد، دسته‌بندی فعال را نشان بده
-                if (query === '') {
-                    const activeCategory = document.querySelector('.category-bottom-active');
-                    if (activeCategory) {
-                        const categoryId = activeCategory.getAttribute('data-category');
-                        filterByCategory(categoryId);
-                    }
-                }
-            }, 300);
-        });
-
-        // منوی هامبورگر
-        const hamburgerIcon = document.querySelector('.hamburger-icon');
-        const hamburgerMenu = document.querySelector('.hamburger-menu');
-        const closeIcon = document.querySelector('.close-icon');
-
-        hamburgerIcon.addEventListener('click', () => {
-            hamburgerMenu.classList.remove('hidden');
-        });
-
-        closeIcon.addEventListener('click', () => {
-            hamburgerMenu.classList.add('hidden');
-        });
-
-        // منوی کشویی دسته‌بندی‌ها از راست
-        const categoriesSlider = document.querySelector('.categories-slider');
-        const categoriesToggle = document.querySelector('.categories-toggle');
-        const sliderClose = document.querySelector('.slider-close');
-        const overlay = document.querySelector('.overlay');
-        const dragHandle = document.querySelector('.drag-handle');
-
-        function toggleCategoriesSlider() {
-            categoriesSlider.classList.toggle('open');
-            categoriesToggle.classList.toggle('open');
-            overlay.classList.toggle('active');
-
-            // تغییر فلش وقتی منو باز/بسته می‌شود
-            const icon = categoriesToggle.querySelector('i');
-            if (categoriesSlider.classList.contains('open')) {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
-            } else {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            }
-        }
-
-        categoriesToggle.addEventListener('click', toggleCategoriesSlider);
-        sliderClose.addEventListener('click', toggleCategoriesSlider);
-        overlay.addEventListener('click', toggleCategoriesSlider);
-
-        // قابلیت کشیدن برای بستن منو
-        dragHandle.addEventListener('mousedown', startDrag);
-        dragHandle.addEventListener('touchstart', startDrag);
-
-        function startDrag(e) {
-            e.preventDefault();
-            isDragging = true;
-            startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
-            currentX = startX;
-
-            document.addEventListener('mousemove', onDrag);
-            document.addEventListener('touchmove', onDrag);
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchend', endDrag);
-
-            categoriesSlider.style.transition = 'none';
-        }
-
-        function onDrag(e) {
-            if (!isDragging) return;
-
-            e.preventDefault();
-            currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
-            const diff = startX - currentX;
-
-            // فقط اگر به سمت راست کشیده شود
-            if (diff < 0) {
-                const newRight = Math.min(0, -diff);
-                categoriesSlider.style.right = `${newRight}px`;
-            }
-        }
-
-        function endDrag() {
-            if (!isDragging) return;
-
-            isDragging = false;
-            categoriesSlider.style.transition = 'right 0.3s ease';
-
-            const diff = startX - currentX;
-            const threshold = 100; // حداقل کشیدن برای بستن
-
-            if (diff > threshold) {
-                // بستن منو
-                categoriesSlider.style.right = '-320px';
-                setTimeout(() => {
-                    categoriesSlider.classList.remove('open');
-                    categoriesToggle.classList.remove('open');
-                    overlay.classList.remove('active');
-
-                    // تغییر فلش به حالت اول
-                    const icon = categoriesToggle.querySelector('i');
-                    icon.classList.remove('fa-chevron-left');
-                    icon.classList.add('fa-chevron-right');
-                }, 300);
-            } else {
-                // بازگشت به حالت باز
-                categoriesSlider.style.right = '0';
-            }
-
-            document.removeEventListener('mousemove', onDrag);
-            document.removeEventListener('touchmove', onDrag);
-            document.removeEventListener('mouseup', endDrag);
-            document.removeEventListener('touchend', endDrag);
-        }
-
-        // پخش صدا - نسخه بهبود یافته
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.sound-btn')) {
-                const soundBtn = e.target.closest('.sound-btn');
-                const soundUrl = soundBtn.getAttribute('data-sound');
-
-                if (!soundUrl) {
-                    showNotification('توضیحات صوتی برای این غذا موجود نیست');
-                    return;
-                }
-
-                // اگر صدا در حال پخش است، متوقف کن
-                if (currentAudio && !currentAudio.paused) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                    document.querySelectorAll('.sound-btn').forEach(btn => {
-                        btn.classList.remove('playing');
-                    });
-                }
-
-                // پخش صدا
-                currentAudio = new Audio(soundUrl);
-                currentAudio.play().then(() => {
-                    soundBtn.classList.add('playing');
-                    showNotification('در حال پخش توضیحات صوتی...');
-                }).catch(error => {
-                    console.error('Error playing sound:', error);
-                    showNotification('خطا در پخش صدا');
-                });
-
-                // وقتی صدا تمام شد
-                currentAudio.addEventListener('ended', () => {
-                    soundBtn.classList.remove('playing');
-                    showNotification('پخش توضیحات صوتی به پایان رسید');
-                });
-
-                // اگر خطایی در پخش صدا رخ داد
-                currentAudio.addEventListener('error', () => {
-                    soundBtn.classList.remove('playing');
-                    showNotification('خطا در پخش فایل صوتی');
-                });
-            }
-        });
-
-        // نمایش نوتیفیکیشن
-        function showNotification(message) {
-            // حذف نوتیفیکیشن قبلی اگر وجود دارد
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-
-            const notification = document.createElement('div');
-            notification.className = 'notification fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // بارگذاری اولیه - نمایش همه غذاها
-        window.addEventListener('load', () => {
-            const allCategoryBtn = document.querySelector('[data-category="all"]');
-            if (allCategoryBtn) {
-                filterByCategory('all');
-            }
-
-            // بارگذاری لیست انتخاب شده
-            updateSelectionList();
-            updateOrderButtons();
-        });
-
-        // توقف پخش صدا وقتی صفحه بسته می‌شود
-        window.addEventListener('beforeunload', () => {
-            if (currentAudio && !currentAudio.paused) {
-                currentAudio.pause();
-            }
-        });
-
-        // ========== ویژگی لیست انتخاب غذا ==========
-
-        // عناصر مربوط به لیست انتخاب
-        const selectionListBtn = document.querySelector('.selection-list-btn');
-        const selectionListPanel = document.querySelector('.selection-list-panel');
-        const selectionListClose = document.querySelector('.selection-list-close');
-        const selectionListItems = document.querySelector('.selection-list-items');
-        const selectionListEmpty = document.querySelector('.selection-list-empty');
-        const selectionListClear = document.querySelector('.selection-list-clear');
-        const selectionListShow = document.querySelector('.selection-list-show');
-        const selectionDisplay = document.querySelector('.selection-display');
-        const selectionDisplayClose = document.querySelector('.selection-display-close');
-        const selectionDisplayItems = document.querySelector('.selection-display-items');
-        const selectionDisplayTotal = document.querySelector('.selection-display-total-price');
-        const selectionDisplayBack = document.querySelector('.selection-display-back');
-        const selectionDisplayCall = document.querySelector('.selection-display-call');
-        const orderBtns = document.querySelectorAll('.order-btn');
-
-        // باز کردن/بستن پنل لیست انتخاب
-        selectionListBtn.addEventListener('click', () => {
-            selectionListPanel.classList.add('open');
-            overlay.classList.add('active');
-        });
-
-        selectionListClose.addEventListener('click', () => {
-            selectionListPanel.classList.remove('open');
-            overlay.classList.remove('active');
-        });
-
-        // باز کردن/بستن صفحه نمایش لیست انتخاب
-        selectionListShow.addEventListener('click', () => {
-            if (selectedFoods.length === 0) {
-                showNotification('لیست انتخاب شما خالی است');
-                return;
-            }
-
-            selectionListPanel.classList.remove('open');
-            selectionDisplay.classList.add('open');
-            updateSelectionDisplay();
-        });
-
-        selectionDisplayClose.addEventListener('click', () => {
-            selectionDisplay.classList.remove('open');
-        });
-
-        selectionDisplayBack.addEventListener('click', () => {
-            selectionDisplay.classList.remove('open');
-            selectionListPanel.classList.add('open');
-            overlay.classList.add('active');
-        });
-
-        // فراخوانی گارسون
-        selectionDisplayCall.addEventListener('click', () => {
-            showNotification('گارسون به میز شما فراخوانده شد');
-            setTimeout(() => {
-                selectionDisplay.classList.remove('open');
-                overlay.classList.remove('active');
-            }, 2000);
-        });
-
-        // پاک کردن لیست انتخاب
-        selectionListClear.addEventListener('click', () => {
-            if (selectedFoods.length === 0) {
-                showNotification('لیست انتخاب شما از قبل خالی است');
-                return;
-            }
-
-            if (confirm('آیا از پاک کردن لیست انتخاب خود مطمئن هستید؟')) {
-                selectedFoods = [];
-                saveSelectionList();
-                updateSelectionList();
-                updateOrderButtons();
-                showNotification('لیست انتخاب شما پاک شد');
-            }
-        });
-
-        // اضافه کردن غذا از طریق دکمه سفارش
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.order-btn')) {
-                const orderBtn = e.target.closest('.order-btn');
-                const foodId = orderBtn.getAttribute('data-food-id');
-                const foodTitle = orderBtn.getAttribute('data-food-title');
-                const foodPrice = parseInt(orderBtn.getAttribute('data-food-price'));
-                const foodImage = orderBtn.getAttribute('data-food-image');
-
-                // بررسی آیا غذا قبلاً انتخاب شده است
-                const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
-
-                if (existingIndex === -1) {
-                    // اضافه کردن غذا به لیست
-                    selectedFoods.push({
-                        id: foodId,
-                        title: foodTitle,
-                        price: foodPrice,
-                        image: foodImage,
-                        quantity: 1
-                    });
-
-                    // تغییر ظاهر دکمه
-                    orderBtn.classList.add('added');
-                    orderBtn.innerHTML = '<i class="fas fa-check"></i><span class="order-text">سفارش شده</span>';
-
-                    showNotification(`"${foodTitle}" به لیست انتخاب اضافه شد`);
-                } else {
-                    // افزایش تعداد غذا
-                    selectedFoods[existingIndex].quantity += 1;
-
-                    showNotification(`تعداد "${foodTitle}" به ${selectedFoods[existingIndex].quantity} افزایش یافت`);
-                }
-
-                saveSelectionList();
-                updateSelectionList();
-            }
-
-            // مدیریت تعداد غذاها در پنل لیست انتخاب
-            if (e.target.closest('.quantity-btn')) {
-                const quantityBtn = e.target.closest('.quantity-btn');
-                const foodId = quantityBtn.closest('.selection-list-item').querySelector('.selection-list-item-remove').getAttribute('data-food-id');
-                const isIncrease = quantityBtn.classList.contains('increase');
-
-                const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
-                if (existingIndex !== -1) {
-                    const foodTitle = selectedFoods[existingIndex].title;
-
-                    if (isIncrease) {
-                        selectedFoods[existingIndex].quantity += 1;
-                        showNotification(`تعداد "${foodTitle}" افزایش یافت`);
-                    } else {
-                        if (selectedFoods[existingIndex].quantity > 1) {
-                            selectedFoods[existingIndex].quantity -= 1;
-                            showNotification(`تعداد "${foodTitle}" کاهش یافت`);
-                        } else {
-                            // اگر تعداد 1 است و دکمه کاهش زده شد، غذا حذف شود
-                            selectedFoods.splice(existingIndex, 1);
-                            showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
-                            updateOrderButtons();
-                        }
-                    }
-
-                    saveSelectionList();
-                    updateSelectionList();
-                }
-            }
-
-            // حذف غذا از لیست انتخاب در پنل
-            if (e.target.closest('.selection-list-item-remove')) {
-                const removeBtn = e.target.closest('.selection-list-item-remove');
-                const foodId = removeBtn.getAttribute('data-food-id');
-
-                const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
-                if (existingIndex !== -1) {
-                    const foodTitle = selectedFoods[existingIndex].title;
-                    selectedFoods.splice(existingIndex, 1);
-
-                    saveSelectionList();
-                    updateSelectionList();
-                    updateOrderButtons();
-
-                    showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
-                }
-            }
-        });
-
-        // ذخیره لیست انتخاب در localStorage
-        function saveSelectionList() {
-            localStorage.setItem('selectedFoods_' + restaurantSlug, JSON.stringify(selectedFoods));
-        }
-
-        // به‌روزرسانی لیست انتخاب در پنل
-        function updateSelectionList() {
-            const badge = document.querySelector('.selection-list-badge');
-            const totalItems = selectedFoods.reduce((total, food) => total + food.quantity, 0);
-            badge.textContent = totalItems;
-
-            // به‌روزرسانی نمایش لیست
-            if (selectedFoods.length === 0) {
-                selectionListEmpty.style.display = 'flex';
-                selectionListItems.innerHTML = '';
-            } else {
-                selectionListEmpty.style.display = 'none';
-
-                let itemsHTML = '';
-                selectedFoods.forEach(food => {
-                    itemsHTML += `
-                        <div class="selection-list-item">
-                            ${food.image ?
-                                `<img src="${food.image}" alt="${food.title}" class="selection-list-item-image">` :
-                                `<div class="selection-list-item-image bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-400">
-                                    <i class="fas fa-utensils"></i>
-                                </div>`
-                            }
-                            <div class="selection-list-item-details">
-                                <div class="selection-list-item-title">${food.title}</div>
-                                <div class="selection-list-item-price">${food.price.toLocaleString()} تومان</div>
-                                <div class="selection-list-item-quantity">
-                                    <div class="quantity-btn decrease">-</div>
-                                    <div class="quantity-value">${food.quantity}</div>
-                                    <div class="quantity-btn increase">+</div>
-                                </div>
-                            </div>
-                            <div class="selection-list-item-remove" data-food-id="${food.id}">
-                                <i class="fas fa-times"></i>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                selectionListItems.innerHTML = itemsHTML;
-            }
-        }
-
-        // به‌روزرسانی دکمه‌های سفارش
-        function updateOrderButtons() {
-            orderBtns.forEach(btn => {
-                const foodId = btn.getAttribute('data-food-id');
-                const isSelected = selectedFoods.some(food => food.id === foodId);
-
-                if (isSelected) {
-                    btn.classList.add('added');
-                    btn.innerHTML = '<i class="fas fa-check"></i><span class="order-text">سفارش شده</span>';
-                } else {
-                    btn.classList.remove('added');
-                    btn.innerHTML = '<span class="order-text">سفارش</span>';
-                }
-            });
-        }
-
-        // به‌روزرسانی صفحه نمایش لیست انتخاب
-        function updateSelectionDisplay() {
-            let itemsHTML = '';
-            let totalPrice = 0;
-
-            selectedFoods.forEach(food => {
-                const foodTotal = food.price * food.quantity;
-                totalPrice += foodTotal;
-
-                itemsHTML += `
-                    <div class="selection-display-item">
-                        ${food.image ?
-                            `<img src="${food.image}" alt="${food.title}" class="selection-display-item-image">` :
-                            `<div class="selection-display-item-image bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-400">
-                                <i class="fas fa-utensils"></i>
-                            </div>`
-                        }
-                        <div class="selection-display-item-details">
-                            <div class="selection-display-item-title">${food.title}</div>
-                            <div class="selection-display-item-price">${food.price.toLocaleString()} تومان</div>
-                            <div class="selection-display-item-quantity">تعداد: ${food.quantity}</div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            selectionDisplayItems.innerHTML = itemsHTML;
-            selectionDisplayTotal.textContent = totalPrice.toLocaleString() + ' تومان';
-        }
-
-        // اسکریپت برای باز و بسته شدن بخش توضیحات رستوران
-        document.addEventListener('DOMContentLoaded', function() {
-            const descriptionContainer = document.querySelector('.description-container');
-            const descriptionHeader = document.querySelector('.description-header');
-            const descriptionContent = document.querySelector('.description-content');
-            const toggleIcon = document.querySelector('.toggle-icon');
-
-            // فقط اگر محتوایی وجود دارد قابلیت باز شدن داشته باشد
-            {% if restaurant.text and restaurant.text != 'خالی' %}
-                descriptionHeader.addEventListener('click', function() {
-                    descriptionContainer.classList.toggle('expanded');
-
-                    // انیمیشن اسموت برای باز و بسته شدن
-                    if (descriptionContainer.classList.contains('expanded')) {
-                        descriptionContent.style.maxHeight = descriptionContent.scrollHeight + 'px';
-                    } else {
-                        descriptionContent.style.maxHeight = '0';
-                    }
-                });
-            {% else %}
-                // اگر محتوایی نیست، غیرفعال شود
-                descriptionHeader.style.cursor = 'default';
-                descriptionHeader.style.opacity = '0.6';
-                toggleIcon.style.opacity = '0.3';
-            {% endif %}
-
-            // برای ریسپانسیو کردن ارتفاع
-            window.addEventListener('resize', function() {
-                if (descriptionContainer.classList.contains('expanded')) {
-                    descriptionContent.style.maxHeight = descriptionContent.scrollHeight + 'px';
-                }
-            });
-        });
-    </script>
 </body>
 </html>

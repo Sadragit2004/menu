@@ -1,0 +1,600 @@
+<!-- Persian Calendar Styles -->
+<style>
+    /* استایل‌های تقویم فارسی */
+   /* استایل‌های تقویم فارسی */
+.calendar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* تغییر از 1000 به 9999 */
+    padding: 20px;
+}
+
+.calendar-modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 10000; /* اضافه کردن این خط */
+    position: relative; /* اضافه کردن این خط */
+}
+
+    .calendar-modal-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .calendar-modal-body {
+        padding: 20px;
+    }
+
+    .calendar-modal-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    /* استایل‌های تقویم */
+    .calendar-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .calendar-header {
+        background: linear-gradient(to right, #f97316, #ef4444);
+        color: white;
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .calendar-body {
+        padding: 16px;
+    }
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        margin-bottom: 12px;
+    }
+
+    .weekday {
+        text-align: center;
+        font-weight: 600;
+        color: #6b7280;
+        font-size: 0.875rem;
+        padding: 8px 0;
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+
+    .calendar-day {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        position: relative;
+    }
+
+    .calendar-day:hover {
+        background-color: #f3f4f6;
+    }
+
+    .calendar-day.selected {
+        background: linear-gradient(to right, #f97316, #ef4444);
+        color: white;
+    }
+
+    .calendar-day.disabled {
+        color: #d1d5db;
+        cursor: not-allowed;
+    }
+
+    .calendar-day.disabled:hover {
+        background-color: transparent;
+    }
+
+    .calendar-day.today {
+        border: 2px solid #f97316;
+    }
+
+    .calendar-navigation {
+        display: flex;
+        gap: 8px;
+    }
+
+    .nav-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .calendar-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+    }
+
+    .today-btn {
+        background: #f97316;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-top: 16px;
+        width: 100%;
+    }
+
+    .today-btn:hover {
+        background: #ea580c;
+    }
+
+    /* استایل‌های dark mode */
+    .dark-mode .calendar-modal-content {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+
+    .dark-mode .calendar-modal-header {
+        border-bottom-color: #334155;
+    }
+
+    .dark-mode .calendar-modal-footer {
+        border-top-color: #334155;
+    }
+
+    .dark-mode .calendar-container {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+
+    .dark-mode .calendar-day:hover {
+        background-color: #334155;
+    }
+
+    .dark-mode .calendar-day.disabled {
+        color: #475569;
+    }
+
+    .dark-mode .weekday {
+        color: #94a3b8;
+    }
+</style>
+
+<!-- HTML مودال تقویم -->
+<div id="calendarModal" class="calendar-modal hidden">
+    <div class="calendar-modal-content">
+        <div class="calendar-modal-header">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">انتخاب تاریخ رزرو</h3>
+            <button type="button" id="closeCalendar" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="calendar-modal-body">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="nav-btn prev-year">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                    <button class="nav-btn prev-month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="calendar-title">مهر 1402</div>
+                    <button class="nav-btn next-month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-btn next-year">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                </div>
+
+                <div class="calendar-body">
+                    <div class="calendar-weekdays">
+                        <div class="weekday">ش</div>
+                        <div class="weekday">ی</div>
+                        <div class="weekday">د</div>
+                        <div class="weekday">س</div>
+                        <div class="weekday">چ</div>
+                        <div class="weekday">پ</div>
+                        <div class="weekday">ج</div>
+                    </div>
+
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- روزهای تقویم توسط جاوااسکریپت پر می‌شوند -->
+                    </div>
+
+                    <button class="today-btn" id="todayBtn">امروز</button>
+                </div>
+            </div>
+        </div>
+        <div class="calendar-modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">انصراف</button>
+            <button type="button" class="btn btn-primary" id="confirmBtn">تأیید تاریخ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== تقویم فارسی ====================
+class PersianCalendar {
+    constructor(containerId, onDateSelect) {
+        this.containerId = containerId;
+        this.onDateSelect = onDateSelect;
+        this.currentDate = this.today();
+        this.selectedDate = null;
+        this.months = [
+            'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+            'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+        ];
+        this.weekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+
+        this.init();
+    }
+
+    // تبدیل تاریخ میلادی به شمسی
+    gregorianToJalali(gy, gm, gd) {
+        const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        let gy2 = (gm > 2) ? (gy + 1) : gy;
+        let days = 355666 + (365 * gy) + ~~((gy2 + 3) / 4) - ~~((gy2 + 99) / 100) + ~~((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+        let jy = -1595 + (33 * ~~(days / 12053));
+        days %= 12053;
+        jy += 4 * ~~(days / 1461);
+        days %= 1461;
+        if (days > 365) {
+            jy += ~~((days - 1) / 365);
+            days = (days - 1) % 365;
+        }
+        let jm = (days < 186) ? 1 + ~~(days / 31) : 7 + ~~((days - 186) / 30);
+        let jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+        return [jy, jm, jd];
+    }
+
+    // تبدیل تاریخ شمسی به میلادی
+    jalaliToGregorian(jy, jm, jd) {
+        jy += 1595;
+        let days = -355668 + (365 * jy) + (~~(jy / 33) * 8) + ~~(((jy % 33) + 3) / 4) + jd + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+        let gy = 400 * ~~(days / 146097);
+        days %= 146097;
+        if (days > 36524) {
+            gy += 100 * ~~(--days / 36524);
+            days %= 36524;
+            if (days >= 365) days++;
+        }
+        gy += 4 * ~~(days / 1461);
+        days %= 1461;
+        if (days > 365) {
+            gy += ~~((days - 1) / 365);
+            days = (days - 1) % 365;
+        }
+        let gd = days + 1;
+        const sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        let gm;
+        for (gm = 0; gm < 13; gm++) {
+            let v = sal_a[gm];
+            if (gd <= v) break;
+            gd -= v;
+        }
+        return [gy, gm, gd];
+    }
+
+    // تاریخ امروز به شمسی
+    today() {
+        const now = new Date();
+        return this.gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    }
+
+    // بررسی سال کبیسه
+    isLeapYear(jy) {
+        return ((((jy - 474) % 128) + 30) * 682) % 2816 < 682;
+    }
+
+    // تعداد روزهای ماه
+    daysInMonth(jy, jm) {
+        if (jm <= 6) return 31;
+        if (jm <= 11) return 30;
+        return this.isLeapYear(jy) ? 30 : 29;
+    }
+
+    // اولین روز ماه
+    firstDayOfMonth(jy, jm) {
+        // محاسبه روز هفته برای اولین روز ماه
+        const gDate = this.jalaliToGregorian(jy, jm, 1);
+        const date = new Date(gDate[0], gDate[1] - 1, gDate[2]);
+        let day = date.getDay() + 1; // تبدیل به شنبه=0
+        if (day === 7) day = 0;
+        return day;
+    }
+
+    // نمایش تقویم
+    renderCalendar() {
+        const [year, month, day] = this.currentDate;
+        const calendarDays = document.getElementById(this.containerId);
+        calendarDays.innerHTML = '';
+
+        // به‌روزرسانی عنوان
+        document.querySelector('.calendar-title').textContent = `${this.months[month - 1]} ${year}`;
+
+        // روزهای خالی قبل از شروع ماه
+        const firstDay = this.firstDayOfMonth(year, month);
+        for (let i = 0; i < firstDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day';
+            calendarDays.appendChild(emptyDay);
+        }
+
+        // روزهای ماه
+        const daysInMonth = this.daysInMonth(year, month);
+        const today = this.today();
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = d;
+
+            // بررسی آیا امروز است
+            if (year === today[0] && month === today[1] && d === today[2]) {
+                dayElement.classList.add('today');
+            }
+
+            // بررسی آیا انتخاب شده است
+            if (this.selectedDate &&
+                year === this.selectedDate[0] &&
+                month === this.selectedDate[1] &&
+                d === this.selectedDate[2]) {
+                dayElement.classList.add('selected');
+            }
+
+            // رویداد کلیک
+            dayElement.addEventListener('click', () => {
+                this.selectDate([year, month, d]);
+            });
+
+            calendarDays.appendChild(dayElement);
+        }
+    }
+
+    // انتخاب تاریخ
+    selectDate(date) {
+        this.selectedDate = date;
+        this.renderCalendar();
+    }
+
+    // دریافت تاریخ انتخاب شده
+    getSelectedDate() {
+        if (!this.selectedDate) return null;
+
+        const [y, m, d] = this.selectedDate;
+        // فرمت تاریخ: YYYY/MM/DD
+        return `${y}/${m.toString().padStart(2, '0')}/${d.toString().padStart(2, '0')}`;
+    }
+
+    // دریافت تاریخ انتخاب شده به صورت متنی
+    getSelectedDateText() {
+        if (!this.selectedDate) return null;
+
+        const [y, m, d] = this.selectedDate;
+        return `${d} ${this.months[m-1]} ${y}`;
+    }
+
+    // تغییر ماه
+    changeMonth(offset) {
+        let [y, m, d] = this.currentDate;
+        m += offset;
+
+        if (m > 12) {
+            y += 1;
+            m = 1;
+        } else if (m < 1) {
+            y -= 1;
+            m = 12;
+        }
+
+        this.currentDate = [y, m, 1];
+        this.renderCalendar();
+    }
+
+    // تغییر سال
+    changeYear(offset) {
+        let [y, m, d] = this.currentDate;
+        y += offset;
+        this.currentDate = [y, m, 1];
+        this.renderCalendar();
+    }
+
+    // رفتن به امروز
+    goToToday() {
+        this.currentDate = this.today();
+        this.selectedDate = this.today();
+        this.renderCalendar();
+    }
+
+    // مقداردهی اولیه
+    init() {
+        this.renderCalendar();
+
+        // رویدادهای ناوبری
+        document.querySelector('.prev-month').addEventListener('click', () => {
+            this.changeMonth(-1);
+        });
+
+        document.querySelector('.next-month').addEventListener('click', () => {
+            this.changeMonth(1);
+        });
+
+        document.querySelector('.prev-year').addEventListener('click', () => {
+            this.changeYear(-1);
+        });
+
+        document.querySelector('.next-year').addEventListener('click', () => {
+            this.changeYear(1);
+        });
+
+        document.getElementById('todayBtn').addEventListener('click', () => {
+            this.goToToday();
+        });
+    }
+}
+
+// ==================== مدیریت مودال تقویم ====================
+let calendar;
+
+function initializeCalendarModal() {
+    const calendarModal = document.getElementById('calendarModal');
+    const closeCalendar = document.getElementById('closeCalendar');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const openCalendarBtn = document.getElementById('openCalendarBtn');
+
+    // ایجاد نمونه تقویم
+    calendar = new PersianCalendar('calendarDays', function(selectedDate) {
+        console.log('تاریخ انتخاب شده:', selectedDate);
+    });
+
+    // باز کردن مودال
+    if (openCalendarBtn) {
+        openCalendarBtn.addEventListener('click', function() {
+            calendarModal.classList.remove('hidden');
+        });
+    }
+
+    // بستن مودال
+    function closeModal() {
+        calendarModal.classList.add('hidden');
+    }
+
+    if (closeCalendar) {
+        closeCalendar.addEventListener('click', closeModal);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeModal);
+    }
+
+    // تأیید تاریخ انتخاب شده
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            const selectedDate = calendar.getSelectedDate();
+
+            if (selectedDate) {
+                // قرار دادن تاریخ در فیلد مربوطه
+                document.getElementById('reservationDate').value = selectedDate;
+                closeModal();
+            } else {
+                showAlert('لطفاً یک تاریخ انتخاب کنید', 'error');
+            }
+        });
+    }
+
+    // بستن مودال با کلیک خارج از آن
+    if (calendarModal) {
+        calendarModal.addEventListener('click', function(e) {
+            if (e.target === calendarModal) {
+                closeModal();
+            }
+        });
+    }
+}
+
+// اضافه کردن به تابع initialize
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendarModal();
+});
+
+// اضافه کردن این تابع برای مدیریت z-index
+function fixZIndex() {
+    const calendarModal = document.getElementById('calendarModal');
+    const reservationModal = document.getElementById('reservationModal');
+
+    if (calendarModal && reservationModal) {
+        // وقتی تقویم باز می‌شود، مودال رزرو را موقتاً غیرفعال کنیم
+        document.getElementById('openCalendarBtn').addEventListener('click', function() {
+            reservationModal.style.zIndex = '9990';
+            calendarModal.style.zIndex = '9999';
+        });
+
+        // وقتی تقویم بسته می‌شود، مودال رزرو را به حالت اول برگردانیم
+        function closeCalendarModal() {
+            calendarModal.classList.add('hidden');
+            reservationModal.style.zIndex = '';
+        }
+
+        document.getElementById('closeCalendar').addEventListener('click', closeCalendarModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeCalendarModal);
+        document.getElementById('confirmBtn').addEventListener('click', closeCalendarModal);
+    }
+}
+
+// فراخوانی تابع در DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendarModal();
+    fixZIndex();
+});
+</script>

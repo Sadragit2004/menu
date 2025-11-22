@@ -196,17 +196,23 @@ class WorkingTime(models.Model):
         if not jalali_date:
             jalali_date = jdatetime.date.today().strftime('%Y/%m/%d')
 
-        current_time = datetime.combine(datetime.today(), self.start_time)
-        end_time_dt = datetime.combine(datetime.today(), self.end_time)
+        # استفاده از datetime.combine با date معتبر
+        today = datetime.today().date()
+        current_time = datetime.combine(today, self.start_time)
+        end_time_dt = datetime.combine(today, self.end_time)
+
+        print(f"🕒 تولید اسلات از {current_time.time()} تا {end_time_dt.time()}")
 
         # مدیریت زمان استراحت
         break_start_dt = None
         break_end_dt = None
 
         if self.break_start and self.break_end:
-            break_start_dt = datetime.combine(datetime.today(), self.break_start)
-            break_end_dt = datetime.combine(datetime.today(), self.break_end)
+            break_start_dt = datetime.combine(today, self.break_start)
+            break_end_dt = datetime.combine(today, self.break_end)
+            print(f"⏸️ زمان استراحت: {self.break_start} تا {self.break_end}")
 
+        slot_count = 0
         while current_time + timedelta(minutes=slot_duration_minutes) <= end_time_dt:
             slot_end = current_time + timedelta(minutes=slot_duration_minutes)
 
@@ -215,6 +221,9 @@ class WorkingTime(models.Model):
             if break_start_dt and break_end_dt:
                 if (current_time < break_end_dt and slot_end > break_start_dt):
                     is_in_break = True
+                    # اگر در زمان استراحت هستیم، به بعد از استراحت پرش کنیم
+                    current_time = break_end_dt
+                    continue
 
             if not is_in_break:
                 slots.append({
@@ -223,9 +232,11 @@ class WorkingTime(models.Model):
                     'display': f"{current_time.strftime('%H:%M')} - {slot_end.strftime('%H:%M')}",
                     'jalali_date': jalali_date
                 })
+                slot_count += 1
 
             current_time = slot_end
 
+        print(f"✅ تعداد اسلات‌های تولید شده: {slot_count}")
         return slots
 
 
