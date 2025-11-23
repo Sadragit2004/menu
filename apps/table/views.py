@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
-from django.db.models import Q, Count
+from django.db.models import Q, Count,Max
 from datetime import datetime, date, timedelta, time
 import json
 import jdatetime
@@ -790,3 +790,207 @@ def get_table_reservations_ajax(request, table_id):
         return JsonResponse({'error': f'تاریخ نامعتبر: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': f'خطا در پردازش: {str(e)}'}, status=400)
+
+
+
+
+
+
+@login_required
+@restaurant_owner_required
+def customer_search(request):
+    """صفحه جستجوی مشتری"""
+    restaurant = get_restaurant_for_user(request.user)
+
+    context = {
+        'restaurant': restaurant,
+        'today_jalali': jdatetime.date.today().strftime('%Y/%m/%d')
+    }
+    return render(request, 'table_app/customer_search.html', context)
+
+from django.db.models import Q, Count, Case, When, IntegerField
+
+@login_required
+@restaurant_owner_required
+def customer_search_api(request):
+
+    print(f"Request method: {request.method}")
+    print(f"POST data: {dict(request.POST)}")
+
+
+    """API جستجوی مشتری بر اساس شماره موبایل"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    phone_number = request.POST.get('phone_number', '').strip()
+
+    if not phone_number:
+        return JsonResponse({'success': False, 'error': 'شماره موبایل را وارد کنید'})
+
+    try:
+        restaurant = get_restaurant_for_user(request.user)
+
+        # جستجوی مشتری - فقط مشتریانی که حداقل یک رزرو در این رستوران دارند
+        customers = Customer.objects.filter(
+            phone_number__icontains=phone_number,
+            reservations__table__restaurant=restaurant
+        ).distinct().annotate(
+            total_reservations_count=Count('reservations'),
+            successful_reservations_count=Count(
+                Case(
+                    When(reservations__reservation_status__in=['completed', 'seated'], then=1),
+                    output_field=IntegerField()
+                )
+            ),
+            last_reservation_date=Max('reservations__created_jalali')
+        ).order_by('-created_jalali')[:10]
+
+        customers_data = []
+        for customer in customers:
+            # محاسبه امتیاز مشتری
+            score = calculate_customer_score(customer)
+
+            # آخرین رزرو
+            last_reservation = customer.reservations.filter(
+                table__restaurant=restaurant
+            ).order_by('-created_jalali').first()
+
+            customers_data.append({
+                'id': customer.id,
+                'full_name': customer.full_name,
+                'phone_number': customer.phone_number,
+                'national_code': customer.national_code,
+                'is_vip': customer.is_vip,
+                'total_reservations': customer.total_reservations_count or 0,
+                'successful_reservations': customer.successful_reservations_count or 0,
+                'cancellation_count': customer.cancellation_count,
+                'success_rate': customer.get_success_rate(),
+                'customer_score': score,
+                'score_label': get_score_label(score),
+                'score_color': get_score_color(score),
+                'last_reservation': {
+                    'date': last_reservation.reservation_jalali_date if last_reservation else None,
+                    'status': last_reservation.get_reservation_status_display() if last_reservation else None,
+                    'table': last_reservation.table.table_number if last_reservation else None
+                } if last_reservation else None,
+                'created_jalali': customer.created_jalali,
+                'is_active': customer.is_active
+            })
+
+        return JsonResponse({
+            'success': True,
+            'customers': customers_data,
+            'count': len(customers_data)
+        })
+
+    except Exception as e:
+        import traceback
+        print(f"Error in customer_search_api: {str(e)}")
+        print(traceback.format_exc())
+        return JsonResponse({'success': False, 'error': 'خطای سرور: ' + str(e)})
+
+@login_required
+@restaurant_owner_required
+def customer_detail_modal(request, customer_id):
+    """نمایش جزئیات مشتری در مودال"""
+    restaurant = get_restaurant_for_user(request.user)
+    customer = get_object_or_404(Customer, id=customer_id)
+
+    # تاریخچه رزروها
+    reservations = customer.reservations.select_related('table').order_by('-reservation_jalali_date', '-start_time')
+
+    # آمار پیشرفته
+    total_reservations = reservations.count()
+    successful_reservations = reservations.filter(
+        reservation_status__in=['completed', 'seated']
+    ).count()
+    cancelled_reservations = reservations.filter(
+        reservation_status='cancelled'
+    ).count()
+    no_show_reservations = reservations.filter(
+        reservation_status='no_show'
+    ).count()
+
+    # محاسبه امتیاز
+    score = calculate_customer_score(customer)
+
+    # رزروهای آینده
+    upcoming_reservations = reservations.filter(
+        reservation_status__in=['pending', 'confirmed'],
+        reservation_jalali_date__gte=jdatetime.date.today().strftime('%Y/%m/%d')
+    )
+
+    context = {
+        'customer': customer,
+        'reservations': reservations[:10],  # 10 رزرو آخر
+        'total_reservations': total_reservations,
+        'successful_reservations': successful_reservations,
+        'cancelled_reservations': cancelled_reservations,
+        'no_show_reservations': no_show_reservations,
+        'customer_score': score,
+        'score_label': get_score_label(score),
+        'score_color': get_score_color(score),
+        'upcoming_reservations': upcoming_reservations,
+        'restaurant': restaurant
+    }
+
+    return render(request, 'table_app/partials/customer_detail_modal.html', context)
+
+def calculate_customer_score(customer):
+    """محاسبه امتیاز مشتری"""
+    score = 50  # امتیاز پایه
+
+    # امتیاز بر اساس تعداد رزروهای موفق
+    if customer.successful_reservations > 10:
+        score += 20
+    elif customer.successful_reservations > 5:
+        score += 10
+    elif customer.successful_reservations > 2:
+        score += 5
+
+    # امتیاز منفی برای لغوها
+    if customer.cancellation_count > 5:
+        score -= 20
+    elif customer.cancellation_count > 2:
+        score -= 10
+    elif customer.cancellation_count > 0:
+        score -= 5
+
+    # امتیاز VIP
+    if customer.is_vip:
+        score += 15
+
+    # امتیاز بر اساس نرخ موفقیت
+    success_rate = customer.get_success_rate()
+    if success_rate > 80:
+        score += 20
+    elif success_rate > 60:
+        score += 10
+    elif success_rate < 30:
+        score -= 10
+
+    return max(0, min(100, score))  # محدود کردن بین 0 تا 100
+
+def get_score_label(score):
+    """برچسب امتیاز"""
+    if score >= 80:
+        return "مشتری عالی"
+    elif score >= 60:
+        return "مشتری خوب"
+    elif score >= 40:
+        return "مشتری متوسط"
+    elif score >= 20:
+        return "نیاز به توجه"
+    else:
+        return "مشتری مشکل‌دار"
+
+def get_score_color(score):
+    """رنگ امتیاز"""
+    if score >= 80:
+        return "success"
+    elif score >= 60:
+        return "info"
+    elif score >= 40:
+        return "warning"
+    else:
+        return "danger"

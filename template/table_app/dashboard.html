@@ -77,7 +77,11 @@
 
 <!-- بخش‌های سریع دسترسی -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- اقدامات سریع -->
+    <!-- اقدامات سریع --><!-- در بخش اقدامات سریع -->
+<a href="{% url 'table:customer_search' %}" class="bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-4 text-center transition duration-200">
+    <i class="fas fa-search text-purple-600 text-2xl mb-2"></i>
+    <p class="text-purple-800 font-semibold">جستجوی مشتری</p>
+</a>
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">اقدامات سریع</h3>
         <div class="grid grid-cols-2 gap-4">

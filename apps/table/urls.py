@@ -41,6 +41,10 @@ urlpatterns = [
     path('ajax/tables/available/', views.get_available_tables_ajax, name='ajax_available_tables'),
     path('ajax/table/<int:table_id>/reservations/', views.get_table_reservations_ajax, name='ajax_table_reservations'),
 
+    path('customer/search/', views.customer_search, name='customer_search'),
+    path('customer/search/api/', views.customer_search_api, name='customer_search_api'),
+    path('customer/<int:customer_id>/detail/', views.customer_detail_modal, name='customer_detail_modal'),
+
 
     #==========
    path('<slug:restaurant_slug>/check-availability/', viewres.check_availability_ajax, name='check_availability'),
