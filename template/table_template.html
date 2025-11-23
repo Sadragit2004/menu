@@ -37,10 +37,7 @@
             </div>
 
             <nav class="mt-6">
-                <a href="{% url 'table:dashboard' %}" class="nav-item flex items-center px-4 py-3 text-white hover:bg-blue-700 {% if request.resolver_match.url_name == 'dashboard' %}bg-blue-900{% endif %}">
-                    <i class="fas fa-tachometer-alt w-6"></i>
-                    <span class="nav-text mr-3">داشبورد</span>
-                </a>
+              z
 
                 <a href="{% url 'table:table_list' %}" class="nav-item flex items-center px-4 py-3 text-white hover:bg-blue-700 {% if 'table' in request.resolver_match.url_name %}bg-blue-900{% endif %}">
                     <i class="fas fa-chair w-6"></i>
@@ -60,6 +57,10 @@
                 <a href="{% url 'table:reservation_settings' %}" class="nav-item flex items-center px-4 py-3 text-white hover:bg-blue-700 {% if 'settings' in request.resolver_match.url_name %}bg-blue-900{% endif %}">
                     <i class="fas fa-cog w-6"></i>
                     <span class="nav-text mr-3">تنظیمات</span>
+                </a>
+                <a href="{% url 'panel:panel' %}" class="nav-item flex items-center px-4 py-3 text-white hover:bg-blue-700 {% if 'settings' in request.resolver_match.url_name %}bg-blue-900{% endif %}">
+                   <i class="fas fa-house-door"></i>
+                    <span class="nav-text mr-3">خانه</span>
                 </a>
             </nav>
         </div>
