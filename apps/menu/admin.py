@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from .models.menufreemodels.models import Category, Restaurant, MenuCategory, Food, ExchangeRate
+from .models.menufreemodels.models import Category, Restaurant, MenuCategory, Food, ExchangeRate,FoodRestaurant
 from .helper import update_all_food_prices
 
 
@@ -241,7 +241,7 @@ class FoodAdmin(admin.ModelAdmin, BilingualAdminMixin):
             'fields': ('price', 'get_price_info', 'price_usd_cents')
         }),
         (_('Time & Settings'), {
-            'fields': ('preparationTime', 'isActive', 'displayOrder')
+            'fields': ('preparationTime', 'isActive', 'displayOrder','created_by')
         }),
         (_('Media'), {
             'fields': ('image', 'image_preview', 'sound', 'sound_preview')
@@ -279,3 +279,131 @@ class ExchangeRateAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+from django.contrib import admin
+from django.utils.html import format_html
+
+@admin.register(FoodRestaurant)
+class FoodRestaurantAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'restaurant_display',
+        'food_display',
+        'custom_price_display',
+        'final_price_display',
+        'custom_image_display',
+        'is_active',
+        'display_order',
+        'created_at'
+    ]
+
+    list_filter = [
+        'restaurant',
+        'is_active',
+        'created_at',
+        'updated_at'
+    ]
+
+    search_fields = [
+        'restaurant__title',
+        'food__title',
+        'food__description'
+    ]
+
+    readonly_fields = [
+        'created_at',
+        'updated_at',
+        'final_price_display',
+        'final_image_display'
+    ]
+
+    fieldsets = (
+        ('اطلاعات اصلی', {
+            'fields': (
+                'restaurant',
+                'food',
+                'is_active',
+                'display_order'
+            )
+        }),
+        ('شخصی‌سازی', {
+            'fields': (
+                'custom_price',
+                'custom_image',
+                'final_price_display',
+                'final_image_display'
+            )
+        }),
+        ('تاریخ‌ها', {
+            'fields': (
+                'created_at',
+                'updated_at'
+            )
+        }),
+    )
+
+    def restaurant_display(self, obj):
+        return obj.restaurant.title
+    restaurant_display.short_description = 'رستوران'
+
+    def food_display(self, obj):
+        return obj.food.title
+    food_display.short_description = 'غذا'
+
+    def custom_price_display(self, obj):
+        if obj.custom_price:
+            return f"{obj.custom_price:,} تومان"
+        return "---"
+    custom_price_display.short_description = 'قیمت کاستوم'
+
+    def final_price_display(self, obj):
+        return f"{obj.final_price:,} تومان"
+    final_price_display.short_description = 'قیمت نهایی'
+
+    def custom_image_display(self, obj):
+        if obj.custom_image:
+            return format_html(
+                '<img src="{}" width="50" height="50" style="border-radius: 5px;" />',
+                obj.custom_image.url
+            )
+        return "---"
+    custom_image_display.short_description = 'عکس کاستوم'
+
+    def final_image_display(self, obj):
+        if obj.final_image:
+            return format_html(
+                '<img src="{}" width="80" height="80" style="border-radius: 5px;" />',
+                obj.final_image.url
+            )
+        return "---"
+    final_image_display.short_description = 'عکس نهایی'
+
+    def has_customizations_display(self, obj):
+        return "✅" if obj.has_customizations() else "❌"
+    has_customizations_display.short_description = 'کاستوم شده'
+
+    actions = ['activate_selected', 'deactivate_selected', 'reset_customizations']
+
+    def activate_selected(self, request, queryset):
+        queryset.update(is_active=True)
+        self.message_user(request, "موارد انتخاب شده فعال شدند")
+    activate_selected.short_description = "فعال کردن موارد انتخاب شده"
+
+    def deactivate_selected(self, request, queryset):
+        queryset.update(is_active=False)
+        self.message_user(request, "موارد انتخاب شده غیرفعال شدند")
+    deactivate_selected.short_description = "غیرفعال کردن موارد انتخاب شده"
+
+    def reset_customizations(self, request, queryset):
+        updated_count = 0
+        for obj in queryset:
+            obj.custom_price = None
+            obj.custom_image = None
+            obj.save()
+            updated_count += 1
+        self.message_user(request, f"کاستومایزهای {updated_count} مورد بازنشانی شد")
+    reset_customizations.short_description = "بازنشانی کاستومایزها"
+
+    list_per_page = 25
+    ordering = ['-created_at']

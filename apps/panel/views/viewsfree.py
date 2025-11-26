@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import json
-from apps.menu.models.menufreemodels.models import Restaurant, Category, MenuCategory, Food
+from apps.menu.models.menufreemodels.models import Restaurant, Category, MenuCategory, Food,FoodRestaurant
 from apps.order.models import Ordermenu, MenuImage
 from apps.plan.models import PlanOrder
 from apps.product.models import ProductOrder
@@ -502,19 +502,65 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-
 @login_required
 @restaurant_owner_required
 def restaurant_admin(request, slug):
     """پنل مدیریت منوی رستوران"""
     restaurant = request.restaurant
 
-    # بررسی انقضا - اگر منقضی شده، ریدایرکت کن
+    # بررسی اگر فرم تنظیمات ارسال شده
+    if request.method == 'POST' and request.headers.get('X-Form-Type') == 'restaurant_settings':
+        try:
+            # دریافت داده‌ها از فرم
+            title = request.POST.get('title')
+            english_name = request.POST.get('english_name')
+            description = request.POST.get('description')
+            phone = request.POST.get('phone')
+            address = request.POST.get('address')
+            opening_time = request.POST.get('opening_time')
+            closing_time = request.POST.get('closing_time')
+            minimum_order = request.POST.get('minimum_order')
+            delivery_fee = request.POST.get('delivery_fee')
+
+            # آپدیت فیلدها
+            if title:
+                restaurant.title = title
+            if english_name:
+                restaurant.english_name = english_name
+            if description:
+                restaurant.description = description
+            if phone:
+                restaurant.phone = phone
+            if address:
+                restaurant.address = address
+            if opening_time:
+                restaurant.openingTime = opening_time
+            if closing_time:
+                restaurant.closingTime = closing_time
+            if minimum_order:
+                restaurant.minimumOrder = Decimal(minimum_order)
+            if delivery_fee:
+                restaurant.deliveryFee = Decimal(delivery_fee)
+
+            # آپلود لوگو
+            if 'logo' in request.FILES:
+                restaurant.logo = request.FILES['logo']
+
+            # آپلود کاور
+            if 'cover_image' in request.FILES:
+                restaurant.coverImage = request.FILES['cover_image']
+
+            restaurant.save()
+
+            return JsonResponse({'success': True, 'message': 'تنظیمات رستوران با موفقیت به‌روزرسانی شد.'})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'خطا در به‌روزرسانی تنظیمات: {str(e)}'})
+
     if restaurant.is_expired:
         messages.error(request, "❌ دسترسی به پنل مدیریت امکان‌پذیر نیست. رستوران شما منقضی شده است.")
         return redirect('/panel/')
 
-    # بقیه کدها فقط اگر منقضی نشده باشد اجرا می‌شود
     # دریافت دسته‌بندی‌های رستوران
     menu_categories = MenuCategory.objects.filter(
         restaurant=restaurant
@@ -525,20 +571,107 @@ def restaurant_admin(request, slug):
         id__in=menu_categories.values_list('category_id', flat=True)
     )
 
-    # دریافت غذاهای رستوران (غذاهای انتخاب شده)
-    selected_foods = Food.objects.filter(
-        restaurants=restaurant
+    # غذاهای رستوران
+    selected_company_foods = Food.objects.filter(
+        restaurants=restaurant,
+        created_by='company'
     ).select_related('menuCategory__category').order_by('displayOrder')
 
-    # دریافت تمام غذاهای شرکت (برای نمایش همه غذاها)
-    all_company_foods = Food.objects.filter(
-        isActive=True
+    restaurant_own_foods = Food.objects.filter(
+        restaurants=restaurant,
+        created_by='restaurant'
     ).select_related('menuCategory__category').order_by('displayOrder')
+
+    # ترکیب همه غذاهای انتخاب شده
+    all_selected_foods = selected_company_foods | restaurant_own_foods
+
+    # ایجاد لیست غذاهای نهایی با شخصی‌سازی‌ها
+    final_foods = []
+    for food in all_selected_foods:
+        if food.created_by == 'company':
+            try:
+                custom_food = FoodRestaurant.objects.get(restaurant=restaurant, food=food)
+                food_data = {
+                    'id': food.id,
+                    'title': food.title,
+                    'title_en': food.title_en,
+                    'description': food.description,
+                    'description_en': food.description_en,
+                    'price': custom_food.final_price,
+                    'image': custom_food.final_image,
+                    'preparationTime': food.preparationTime,
+                    'isActive': custom_food.is_active and food.isActive,
+                    'menuCategory': food.menuCategory,
+                    'slug': food.slug,
+                    'displayOrder': custom_food.display_order,
+                    'is_customized': custom_food.has_customizations(),
+                    'custom_food_id': custom_food.id,
+                    'created_by': food.created_by
+                }
+            except FoodRestaurant.DoesNotExist:
+                food_data = {
+                    'id': food.id,
+                    'title': food.title,
+                    'title_en': food.title_en,
+                    'description': food.description,
+                    'description_en': food.description_en,
+                    'price': food.price,
+                    'image': food.image,
+                    'preparationTime': food.preparationTime,
+                    'isActive': food.isActive,
+                    'menuCategory': food.menuCategory,
+                    'slug': food.slug,
+                    'displayOrder': food.displayOrder,
+                    'is_customized': False,
+                    'custom_food_id': None,
+                    'created_by': food.created_by
+                }
+        else:
+            food_data = {
+                'id': food.id,
+                'title': food.title,
+                'title_en': food.title_en,
+                'description': food.description,
+                'description_en': food.description_en,
+                'price': food.price,
+                'image': food.image,
+                'preparationTime': food.preparationTime,
+                'isActive': food.isActive,
+                'menuCategory': food.menuCategory,
+                'slug': food.slug,
+                'displayOrder': food.displayOrder,
+                'is_customized': False,
+                'custom_food_id': None,
+                'created_by': food.created_by
+            }
+        final_foods.append(food_data)
+
+    # دریافت تمام غذاهای شرکت برای نمایش در تب "همه غذاهای شرکت"
+    all_company_foods = Food.objects.filter(
+        isActive=True,
+        created_by='company'
+    ).select_related('menuCategory__category').order_by('displayOrder')
+
+    # محاسبه آمار برای همه غذاهای شرکت
+    foods_with_stats = []
+    all_food_ids = set()
+
+    # ابتدا غذاهای اصلی شرکت
+    for food in all_company_foods:
+        all_food_ids.add(food.id)
+        stats = calculate_food_stats(food)
+        foods_with_stats.append(create_food_with_stats(food, stats))
+
+    # سپس غذاهای انتخاب شده توسط رستوران که ممکن است در لیست اصلی نباشند
+    for food in selected_company_foods:
+        if food.id not in all_food_ids:
+            stats = calculate_food_stats(food)
+            foods_with_stats.append(create_food_with_stats(food, stats))
 
     # لیست ID غذاهای انتخاب شده
-    selected_food_ids = list(selected_foods.values_list('id', flat=True))
+    selected_food_ids = list(all_selected_foods.values_list('id', flat=True))
 
-    # محاسبه اطلاعات انقضا برای نمایش در UI (فقط اگر منقضی نشده باشد)
+    # محاسبه اطلاعات انقضا
     expiry_info = {
         'is_expired': restaurant.is_expired,
         'days_until_expiry': restaurant.days_until_expiry,
@@ -550,16 +683,76 @@ def restaurant_admin(request, slug):
         'restaurant': restaurant,
         'menu_categories': menu_categories,
         'all_categories': all_categories,
-        'foods': selected_foods,
-        'all_foods': all_company_foods,
+        'foods_data': final_foods,
+        'all_foods': foods_with_stats,
         'selected_food_ids': selected_food_ids,
         'categories': Category.objects.filter(isActive=True),
         'expiry_info': expiry_info,
+        'restaurant_own_foods_count': restaurant_own_foods.count(),
+        'selected_company_foods_count': selected_company_foods.count(),
     }
     return render(request, 'panel_app/free/restaurant_admin.html', context)
 
 
+def calculate_food_stats(food):
+    """محاسبه آمار برای یک غذا"""
+    # تعداد رستوران‌هایی که این غذا را انتخاب کرده‌اند
+    restaurant_count = food.restaurants.count()
 
+    # محاسبه آمار از FoodRestaurant
+    custom_foods = FoodRestaurant.objects.filter(food=food)
+
+    if custom_foods.exists():
+        # محاسبه قیمت‌های نهایی
+        final_prices = [cf.final_price for cf in custom_foods if cf.final_price is not None]
+
+        if final_prices:
+            avg_price = sum(final_prices) // len(final_prices)
+            min_price = min(final_prices)
+            max_price = max(final_prices)
+        else:
+            avg_price = food.price or 0
+            min_price = food.price or 0
+            max_price = food.price or 0
+
+        # بررسی شخصی‌سازی
+        has_customizations = any(
+            cf.custom_price is not None or cf.custom_image for cf in custom_foods
+        )
+    else:
+        avg_price = food.price or 0
+        min_price = food.price or 0
+        max_price = food.price or 0
+        has_customizations = False
+
+    return {
+        'restaurant_count': restaurant_count,
+        'avg_price': int(avg_price),
+        'min_price': int(min_price),
+        'max_price': int(max_price),
+        'base_price': int(food.price or 0),
+        'has_customizations': has_customizations
+    }
+
+
+def create_food_with_stats(food, stats):
+    """ایجاد دیکشنری غذا با آمار"""
+    return {
+        'id': food.id,
+        'title': food.title,
+        'title_en': food.title_en,
+        'description': food.description,
+        'description_en': food.description_en,
+        'price': food.price or 0,
+        'image': food.image,
+        'preparationTime': food.preparationTime or 0,
+        'isActive': food.isActive,
+        'menuCategory': food.menuCategory,
+        'slug': food.slug,
+        'displayOrder': food.displayOrder or 0,
+        'created_by': food.created_by,
+        'stats': stats
+    }
 
 @login_required
 @restaurant_owner_required
@@ -827,6 +1020,7 @@ def delete_menu_category(request, slug, menu_category_id):
             'success': False,
             'message': f'خطا در حذف دسته‌بندی: {str(e)}'
         })
+
 
 @login_required
 @restaurant_owner_required
@@ -1428,3 +1622,270 @@ def assign_food_to_category(request, slug, food_id):
             'success': False,
             'message': f'خطا در انتساب دسته‌بندی: {str(e)}'
         })
+
+
+
+
+# در فایل viewsfree.py - اضافه کردن ویوهای شخصی‌سازی
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+import json
+
+@require_http_methods(["GET"])
+def get_customized_foods(request, restaurant_slug):
+    """دریافت لیست غذاهای شخصی‌سازی شده رستوران"""
+    try:
+        restaurant = get_object_or_404(Restaurant, slug=restaurant_slug)
+
+        # استفاده از related_name درست از مدل FoodRestaurant
+        customized_foods = FoodRestaurant.objects.filter(
+            restaurant=restaurant
+        ).select_related('food')
+
+        foods_data = []
+        for custom_food in customized_foods:
+            food = custom_food.food
+
+            food_data = {
+                'id': custom_food.id,
+                'food_id': food.id,
+                'title': food.title,
+                'description': food.description,
+                'original_price': food.price,
+                'custom_price': custom_food.custom_price,
+                'final_price': custom_food.final_price,
+                'original_image': food.image.url if food.image else None,
+                'custom_image': custom_food.custom_image.url if custom_food.custom_image else None,
+                'final_image': custom_food.final_image.url if custom_food.final_image else None,
+                'preparation_time': food.preparationTime,
+                'category_name': food.menuCategory.category.title if food.menuCategory and food.menuCategory.category else None,
+                'has_customizations': custom_food.has_customizations(),
+                'is_active': custom_food.is_active,
+                'created_at': custom_food.created_at.isoformat(),
+                'updated_at': custom_food.updated_at.isoformat()
+            }
+            foods_data.append(food_data)
+
+        return JsonResponse({
+            'success': True,
+            'customized_foods': foods_data,
+            'total_count': len(foods_data)
+        })
+
+    except Exception as e:
+        import traceback
+        print("Error in get_customized_foods:", str(e))
+        print(traceback.format_exc())
+
+        return JsonResponse({
+            'success': False,
+            'message': f'خطا در دریافت لیست غذاهای شخصی‌سازی شده: {str(e)}'
+        }, status=500)
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def reset_food_customization(request, restaurant_slug, food_id):
+    """بازنشانی شخصی‌سازی یک غذا"""
+    try:
+        restaurant = get_object_or_404(Restaurant, slug=restaurant_slug)
+        food = get_object_or_404(Food, id=food_id)
+
+        custom_food = get_object_or_404(
+            FoodRestaurant,
+            restaurant=restaurant,
+            food=food
+        )
+
+        custom_food.reset_customizations()
+        custom_food.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'شخصی‌سازی غذا با موفقیت بازنشانی شد'
+        })
+
+    except Exception as e:
+        import traceback
+        print("Error in reset_food_customization:", str(e))
+        print(traceback.format_exc())
+
+        return JsonResponse({
+            'success': False,
+            'message': f'خطا در بازنشانی شخصی‌سازی: {str(e)}'
+        }, status=500)
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def toggle_custom_food_status(request, restaurant_slug, food_id):
+    """تغییر وضعیت فعال/غیرفعال بودن غذای شخصی‌سازی شده"""
+    try:
+        restaurant = get_object_or_404(Restaurant, slug=restaurant_slug)
+        food = get_object_or_404(Food, id=food_id)
+
+        custom_food = get_object_or_404(
+            FoodRestaurant,
+            restaurant=restaurant,
+            food=food
+        )
+
+        custom_food.is_active = not custom_food.is_active
+        custom_food.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': f'وضعیت غذا با موفقیت {"فعال" if custom_food.is_active else "غیرفعال"} شد'
+        })
+
+    except Exception as e:
+        import traceback
+        print("Error in toggle_custom_food_status:", str(e))
+        print(traceback.format_exc())
+
+        return JsonResponse({
+            'success': False,
+            'message': f'خطا در تغییر وضعیت: {str(e)}'
+        }, status=500)
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def bulk_customize_foods(request, restaurant_slug):
+    """ذخیره گروهی شخصی‌سازی غذاها"""
+    try:
+        print(f"=== شروع bulk_customize_foods برای رستوران: {restaurant_slug} ===")
+        restaurant = get_object_or_404(Restaurant, slug=restaurant_slug)
+
+        # لاگ هدرها و محتوای درخواست
+        print(f"Content-Type: {request.content_type}")
+        print(f"Method: {request.method}")
+        print(f"POST data: {dict(request.POST)}")
+        print(f"FILES: {list(request.FILES.keys())}")
+
+        # دریافت داده‌ها
+        if request.content_type.startswith("application/json"):
+            try:
+                raw_body = request.body
+                body_str = raw_body.decode('utf-8')
+                data = json.loads(body_str)
+                print(f"JSON data received: {data}")
+            except Exception as e:
+                print(f"Error decoding JSON: {e}")
+                return JsonResponse({
+                    'success': False,
+                    'message': f'خطا در پردازش داده‌های JSON: {str(e)}'
+                }, status=400)
+        else:
+            # دریافت از FormData
+            data = request.POST.dict()
+            print(f"FormData received: {data}")
+
+            # پردازش customizations
+            if "customizations" in data:
+                try:
+                    customizations_str = data["customizations"]
+                    print(f"Customizations string: {customizations_str}")
+                    data["customizations"] = json.loads(customizations_str)
+                    print(f"Parsed customizations: {data['customizations']}")
+                except Exception as e:
+                    print(f"Error parsing customizations: {e}")
+                    data["customizations"] = []
+
+        customizations = data.get('customizations', [])
+        print(f"Final customizations: {customizations}")
+        print(f"Number of customizations: {len(customizations)}")
+
+        results = []
+        errors = []
+
+        with transaction.atomic():
+            for i, customization in enumerate(customizations):
+                try:
+                    print(f"Processing customization {i+1}: {customization}")
+
+                    food_id = customization.get('food_id')
+                    custom_price = customization.get('custom_price')
+
+                    print(f"Food ID: {food_id}, Custom Price: {custom_price}")
+
+                    if not food_id:
+                        errors.append('شناسه غذا الزامی است')
+                        continue
+
+                    # پیدا کردن غذا
+                    food = Food.objects.get(id=food_id)
+                    print(f"Found food: {food.title} (ID: {food.id})")
+
+                    # بررسی قابل شخصی‌سازی بودن
+                    if food.created_by != 'company':
+                        error_msg = f'غذای {food.title} قابل شخصی‌سازی نیست (created_by: {food.created_by})'
+                        errors.append(error_msg)
+                        print(error_msg)
+                        continue
+
+                    # ایجاد یا به‌روزرسانی FoodRestaurant
+                    custom_food, created = FoodRestaurant.objects.get_or_create(
+                        restaurant=restaurant,
+                        food=food
+                    )
+
+                    print(f"FoodRestaurant {'created' if created else 'updated'}: {custom_food.id}")
+
+                    # به‌روزرسانی قیمت
+                    old_price = custom_food.custom_price
+                    if custom_price is not None:
+                        custom_food.custom_price = custom_price
+
+                    # پردازش تصویر
+                    image_key = f'image_{food_id}'
+                    if image_key in request.FILES:
+                        custom_food.custom_image = request.FILES[image_key]
+                        print(f"Image updated for food {food_id}")
+
+                    custom_food.save()
+
+                    print(f"Custom food saved - ID: {custom_food.id}, Custom Price: {custom_food.custom_price}, Final Price: {custom_food.final_price}")
+
+                    results.append({
+                        'food_id': food.id,
+                        'food_title': food.title,
+                        'custom_price': custom_food.custom_price,
+                        'final_price': custom_food.final_price,
+                        'success': True
+                    })
+
+                except Food.DoesNotExist:
+                    error_msg = f'غذا با شناسه {food_id} یافت نشد'
+                    errors.append(error_msg)
+                    print(error_msg)
+                except Exception as e:
+                    error_msg = f'خطا در شخصی‌سازی غذا {food_id}: {str(e)}'
+                    errors.append(error_msg)
+                    print(error_msg)
+                    import traceback
+                    print(traceback.format_exc())
+
+        print(f"Processing completed. Results: {len(results)}, Errors: {len(errors)}")
+        print(f"Results: {results}")
+        print(f"Errors: {errors}")
+
+        response_data = {
+            'success': len(errors) == 0,
+            'message': f'{len(results)} غذا با موفقیت شخصی‌سازی شدند',
+            'results': results,
+            'errors': errors
+        }
+
+        print(f"Final response: {response_data}")
+        return JsonResponse(response_data)
+
+    except Exception as e:
+        import traceback
+        print("Error in bulk_customize_foods:", str(e))
+        print(traceback.format_exc())
+
+        return JsonResponse({
+            'success': False,
+            'message': f'خطا در ذخیره گروهی: {str(e)}'
+        }, status=500)

@@ -1,0 +1,1697 @@
+<script>
+    // ==================== مدیریت کاستوم غذاها ====================
+    class CustomFoodsManager {
+        constructor() {
+            this.currentCustomFoodId = null;
+            this.availableFoods = [];
+        }
+
+        init() {
+            this.bindEvents();
+            this.loadCustomFoods();
+            this.loadAvailableFoods();
+        }
+
+        bindEvents() {
+            // تب کاستوم غذاها
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('[data-tab="custom-foods"]')) {
+                    this.loadCustomFoods();
+                }
+            });
+
+            // دکمه افزودن غذای کاستوم
+            document.getElementById('add-custom-food-btn')?.addEventListener('click', () => this.openCustomFoodModal());
+            document.getElementById('add-first-custom-food')?.addEventListener('click', () => this.openCustomFoodModal());
+            document.getElementById('refresh-custom-foods')?.addEventListener('click', () => this.loadCustomFoods());
+
+            // انتخاب غذا
+            document.getElementById('food-select')?.addEventListener('change', (e) => this.onFoodSelect(e.target.value));
+
+            // مدیریت آپلود عکس
+            document.getElementById('image-upload-area')?.addEventListener('click', () => {
+                document.getElementById('custom-image').click();
+            });
+
+            document.getElementById('custom-image')?.addEventListener('change', (e) => this.handleImageUpload(e));
+
+            // مدیریت قیمت
+            document.getElementById('custom-price')?.addEventListener('input', (e) => this.onPriceChange(e.target.value));
+
+            // بازنشانی تغییرات
+            document.getElementById('reset-customizations')?.addEventListener('click', () => this.resetCustomizations());
+
+            // ارسال فرم
+            document.getElementById('custom-food-form')?.addEventListener('submit', (e) => this.submitCustomFoodForm(e));
+        }
+
+        async loadAvailableFoods() {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/custom-foods/available/`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.availableFoods = result.foods;
+                    this.populateFoodSelect();
+                }
+            } catch (error) {
+                console.error('Error loading available foods:', error);
+                this.showNotification('خطا در بارگذاری غذاهای قابل کاستوم', 'error');
+            }
+        }
+
+        populateFoodSelect() {
+            const select = document.getElementById('food-select');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">لطفاً یک غذا انتخاب کنید</option>';
+
+            this.availableFoods.forEach(food => {
+                const option = document.createElement('option');
+                option.value = food.id;
+                option.textContent = `${food.title} - ${food.base_price.toLocaleString()} تومان`;
+                option.setAttribute('data-food', JSON.stringify(food));
+                select.appendChild(option);
+            });
+        }
+
+        onFoodSelect(foodId) {
+            const foodInfoSection = document.getElementById('food-info-section');
+
+            if (!foodId) {
+                foodInfoSection.classList.add('hidden');
+                return;
+            }
+
+            const selectedOption = document.querySelector(`#food-select option[value="${foodId}"]`);
+            if (!selectedOption) return;
+
+            const foodData = JSON.parse(selectedOption.getAttribute('data-food'));
+
+            // نمایش اطلاعات غذا
+            document.getElementById('base-food-title').textContent = foodData.title;
+            document.getElementById('base-food-description').textContent = foodData.description || 'بدون توضیحات';
+            document.getElementById('base-food-price').textContent = foodData.base_price.toLocaleString() + ' تومان';
+            document.getElementById('base-food-prep-time').textContent = foodData.preparation_time + ' دقیقه';
+
+            if (foodData.base_image_url) {
+                document.getElementById('base-food-image').src = foodData.base_image_url;
+            }
+
+            // تنظیم مقادیر پیش‌فرض
+            document.getElementById('base-price-display').textContent = foodData.base_price.toLocaleString() + ' تومان';
+            document.getElementById('current-image-preview').src = foodData.base_image_url || '/static/images/food-placeholder.jpg';
+
+            foodInfoSection.classList.remove('hidden');
+            document.getElementById('image-preview-section').classList.remove('hidden');
+        }
+
+        onPriceChange(newPrice) {
+            const priceComparison = document.getElementById('price-comparison');
+            const basePriceText = document.getElementById('base-price-display').textContent;
+            const basePrice = basePriceText.split(' ')[0].replace(/,/g, '');
+
+            if (newPrice && newPrice !== basePrice) {
+                document.getElementById('new-price-display').textContent = parseInt(newPrice).toLocaleString() + ' تومان';
+                priceComparison.classList.remove('hidden');
+            } else {
+                priceComparison.classList.add('hidden');
+            }
+        }
+
+        handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // بررسی سایز فایل (حداکثر 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                this.showNotification('حجم فایل نباید بیشتر از 5 مگابایت باشد', 'error');
+                return;
+            }
+
+            // بررسی نوع فایل
+            if (!file.type.startsWith('image/')) {
+                this.showNotification('لطفاً فقط فایل تصویری انتخاب کنید', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('new-image-preview').src = e.target.result;
+                document.getElementById('new-image-preview').classList.remove('hidden');
+                document.getElementById('no-new-image').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        resetCustomizations() {
+            document.getElementById('custom-price').value = '';
+            document.getElementById('custom-image').value = '';
+            document.getElementById('new-image-preview').classList.add('hidden');
+            document.getElementById('no-new-image').classList.remove('hidden');
+            document.getElementById('price-comparison').classList.add('hidden');
+
+            this.showNotification('تغییرات بازنشانی شدند', 'success');
+        }
+
+        async submitCustomFoodForm(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const loading = document.getElementById('custom-food-loading');
+
+            // بررسی اینکه حداقل یک تغییر وجود دارد
+            const customPrice = formData.get('custom_price');
+            const customImage = document.getElementById('custom-image').files[0];
+
+            if (!customPrice && !customImage) {
+                this.showNotification('لطفاً حداقل یک تغییر (قیمت یا عکس) اعمال کنید', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            loading.classList.remove('hidden');
+
+            try {
+                const url = this.currentCustomFoodId ?
+                    `/panel/${restaurantSlug}/custom-foods/${this.currentCustomFoodId}/update/` :
+                    `/panel/${restaurantSlug}/custom-foods/create/`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message, 'success');
+                    document.getElementById('custom-food-modal').style.display = 'none';
+                    this.resetForm();
+                    this.loadCustomFoods();
+                    this.loadAvailableFoods();
+                } else {
+                    this.showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showNotification('خطا در ارسال اطلاعات', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                loading.classList.add('hidden');
+            }
+        }
+
+        resetForm() {
+            document.getElementById('custom-food-form').reset();
+            document.getElementById('food-info-section').classList.add('hidden');
+            document.getElementById('image-preview-section').classList.add('hidden');
+            document.getElementById('reset-customizations').classList.add('hidden');
+            document.getElementById('custom-food-id').value = '';
+            document.getElementById('base-food-id').value = '';
+            this.currentCustomFoodId = null;
+
+            document.getElementById('custom-food-modal-title').textContent = 'کاستومایز غذا';
+            document.getElementById('submit-button-text').textContent = 'ذخیره تغییرات';
+        }
+
+        async loadCustomFoods() {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/custom-foods/list/`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.renderCustomFoods(result.custom_foods);
+                    this.updateStats(result.custom_foods);
+                }
+            } catch (error) {
+                console.error('Error loading custom foods:', error);
+                this.showNotification('خطا در بارگذاری غذاهای کاستوم', 'error');
+            }
+        }
+
+        renderCustomFoods(customFoods) {
+            const container = document.getElementById('custom-foods-container');
+            if (!container) return;
+
+            if (!customFoods || customFoods.length === 0) {
+                container.innerHTML = this.getEmptyStateHTML();
+                return;
+            }
+
+            let html = `
+                <div class="mb-4 flex justify-between items-center">
+                    <p class="text-gray-600">تعداد: <span class="font-bold">${customFoods.length}</span> غذای کاستوم</p>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors" onclick="customFoodsManager.sortBy('name')">
+                            <i class="fas fa-sort-alpha-down mr-1"></i>مرتب سازی بر اساس نام
+                        </button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors" onclick="customFoodsManager.sortBy('price')">
+                            <i class="fas fa-sort-numeric-down mr-1"></i>مرتب سازی بر اساس قیمت
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            `;
+
+            customFoods.forEach(customFood => {
+                html += this.getCustomFoodCardHTML(customFood);
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // اضافه کردن event listeners برای کارت‌ها
+            this.attachCustomFoodCardEvents();
+        }
+
+        getCustomFoodCardHTML(customFood) {
+            const hasPriceCustom = customFood.custom_price !== null;
+            const hasImageCustom = customFood.custom_image_url !== '';
+            const customizationsCount = (hasPriceCustom ? 1 : 0) + (hasImageCustom ? 1 : 0);
+
+            return `
+                <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden border-2 border-transparent hover:border-purple-200 transition-all duration-300" data-custom-food-id="${customFood.id}">
+                    <div class="relative">
+                        <img src="${customFood.final_image_url || customFood.base_image_url}"
+                             alt="${customFood.title}"
+                             class="w-full h-48 object-cover">
+
+                        <!-- نشانگر کاستوم -->
+                        <div class="customization-indicator">
+                            <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full shadow-lg">
+                                <i class="fas fa-star mr-1"></i>کاستوم
+                            </span>
+                        </div>
+
+                        <!-- وضعیت تغییرات -->
+                        <div class="absolute top-3 right-3 flex flex-col gap-1">
+                            ${hasPriceCustom ? `
+                                <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg">
+                                    <i class="fas fa-money-bill-wave mr-1"></i>قیمت
+                                </span>
+                            ` : ''}
+                            ${hasImageCustom ? `
+                                <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow-lg">
+                                    <i class="fas fa-image mr-1"></i>عکس
+                                </span>
+                            ` : ''}
+                        </div>
+
+                        <!-- قیمت نهایی -->
+                        <div class="absolute bottom-3 right-3 bg-white rounded-full px-3 py-2 shadow-lg">
+                            <span class="font-bold text-green-600 text-sm">
+                                ${customFood.final_price.toLocaleString()} تومان
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <!-- هدر کارت -->
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
+                                ${customFood.title}
+                                ${customizationsCount > 0 ? `
+                                    <span class="bg-purple-100 text-purple-600 text-xs px-2 py-1 rounded-full">
+                                        ${customizationsCount} تغییر
+                                    </span>
+                                ` : ''}
+                            </h3>
+                            <div class="flex gap-1">
+                                <button class="edit-custom-food text-blue-500 hover:text-blue-700 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                                        data-custom-food-id="${customFood.id}"
+                                        title="ویرایش">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-custom-food text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                                        data-custom-food-id="${customFood.id}"
+                                        title="حذف کاستوم">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- توضیحات -->
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            ${customFood.description || 'بدون توضیحات'}
+                        </p>
+
+                        <!-- جزئیات تغییرات -->
+                        <div class="space-y-2 text-sm">
+                            <!-- قیمت -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500">قیمت:</span>
+                                <div class="flex items-center gap-2">
+                                    ${hasPriceCustom ? `
+                                        <span class="text-gray-400 line-through text-xs">
+                                            ${customFood.base_price.toLocaleString()}
+                                        </span>
+                                        <span class="text-green-600 font-bold">
+                                            ${customFood.custom_price.toLocaleString()}
+                                        </span>
+                                    ` : `
+                                        <span class="text-gray-700">
+                                            ${customFood.base_price.toLocaleString()}
+                                        </span>
+                                    `}
+                                    <span class="text-xs text-gray-400">تومان</span>
+                                </div>
+                            </div>
+
+                            <!-- وضعیت عکس -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500">عکس:</span>
+                                <span class="${hasImageCustom ? 'text-blue-600' : 'text-gray-600'} text-xs">
+                                    ${hasImageCustom ? 'کاستوم' : 'پیش‌فرض'}
+                                </span>
+                            </div>
+
+                            <!-- زمان -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500">زمان:</span>
+                                <span class="text-gray-700">${customFood.preparation_time} دقیقه</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        attachCustomFoodCardEvents() {
+            // ویرایش
+            document.querySelectorAll('.edit-custom-food').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const customFoodId = e.target.closest('.edit-custom-food').getAttribute('data-custom-food-id');
+                    this.editCustomFood(customFoodId);
+                });
+            });
+
+            // حذف
+            document.querySelectorAll('.delete-custom-food').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const customFoodId = e.target.closest('.delete-custom-food').getAttribute('data-custom-food-id');
+                    this.deleteCustomFood(customFoodId);
+                });
+            });
+        }
+
+        async editCustomFood(customFoodId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/custom-foods/${customFoodId}/`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.openCustomFoodModalForEdit(result.custom_food);
+                } else {
+                    this.showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading custom food:', error);
+                this.showNotification('خطا در بارگذاری اطلاعات غذا', 'error');
+            }
+        }
+
+        openCustomFoodModalForEdit(customFood) {
+            this.currentCustomFoodId = customFood.id;
+
+            // پر کردن فرم
+            document.getElementById('custom-food-modal-title').textContent = 'ویرایش غذای کاستوم';
+            document.getElementById('submit-button-text').textContent = 'بروزرسانی تغییرات';
+            document.getElementById('custom-food-id').value = customFood.id;
+            document.getElementById('base-food-id').value = customFood.food_id;
+
+            // نمایش اطلاعات پایه
+            document.getElementById('base-food-title').textContent = customFood.title;
+            document.getElementById('base-food-description').textContent = customFood.description || 'بدون توضیحات';
+            document.getElementById('base-food-price').textContent = customFood.base_price.toLocaleString() + ' تومان';
+            document.getElementById('base-food-image').src = customFood.base_image_url;
+
+            // مقادیر کاستوم
+            if (customFood.custom_price) {
+                document.getElementById('custom-price').value = customFood.custom_price;
+                this.onPriceChange(customFood.custom_price);
+            }
+
+            if (customFood.custom_image_url) {
+                document.getElementById('new-image-preview').src = customFood.custom_image_url;
+                document.getElementById('new-image-preview').classList.remove('hidden');
+                document.getElementById('no-new-image').classList.add('hidden');
+            }
+
+            // نمایش بخش‌ها
+            document.getElementById('food-info-section').classList.remove('hidden');
+            document.getElementById('image-preview-section').classList.remove('hidden');
+            document.getElementById('reset-customizations').classList.remove('hidden');
+            document.getElementById('food-selection-section').classList.add('hidden');
+
+            // باز کردن مودال
+            document.getElementById('custom-food-modal').style.display = 'flex';
+        }
+
+        async deleteCustomFood(customFoodId) {
+            if (!confirm('آیا از حذف این غذای کاستوم مطمئن هستید؟ غذا به حالت پیش‌فرض بازمی‌گردد.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/custom-foods/${customFoodId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message, 'success');
+                    this.loadCustomFoods();
+                    this.loadAvailableFoods();
+                } else {
+                    this.showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting custom food:', error);
+                this.showNotification('خطا در حذف غذای کاستوم', 'error');
+            }
+        }
+
+        updateStats(customFoods) {
+            const total = customFoods.length;
+            const customPrices = customFoods.filter(food => food.custom_price !== null).length;
+            const customImages = customFoods.filter(food => food.custom_image_url !== '').length;
+
+            // آپدیت اعداد
+            document.getElementById('total-custom-foods').textContent = total;
+            document.getElementById('custom-prices-count').textContent = customPrices;
+            document.getElementById('custom-images-count').textContent = customImages;
+
+            // آپدیت شمارشگر تب
+            document.getElementById('custom-foods-count').textContent = total;
+        }
+
+        getEmptyStateHTML() {
+            return `
+                <div class="text-center py-16">
+                    <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-star text-purple-400 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700 mb-3">هنوز غذایی کاستومایز نکرده‌اید</h3>
+                    <p class="text-gray-500 max-w-md mx-auto mb-6 leading-relaxed">
+                        با کاستومایز کردن غذاهای شرکت، منوی منحصر به فردی برای رستوران خود ایجاد کنید.
+                        می‌توانید قیمت و عکس غذاها را تغییر دهید.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-lg transition-colors flex items-center gap-2"
+                                onclick="customFoodsManager.openCustomFoodModal()">
+                            <i class="fas fa-plus"></i>
+                            شروع کاستومایز کردن
+                        </button>
+                        <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-8 py-3 rounded-lg transition-colors flex items-center gap-2"
+                                onclick="customFoodsManager.loadAvailableFoods()">
+                            <i class="fas fa-sync-alt"></i>
+                            بروزرسانی لیست غذاها
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        openCustomFoodModal() {
+            this.resetForm();
+            document.getElementById('food-selection-section').classList.remove('hidden');
+            document.getElementById('custom-food-modal').style.display = 'flex';
+        }
+
+        sortBy(criteria) {
+            console.log(`Sorting by: ${criteria}`);
+        }
+
+        showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    }
+
+    // ==================== مدیریت اصلی ====================
+    class RestaurantMenuManager {
+        constructor() {
+            this.currentSelectedCategory = 'all';
+            this.currentSelectedMenuCategoryId = null;
+            this.selectedCategories = new Map();
+        }
+
+        init() {
+            this.initializeSelect2();
+            this.bindEvents();
+            this.loadInitialData();
+        }
+
+        initializeSelect2() {
+            $.fn.select2.defaults.set("language", "fa");
+
+            $('.select2-category').select2({
+                placeholder: "انتخاب دسته‌بندی",
+                allowClear: true,
+                width: '100%',
+                dir: 'rtl'
+            });
+
+            $('.select2-category-all').select2({
+                placeholder: "جستجو و انتخاب دسته‌بندی",
+                allowClear: true,
+                width: '100%',
+                dir: 'rtl'
+            });
+        }
+
+        bindEvents() {
+            // مدیریت تب‌ها
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    this.switchTab(tabId, button);
+                });
+            });
+
+            // دکمه‌های دسکتاپ
+            this.bindDesktopButtons();
+
+            // Floating Action Button
+            this.bindFABEvents();
+
+            // بستن همه مودال‌ها
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', () => this.closeAllModals());
+            });
+
+            // مدیریت دسته‌بندی‌ها
+            this.bindCategoryEvents();
+
+            // Search and Filter
+            this.bindSearchEvents();
+
+            // مدیریت عملیات غذاها
+            document.addEventListener('click', (e) => this.handleFoodOperations(e));
+
+            // ارسال فرم‌ها
+            this.bindFormSubmissions();
+
+            // مدیریت انتخاب سریع دسته‌بندی‌ها
+            this.bindQuickCategoryEvents();
+
+            // مدیریت تصاویر
+            this.bindImagePreviews();
+        }
+
+        bindDesktopButtons() {
+            document.getElementById('add-food-btn')?.addEventListener('click', () => this.openFoodModal());
+            document.getElementById('add-first-food-btn')?.addEventListener('click', () => this.openFoodModal());
+            document.getElementById('manage-categories-btn')?.addEventListener('click', () => this.showModal('category-modal'));
+            document.getElementById('restaurant-settings-btn')?.addEventListener('click', () => this.showModal('restaurant-modal'));
+            document.getElementById('add-new-category-btn')?.addEventListener('click', () => this.openAddCategoryModal());
+            document.getElementById('add-category-mobile-btn')?.addEventListener('click', () => this.openQuickCategoryModal());
+            document.getElementById('quick-category-btn')?.addEventListener('click', () => this.openQuickCategoryModal());
+        }
+
+        bindFABEvents() {
+            const fabMain = document.getElementById('fab-main');
+            const fabMenu = document.getElementById('fab-menu');
+
+            fabMain?.addEventListener('click', function() {
+                this.classList.toggle('active');
+                fabMenu.classList.toggle('active');
+            });
+
+            document.getElementById('fab-add-food')?.addEventListener('click', () => {
+                this.openFoodModal();
+                this.closeFAB();
+            });
+
+            document.getElementById('fab-add-category')?.addEventListener('click', () => {
+                this.openAddCategoryModal();
+                this.closeFAB();
+            });
+
+            document.getElementById('fab-quick-category')?.addEventListener('click', () => {
+                this.openQuickCategoryModal();
+                this.closeFAB();
+            });
+
+            document.getElementById('fab-restaurant-settings')?.addEventListener('click', () => {
+                this.showModal('restaurant-modal');
+                this.closeFAB();
+            });
+        }
+
+        bindCategoryEvents() {
+            document.querySelectorAll('.category-sidebar-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const categoryId = btn.getAttribute('data-category');
+                    const menuCategoryId = btn.getAttribute('data-menu-category-id');
+                    this.selectCategory(categoryId, menuCategoryId, btn);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.add-food-to-category')) {
+                    const menuCategoryId = e.target.closest('.add-food-to-category').getAttribute('data-category');
+                    this.openFoodModal(menuCategoryId);
+                }
+            });
+        }
+
+        bindSearchEvents() {
+            const searchInput = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search');
+            const statusFilter = document.getElementById('status-filter');
+
+            searchInput?.addEventListener('input', () => {
+                if (searchInput.value) {
+                    clearBtn?.classList.remove('hidden');
+                } else {
+                    clearBtn?.classList.add('hidden');
+                }
+                this.filterFoods();
+            });
+
+            clearBtn?.addEventListener('click', () => {
+                searchInput.value = '';
+                clearBtn.classList.add('hidden');
+                this.filterFoods();
+            });
+
+            statusFilter?.addEventListener('change', () => this.filterFoods());
+        }
+
+        bindFormSubmissions() {
+            document.getElementById('food-form')?.addEventListener('submit', (e) => this.submitFoodForm(e));
+            document.getElementById('add-category-form')?.addEventListener('submit', (e) => this.submitCategoryForm(e));
+            document.getElementById('restaurant-form')?.addEventListener('submit', (e) => this.submitRestaurantForm(e));
+        }
+
+        bindQuickCategoryEvents() {
+            const confirmBtn = document.getElementById('confirm-categories-btn');
+            const selectAllBtn = document.getElementById('select-all-categories');
+            const deselectAllBtn = document.getElementById('deselect-all-categories');
+
+            confirmBtn?.addEventListener('click', () => this.confirmAndAddCategories());
+            selectAllBtn?.addEventListener('click', () => this.selectAllCategories());
+            deselectAllBtn?.addEventListener('click', () => this.deselectAllCategories());
+        }
+
+        bindImagePreviews() {
+            this.bindImagePreview('food-image', 'food-image-preview');
+            this.bindImagePreview('category-icon', 'category-icon-preview');
+            this.bindImagePreview('restaurant-logo', 'restaurant-logo-preview');
+        }
+
+        bindImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            input?.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+
+        switchTab(tabId, button) {
+            // Update active tab button
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-blue-600', 'border-blue-600');
+                btn.classList.add('text-gray-500', 'border-transparent');
+            });
+            button.classList.add('active', 'text-blue-600', 'border-blue-600');
+            button.classList.remove('text-gray-500', 'border-transparent');
+
+            // Show active tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+
+        closeAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        closeFAB() {
+            document.getElementById('fab-menu').classList.remove('active');
+            document.getElementById('fab-main').classList.remove('active');
+        }
+
+        showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        selectCategory(categoryId, menuCategoryId, button) {
+            this.currentSelectedCategory = categoryId;
+            this.currentSelectedMenuCategoryId = menuCategoryId;
+
+            document.querySelectorAll('.category-sidebar-btn').forEach(b => b.classList.remove('category-active'));
+            button.classList.add('category-active');
+
+            document.querySelectorAll('.foods-section').forEach(section => section.classList.remove('active'));
+
+            if (categoryId === 'all') {
+                document.getElementById('foods-all').classList.add('active');
+                document.getElementById('current-category-text').textContent = 'همه غذاها';
+            } else {
+                document.getElementById(`foods-category-${categoryId}`).classList.add('active');
+                const categoryName = button.querySelector('.category-name').textContent;
+                document.getElementById('current-category-text').textContent = `غذاهای ${categoryName}`;
+            }
+
+            this.filterFoods();
+        }
+
+        // ==================== فیلتر غذاها ====================
+        filterFoods() {
+            const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('status-filter')?.value || 'all';
+            const activeTab = document.querySelector('.tab-content.active')?.id;
+
+            if (activeTab === 'selected-foods-tab') {
+                this.filterFoodsInSelectedTab(searchTerm, statusFilter);
+            } else {
+                this.filterFoodsInAllTab(searchTerm, statusFilter);
+            }
+        }
+
+        filterFoodsInSelectedTab(searchTerm, statusFilter) {
+            const activeCategory = document.querySelector('.category-sidebar-btn.active')?.getAttribute('data-category');
+            if (!activeCategory) return;
+
+            let foodCards;
+            if (activeCategory === 'all') {
+                foodCards = document.querySelectorAll('#foods-all .food-card');
+            } else {
+                foodCards = document.querySelectorAll(`#foods-category-${activeCategory} .food-card`);
+            }
+
+            let visibleCount = 0;
+            foodCards.forEach(card => {
+                const foodTitle = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                const foodDescription = card.querySelector('p')?.textContent.toLowerCase() || '';
+                const foodStatus = card.getAttribute('data-status');
+
+                const matchesSearch = foodTitle.includes(searchTerm) || foodDescription.includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || foodStatus === statusFilter;
+
+                if (matchesSearch && matchesStatus) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            this.showNoResultsMessage(activeCategory, visibleCount === 0);
+        }
+
+        filterFoodsInAllTab(searchTerm, statusFilter) {
+            const foodCards = document.querySelectorAll('#all-foods-container .food-card');
+            let visibleCount = 0;
+
+            foodCards.forEach(card => {
+                const foodTitle = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                const foodDescription = card.querySelector('p')?.textContent.toLowerCase() || '';
+                const foodStatus = card.getAttribute('data-status');
+
+                const matchesSearch = foodTitle.includes(searchTerm) || foodDescription.includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || foodStatus === statusFilter;
+
+                if (matchesSearch && matchesStatus) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            this.showNoResultsMessage('all-foods', visibleCount === 0);
+        }
+
+        showNoResultsMessage(sectionId, show) {
+            let messageElement;
+
+            if (sectionId === 'all-foods') {
+                messageElement = document.querySelector('#all-foods-container .no-results-message');
+            } else {
+                const section = sectionId === 'all' ?
+                    document.getElementById('foods-all') :
+                    document.getElementById(`foods-category-${sectionId}`);
+                messageElement = section?.querySelector('.no-results-message');
+            }
+
+            if (show && !messageElement) {
+                messageElement = document.createElement('div');
+                messageElement.className = 'no-results-message col-span-full text-center py-12';
+                messageElement.innerHTML = `
+                    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">نتیجه‌ای یافت نشد</p>
+                    <p class="text-gray-400 text-sm mt-2">لطفاً عبارت جستجو یا فیلتر وضعیت را تغییر دهید</p>
+                `;
+
+                if (sectionId === 'all-foods') {
+                    document.getElementById('all-foods-container').appendChild(messageElement);
+                } else {
+                    const section = sectionId === 'all' ?
+                        document.getElementById('foods-all') :
+                        document.getElementById(`foods-category-${sectionId}`);
+                    const foodGrid = section?.querySelector('.food-grid');
+                    if (foodGrid) {
+                        foodGrid.appendChild(messageElement);
+                    }
+                }
+            } else if (!show && messageElement) {
+                messageElement.remove();
+            }
+        }
+
+        // ==================== عملیات غذاها ====================
+        handleFoodOperations(e) {
+            // افزودن غذا به منو
+            if (e.target.closest('.add-food-btn')) {
+                const foodId = e.target.closest('.add-food-btn').getAttribute('data-food-id');
+                this.addFoodToMenu(foodId);
+                return;
+            }
+
+            // حذف غذا از منو
+            if (e.target.closest('.remove-food-btn')) {
+                const foodId = e.target.closest('.remove-food-btn').getAttribute('data-food-id');
+                this.removeFoodFromMenu(foodId);
+                return;
+            }
+
+            if (e.target.closest('.edit-food-btn')) {
+                const foodId = e.target.closest('.edit-food-btn').getAttribute('data-food-id');
+                this.loadFoodData(foodId);
+                return;
+            }
+
+            if (e.target.closest('.toggle-food-status')) {
+                const foodId = e.target.closest('.toggle-food-status').getAttribute('data-food-id');
+                this.toggleFoodStatus(foodId);
+                return;
+            }
+
+            if (e.target.closest('.delete-food-btn')) {
+                const foodId = e.target.closest('.delete-food-btn').getAttribute('data-food-id');
+                if (confirm('آیا از حذف این غذا مطمئن هستید؟')) {
+                    this.deleteFood(foodId);
+                }
+                return;
+            }
+
+            if (e.target.closest('.toggle-category-status')) {
+                const categoryId = e.target.closest('.toggle-category-status').getAttribute('data-category-id');
+                this.toggleMenuCategoryStatus(categoryId);
+                return;
+            }
+
+            if (e.target.closest('.delete-category-sidebar')) {
+                const categoryId = e.target.closest('.delete-category-sidebar').getAttribute('data-category-id');
+                if (confirm('آیا از حذف این دسته‌بندی از منو مطمئن هستید؟')) {
+                    this.deleteMenuCategory(categoryId);
+                }
+                return;
+            }
+        }
+
+        async addFoodToMenu(foodId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/foods/${foodId}/toggle-selection/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.updateFoodCardUI(foodId, 'add');
+                    this.showNotification('غذا با موفقیت به منو اضافه شد', 'success');
+                } else {
+                    this.showNotification('خطا در افزودن غذا به منو', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showNotification('خطا در ارتباط با سرور', 'error');
+            }
+        }
+
+        async removeFoodFromMenu(foodId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/foods/${foodId}/toggle-selection/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.updateFoodCardUI(foodId, 'remove');
+                    this.showNotification('غذا با موفقیت از منو حذف شد', 'success');
+                } else {
+                    this.showNotification('خطا در حذف غذا از منو', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showNotification('خطا در ارتباط با سرور', 'error');
+            }
+        }
+
+        updateFoodCardUI(foodId, action) {
+            const foodCard = document.querySelector(`.food-card[data-food-id="${foodId}"]`);
+            if (!foodCard) return;
+
+            if (action === 'add') {
+                foodCard.classList.remove('available');
+                foodCard.classList.add('selected');
+
+                const button = foodCard.querySelector('.add-food-btn');
+                button.classList.remove('add-food-btn', 'text-green-500');
+                button.classList.add('remove-food-btn', 'text-red-500');
+                button.innerHTML = '<i class="fas fa-times"></i>';
+                button.setAttribute('title', 'حذف از منو');
+
+                const badge = foodCard.querySelector('.absolute.bottom-3.left-3 span');
+                badge.classList.remove('bg-red-500');
+                badge.classList.add('bg-green-500');
+                badge.innerHTML = '<i class="fas fa-check ml-1"></i> انتخاب شده';
+            } else {
+                if (document.getElementById('selected-foods-tab').classList.contains('active')) {
+                    foodCard.remove();
+                } else {
+                    foodCard.classList.remove('selected');
+                    foodCard.classList.add('available');
+
+                    const button = foodCard.querySelector('.remove-food-btn');
+                    button.classList.remove('remove-food-btn', 'text-red-500');
+                    button.classList.add('add-food-btn', 'text-green-500');
+                    button.innerHTML = '<i class="fas fa-plus"></i>';
+                    button.setAttribute('title', 'افزودن به منو');
+
+                    const badge = foodCard.querySelector('.absolute.bottom-3.left-3 span');
+                    badge.classList.remove('bg-green-500');
+                    badge.classList.add('bg-red-500');
+                    badge.innerHTML = '<i class="fas fa-plus ml-1"></i> قابل انتخاب';
+                }
+            }
+        }
+
+        // ==================== مودال‌ها ====================
+        openFoodModal(selectedMenuCategory = '') {
+            document.getElementById('modal-title').textContent = 'افزودن غذا';
+            document.getElementById('food-form').reset();
+            document.getElementById('food-id').value = '';
+            document.getElementById('food-image-preview').style.display = 'none';
+
+            $('.select2-category').val('').trigger('change');
+
+            if (selectedMenuCategory && selectedMenuCategory !== 'all') {
+                $('.select2-category').val(selectedMenuCategory).trigger('change');
+            } else if (this.currentSelectedMenuCategoryId && this.currentSelectedCategory !== 'all') {
+                $('.select2-category').val(this.currentSelectedMenuCategoryId).trigger('change');
+            }
+
+            this.showModal('food-modal');
+        }
+
+        openAddCategoryModal() {
+            document.getElementById('add-category-form').reset();
+            document.getElementById('category-icon-preview').style.display = 'none';
+            $('.select2-category-all').val('').trigger('change');
+            this.showModal('add-category-modal');
+        }
+
+        openQuickCategoryModal() {
+            this.selectedCategories.clear();
+            this.showModal('quick-category-modal');
+            this.updateSelectedCategoriesUI();
+            document.getElementById('category-search').value = '';
+            this.loadCategoryTree();
+        }
+
+        // ==================== توابع اصلی برای عملیات غذاها ====================
+        async toggleFoodStatus(foodId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/foods/${foodId}/toggle/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification(result.message);
+                }
+            } catch (error) {
+                this.showNotification('خطا در تغییر وضعیت غذا');
+            }
+        }
+
+        async deleteFood(foodId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/foods/${foodId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    const foodCard = document.querySelector(`[data-food-id="${foodId}"]`);
+                    if (foodCard) {
+                        foodCard.remove();
+                    }
+                } else {
+                    this.showNotification(result.message);
+                }
+            } catch (error) {
+                this.showNotification('خطا در حذف غذا');
+            }
+        }
+
+        async toggleMenuCategoryStatus(categoryId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/menu-categories/${categoryId}/toggle/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification(result.message);
+                }
+            } catch (error) {
+                this.showNotification('خطا در تغییر وضعیت دسته‌بندی');
+            }
+        }
+
+        async deleteMenuCategory(categoryId) {
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/menu-categories/${categoryId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification(result.message);
+                }
+            } catch (error) {
+                this.showNotification('خطا در حذف دسته‌بندی');
+            }
+        }
+
+        async loadFoodData(foodId) {
+            try {
+                document.getElementById('modal-title').textContent = 'ویرایش غذا';
+                document.getElementById('food-id').value = foodId;
+
+                const foodCard = document.querySelector(`[data-food-id="${foodId}"]`);
+                if (foodCard) {
+                    document.getElementById('food-title').value = foodCard.querySelector('h3').textContent;
+                    document.getElementById('food-description').value = foodCard.querySelector('p').textContent;
+
+                    const priceText = foodCard.querySelector('.font-bold').textContent;
+                    const price = priceText.replace(/[^0-9]/g, '');
+                    document.getElementById('food-price').value = price;
+
+                    const prepTime = foodCard.querySelector('.fa-clock').parentElement.textContent.replace(/[^0-9]/g, '');
+                    document.getElementById('food-preparation-time').value = prepTime;
+
+                    const isActive = foodCard.getAttribute('data-status') === 'active';
+                    document.getElementById('food-active').checked = isActive;
+
+                    const categoryName = foodCard.querySelector('.fa-tag').parentElement.textContent.trim();
+                    const categorySelect = document.getElementById('food-category');
+                    for (let option of categorySelect.options) {
+                        if (option.text === categoryName) {
+                            $('.select2-category').val(option.value).trigger('change');
+                            break;
+                        }
+                    }
+                }
+
+                this.showModal('food-modal');
+            } catch (error) {
+                this.showNotification('خطا در بارگذاری اطلاعات غذا');
+            }
+        }
+
+        // ==================== توابع ارسال فرم ====================
+        async submitFoodForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const loading = form.querySelector('.loading');
+
+            submitBtn.disabled = true;
+            loading?.classList.remove('hidden');
+
+            try {
+                const foodId = document.getElementById('food-id').value;
+                const url = foodId ?
+                    `/panel/${restaurantSlug}/foods/${foodId}/update/` :
+                    `/panel/${restaurantSlug}/foods/add/`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    form.closest('.modal').style.display = 'none';
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification(result.message || 'خطا در ذخیره غذا');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showNotification('خطا در ارسال اطلاعات');
+            } finally {
+                submitBtn.disabled = false;
+                loading?.classList.add('hidden');
+            }
+        }
+
+        async submitCategoryForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const loading = form.querySelector('.loading');
+
+            submitBtn.disabled = true;
+            loading?.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/menu-categories/add/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    form.closest('.modal').style.display = 'none';
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification(result.message);
+                }
+            } catch (error) {
+                this.showNotification('خطا در ارسال اطلاعات');
+            } finally {
+                submitBtn.disabled = false;
+                loading?.classList.add('hidden');
+            }
+        }
+
+        async submitRestaurantForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const loading = form.querySelector('.loading');
+
+            submitBtn.disabled = true;
+            loading?.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/settings/update/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification(result.message);
+                    form.closest('.modal').style.display = 'none';
+                } else {
+                    this.showNotification(result.message);
+                }
+            } catch (error) {
+                this.showNotification('خطا در ارسال اطلاعات');
+            } finally {
+                submitBtn.disabled = false;
+                loading?.classList.add('hidden');
+            }
+        }
+
+        // ==================== بخش مدیریت انتخاب چندین دسته‌بندی ====================
+        async loadCategoryTree() {
+            try {
+                const container = document.getElementById('category-tree-container');
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="loading mx-auto"></div>
+                        <p class="text-gray-500 mt-2">در حال بارگذاری دسته‌بندی‌ها...</p>
+                    </div>
+                `;
+
+                const response = await fetch(`/panel/${restaurantSlug}/categories/tree/`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.renderCategoryTree(result.categories);
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-red-500">
+                            <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                            <p>خطا در بارگذاری دسته‌بندی‌ها</p>
+                            <p class="text-sm mt-2">${result.message || 'لطفاً دوباره تلاش کنید'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading category tree:', error);
+                const container = document.getElementById('category-tree-container');
+                container.innerHTML = `
+                    <div class="text-center py-8 text-red-500">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p>خطا در اتصال به سرور</p>
+                        <p class="text-sm mt-2">لطفاً اتصال اینترنت خود را بررسی کنید</p>
+                    </div>
+                `;
+            }
+        }
+
+        renderCategoryTree(categories) {
+            const container = document.getElementById('category-tree-container');
+
+            if (!categories || categories.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-folder-open text-2xl mb-2"></i>
+                        <p>دسته‌بندی‌ای یافت نشد</p>
+                        <p class="text-sm mt-2">هنوز هیچ دسته‌بندی در سیستم تعریف نشده است</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="category-tree space-y-3">';
+
+            categories.forEach(parent => {
+                const hasChildren = parent.subcategories && parent.subcategories.length > 0;
+
+                html += `
+                    <div class="parent-category">
+                        <div class="parent-header cursor-pointer" data-parent-id="${parent.id}">
+                            <div class="parent-title">
+                                ${parent.image_url ?
+                                    `<img src="${parent.image_url}" alt="${parent.title}" class="parent-image">` :
+                                    `<div class="parent-image bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-folder text-blue-500"></i>
+                                    </div>`
+                                }
+                                <span class="font-medium">${parent.title}</span>
+                                ${hasChildren ? `<span class="category-badge">${parent.subcategories.length} زیردسته</span>` : ''}
+                            </div>
+                            ${hasChildren ?
+                                `<i class="fas fa-chevron-down category-arrow"></i>` :
+                                `<span class="text-xs text-gray-500 px-2">بدون زیردسته</span>`
+                            }
+                        </div>
+                        ${hasChildren ? `
+                            <div class="parent-content hidden">
+                                <div class="space-y-2 mt-2">
+                                    ${parent.subcategories.map(sub => {
+                                        const isSelected = this.selectedCategories.has(sub.id.toString());
+                                        return `
+                                        <div class="subcategory-item ${isSelected ? 'selected' : ''}"
+                                            data-category-id="${sub.id}"
+                                            data-category-name="${sub.title}">
+                                            ${sub.image_url ?
+                                                `<img src="${sub.image_url}" alt="${sub.title}" class="subcategory-image">` :
+                                                `<div class="subcategory-image bg-green-100 flex items-center justify-center">
+                                                    <i class="fas fa-tag text-green-500 text-sm"></i>
+                                                </div>`
+                                            }
+                                            <span class="flex-1 font-medium">${sub.title}</span>
+                                            <span class="text-xs opacity-75">${sub.parent_title}</span>
+                                            <i class="fas fa-check-circle ${isSelected ? 'opacity-100' : 'opacity-0'} transition-opacity"></i>
+                                        </div>
+                                    `}).join('')}
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="parent-content hidden">
+                                <div class="no-subcategories text-center py-4 text-gray-500">
+                                    <i class="fas fa-info-circle mb-1"></i>
+                                    <p>این دسته‌بندی زیرمجموعه‌ای ندارد</p>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            this.attachCategoryEventListeners();
+        }
+
+        attachCategoryEventListeners() {
+            // کلیک روی هدر دسته‌بندی مادر
+            document.querySelectorAll('.parent-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const arrow = this.querySelector('.category-arrow');
+
+                    if (content) {
+                        content.classList.toggle('hidden');
+                    }
+                    if (arrow) {
+                        arrow.classList.toggle('fa-chevron-down');
+                        arrow.classList.toggle('fa-chevron-up');
+                    }
+                    this.classList.toggle('active');
+                });
+            });
+
+            // کلیک روی زیردسته‌ها
+            document.querySelectorAll('.subcategory-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const categoryId = item.getAttribute('data-category-id');
+                    const categoryName = item.getAttribute('data-category-name');
+
+                    if (this.selectedCategories.has(categoryId)) {
+                        this.selectedCategories.delete(categoryId);
+                        item.classList.remove('selected');
+                        item.querySelector('.fa-check-circle').classList.add('opacity-0');
+                    } else {
+                        this.selectedCategories.set(categoryId, categoryName);
+                        item.classList.add('selected');
+                        item.querySelector('.fa-check-circle').classList.remove('opacity-0');
+                    }
+
+                    this.updateSelectedCategoriesUI();
+                });
+            });
+
+            // جستجوی دسته‌بندی‌ها
+            const searchInput = document.getElementById('category-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    this.filterCategories(searchTerm);
+                });
+            }
+        }
+
+        filterCategories(searchTerm) {
+            const allParents = document.querySelectorAll('.parent-category');
+
+            if (!searchTerm) {
+                allParents.forEach(parent => {
+                    parent.style.display = 'block';
+                    const subItems = parent.querySelectorAll('.subcategory-item');
+                    subItems.forEach(item => item.style.display = 'flex');
+                });
+                return;
+            }
+
+            allParents.forEach(parent => {
+                const parentHeader = parent.querySelector('.parent-header');
+                const parentText = parentHeader.textContent.toLowerCase();
+                const subItems = parent.querySelectorAll('.subcategory-item');
+                let hasVisibleItems = false;
+
+                subItems.forEach(item => {
+                    const itemText = item.textContent.toLowerCase();
+                    if (itemText.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                        hasVisibleItems = true;
+                        const content = parent.querySelector('.parent-content');
+                        const arrow = parent.querySelector('.category-arrow');
+                        if (content && arrow) {
+                            content.classList.remove('hidden');
+                            arrow.classList.remove('fa-chevron-down');
+                            arrow.classList.add('fa-chevron-up');
+                            parentHeader.classList.add('active');
+                        }
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                if (parentText.includes(searchTerm) || hasVisibleItems) {
+                    parent.style.display = 'block';
+                } else {
+                    parent.style.display = 'none';
+                }
+            });
+        }
+
+        selectAllCategories() {
+            document.querySelectorAll('.subcategory-item').forEach(item => {
+                const categoryId = item.getAttribute('data-category-id');
+                const categoryName = item.getAttribute('data-category-name');
+
+                this.selectedCategories.set(categoryId, categoryName);
+                item.classList.add('selected');
+                item.querySelector('.fa-check-circle').classList.remove('opacity-0');
+            });
+
+            this.updateSelectedCategoriesUI();
+        }
+
+        deselectAllCategories() {
+            this.selectedCategories.clear();
+            document.querySelectorAll('.subcategory-item').forEach(item => {
+                item.classList.remove('selected');
+                item.querySelector('.fa-check-circle').classList.add('opacity-0');
+            });
+
+            this.updateSelectedCategoriesUI();
+        }
+
+        updateSelectedCategoriesUI() {
+            const selectedCount = this.selectedCategories.size;
+            const infoElement = document.getElementById('selected-categories-info');
+            const countElement = document.getElementById('selected-categories-count');
+            const listElement = document.getElementById('selected-categories-list');
+            const confirmBtn = document.getElementById('confirm-categories-btn');
+
+            if (confirmBtn) {
+                confirmBtn.disabled = selectedCount === 0;
+            }
+
+            if (infoElement) {
+                if (selectedCount > 0) {
+                    infoElement.classList.remove('hidden');
+                    if (countElement) {
+                        countElement.textContent = `${selectedCount} دسته‌بندی انتخاب شده`;
+                    }
+                } else {
+                    infoElement.classList.add('hidden');
+                }
+            }
+
+            if (listElement) {
+                listElement.innerHTML = '';
+                this.selectedCategories.forEach((name, id) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'selected-category-tag';
+                    tag.innerHTML = `
+                        ${name}
+                        <button type="button" onclick="restaurantMenuManager.removeSelectedCategory('${id}')">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    `;
+                    listElement.appendChild(tag);
+                });
+            }
+        }
+
+        removeSelectedCategory(categoryId) {
+            this.selectedCategories.delete(categoryId);
+
+            const item = document.querySelector(`[data-category-id="${categoryId}"]`);
+            if (item) {
+                item.classList.remove('selected');
+                item.querySelector('.fa-check-circle').classList.add('opacity-0');
+            }
+
+            this.updateSelectedCategoriesUI();
+        }
+
+        async confirmAndAddCategories() {
+            if (this.selectedCategories.size === 0) return;
+
+            const btn = document.getElementById('confirm-categories-btn');
+            if (!btn) return;
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loading"></div> در حال افزودن...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/panel/${restaurantSlug}/categories/quick-add-multiple/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        category_ids: Array.from(this.selectedCategories.keys())
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotification('✅ ' + result.message);
+                    document.getElementById('quick-category-modal').style.display = 'none';
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    this.showNotification('❌ ' + result.message);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error adding categories:', error);
+                this.showNotification('❌ خطا در افزودن دسته‌بندی‌ها');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // ==================== ابزارهای کمکی ====================
+        showNotification(message, type = 'success') {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification fixed top-20 left-1/2 transform -translate-x-1/2 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        loadInitialData() {
+            document.querySelector('[data-category="all"]')?.click();
+        }
+    }
+
+    // ==================== مقداردهی اولیه ====================
+    document.addEventListener('DOMContentLoaded', function() {
+        // مقداردهی اولیه Select2
+        $.fn.select2.defaults.set("language", "fa");
+
+        $('.select2-category').select2({
+            placeholder: "انتخاب دسته‌بندی",
+            allowClear: true,
+            width: '100%',
+            dir: 'rtl'
+        });
+
+        $('.select2-category-all').select2({
+            placeholder: "جستجو و انتخاب دسته‌بندی",
+            allowClear: true,
+            width: '100%',
+            dir: 'rtl'
+        });
+
+        // بستن Select2 هنگام بستن مودال
+        $('.close-modal').on('click', function() {
+            $('.select2-category').select2('close');
+            $('.select2-category-all').select2('close');
+        });
+
+        // مقداردهی اولیه مدیر اصلی
+        window.restaurantMenuManager = new RestaurantMenuManager();
+        window.restaurantMenuManager.init();
+
+        // مقداردهی اولیه مدیر کاستوم غذاها
+        window.customFoodsManager = new CustomFoodsManager();
+        window.customFoodsManager.init();
+
+        // بستن با کلیک خارج از مودال
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    });
+</script>

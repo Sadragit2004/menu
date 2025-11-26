@@ -405,24 +405,23 @@ class Food(BaseModel):
         return self.title or self.title_en or "Food"
 
 
-# ----------------------------
-# FoodRestaurant - برای کاستومایز کردن غذاها در هر رستوران
-# ----------------------------
+
+
 class FoodRestaurant(models.Model):
     restaurant = models.ForeignKey(
         Restaurant,
         on_delete=models.CASCADE,
-        related_name='food_restaurants',
+        related_name='custom_foods',
         verbose_name="رستوران"
     )
     food = models.ForeignKey(
         Food,
         on_delete=models.CASCADE,
-        related_name='food_restaurants',
+        related_name='custom_restaurants',
         verbose_name="غذا"
     )
 
-    # فقط فیلدهای ضروری
+    # فیلدهای کاستومایز
     custom_price = models.PositiveIntegerField(
         null=True,
         blank=True,
@@ -439,6 +438,7 @@ class FoodRestaurant(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="فعال")
     display_order = models.IntegerField(default=0, verbose_name="ترتیب نمایش")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'restaurant_food_restaurant'
@@ -456,7 +456,7 @@ class FoodRestaurant(models.Model):
             raise ValueError("فقط غذاهای ایجاد شده توسط شرکت قابل کاستومایز هستند")
         super().save(*args, **kwargs)
 
-    # property های دسترسی به مقادیر نهایی
+    # property های اصلی
     @property
     def final_price(self):
         """قیمت نهایی - اولویت با قیمت کاستوم است"""
@@ -494,9 +494,10 @@ class FoodRestaurant(models.Model):
     def get_customizable_foods_for_restaurant(cls, restaurant):
         """لیست غذاهای قابل کاستومایز برای یک رستوران"""
         return Food.objects.filter(
-            created_by='company'
+            created_by='company',
+            isActive=True
         ).exclude(
-            food_restaurants__restaurant=restaurant
+            custom_restaurants__restaurant=restaurant
         )
 
     @classmethod
@@ -512,6 +513,46 @@ class FoodRestaurant(models.Model):
             custom_image=custom_image
         )
 
+    @classmethod
+    def get_final_food_data(cls, restaurant, food):
+        """
+        دریافت اطلاعات نهایی غذا با در نظر گرفتن شخصی‌سازی‌ها
+        """
+        try:
+            custom_food = cls.objects.get(restaurant=restaurant, food=food)
+            return {
+                'id': food.id,
+                'title': food.title,
+                'title_en': food.title_en,
+                'description': food.description,
+                'description_en': food.description_en,
+                'price': custom_food.final_price,
+                'image': custom_food.final_image,
+                'preparationTime': food.preparationTime,
+                'isActive': custom_food.is_active and food.isActive,
+                'menuCategory': food.menuCategory,
+                'slug': food.slug,
+                'displayOrder': custom_food.display_order,
+                'is_customized': custom_food.has_customizations(),
+                'custom_food_id': custom_food.id
+            }
+        except cls.DoesNotExist:
+            return {
+                'id': food.id,
+                'title': food.title,
+                'title_en': food.title_en,
+                'description': food.description,
+                'description_en': food.description_en,
+                'price': food.price,
+                'image': food.image,
+                'preparationTime': food.preparationTime,
+                'isActive': food.isActive,
+                'menuCategory': food.menuCategory,
+                'slug': food.slug,
+                'displayOrder': food.displayOrder,
+                'is_customized': False,
+                'custom_food_id': None
+            }
 
 # ----------------------------
 # Exchange Rate
