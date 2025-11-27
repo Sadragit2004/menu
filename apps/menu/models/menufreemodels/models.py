@@ -3,7 +3,7 @@ from uuid import uuid4
 from decimal import Decimal
 from django.db import models
 from django.utils.text import slugify
-from apps.user.models import CustomUser
+from apps.user.model.user import CustomUser
 from django.utils.translation import gettext as _
 from django.conf import settings
 from ckeditor_uploader.fields import RichTextUploadingField

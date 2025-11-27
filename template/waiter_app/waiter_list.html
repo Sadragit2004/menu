@@ -1,0 +1,295 @@
+{% extends 'waiter_template.html' %}
+{% load humanize %}
+
+{% block title %}لیست گارسون‌ها - رستوران من{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">
+            <i class="bi bi-people-fill me-2"></i>
+            لیست گارسون‌ها
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'waiter:waiter_export' %}?format=csv" class="btn btn-outline-primary">
+                <i class="bi bi-download me-1"></i>
+                خروجی
+            </a>
+            <a href="{% url 'waiter:waiter_create' %}" class="btn btn-primary">
+                <i class="bi bi-person-plus me-1"></i>
+                گارسون جدید
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">جستجو</label>
+                    <div class="search-box">
+                        <input type="text" class="form-control" placeholder="جستجو بر اساس نام، کد یا موبایل..."
+                               value="{{ search_query|default:'' }}">
+                        <i class="bi bi-search"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">رستوران</label>
+                    <select class="form-select" id="restaurantFilter">
+                        <option value="">همه رستوران‌ها</option>
+                        {% for restaurant in restaurants %}
+                        <option value="{{ restaurant.id }}"
+                                {% if current_restaurant_id == restaurant.id|stringformat:"i" %}selected{% endif %}>
+                            {{ restaurant.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">وضعیت</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">همه وضعیت‌ها</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>فعال</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>غیرفعال</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">مرتب‌سازی</label>
+                    <select class="form-select" id="sortFilter">
+                        <option value="-createdAt" {% if sort_by == '-createdAt' %}selected{% endif %}>جدیدترین</option>
+                        <option value="createdAt" {% if sort_by == 'createdAt' %}selected{% endif %}>قدیمی‌ترین</option>
+                        <option value="fullname" {% if sort_by == 'fullname' %}selected{% endif %}>نام</option>
+                        <option value="code" {% if sort_by == 'code' %}selected{% endif %}>کد</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center py-3">
+                    <h4 class="mb-0">{{ total_count|intcomma }}</h4>
+                    <small>کل گارسون‌ها</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center py-3">
+                    <h4 class="mb-0">{{ active_count|intcomma }}</h4>
+                    <small>گارسون‌های فعال</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center py-3">
+                    <h4 class="mb-0">{{ inactive_count|intcomma }}</h4>
+                    <small>گارسون‌های غیرفعال</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center py-3">
+                    <h4 class="mb-0">{{ page_obj.paginator.count|intcomma }}</h4>
+                    <small>نتایج جستجو</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiters Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>کد گارسون</th>
+                            <th>نام کامل</th>
+                            <th>موبایل</th>
+                            <th>سن</th>
+                            <th>رستوران</th>
+                            <th>وضعیت</th>
+                            <th>سفارش فعال</th>
+                            <th>تاریخ ایجاد</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for waiter in page_obj %}
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-primary">{{ waiter.code }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                        <i class="bi bi-person-fill text-primary"></i>
+                                    </div>
+                                    {{ waiter.fullname }}
+                                </div>
+                            </td>
+                            <td>{{ waiter.mobileNumber }}</td>
+                            <td>
+                                {% if waiter.age %}
+                                    {{ waiter.age }} سال
+                                {% else %}
+                                    <span class="text-muted">---</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ waiter.restaurant.title }}</td>
+                            <td>
+                                <span class="badge {% if waiter.isActive %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if waiter.isActive %}فعال{% else %}غیرفعال{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">{{ waiter.active_orders_count }}</span>
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ waiter.createdAt|date:"Y/m/d H:i" }}</small>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{% url 'waiter:waiter_detail' waiter.id %}"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="مشاهده">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'waiter:waiter_edit' waiter.id %}"
+                                       class="btn btn-sm btn-outline-warning"
+                                       title="ویرایش">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if waiter.isActive %}
+                                    <button class="btn btn-sm btn-outline-danger toggle-active"
+                                            data-waiter-id="{{ waiter.id }}"
+                                            data-action="deactivate"
+                                            title="غیرفعال کردن">
+                                        <i class="bi bi-person-dash"></i>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-outline-success toggle-active"
+                                            data-waiter-id="{{ waiter.id }}"
+                                            data-action="activate"
+                                            title="فعال کردن">
+                                        <i class="bi bi-person-check"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <i class="bi bi-people display-4 text-muted"></i>
+                                <h5 class="text-muted mt-3">گارسونی یافت نشد</h5>
+                                <p class="text-muted">با تغییر فیلترها دوباره امتحان کنید.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    قبلی
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    بعدی
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<script>
+// Filter functionality
+function updateFilters() {
+    const params = new URLSearchParams();
+
+    const search = document.querySelector('.search-box input').value;
+    const restaurant = document.getElementById('restaurantFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const sort = document.getElementById('sortFilter').value;
+
+    if (search) params.set('search', search);
+    if (restaurant) params.set('restaurant', restaurant);
+    if (status) params.set('status', status);
+    if (sort) params.set('sort', sort);
+
+    window.location.href = '?' + params.toString();
+}
+
+// Add event listeners to filters
+document.getElementById('restaurantFilter').addEventListener('change', updateFilters);
+document.getElementById('statusFilter').addEventListener('change', updateFilters);
+document.getElementById('sortFilter').addEventListener('change', updateFilters);
+
+// Search on enter
+document.querySelector('.search-box input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        updateFilters();
+    }
+});
+
+// Toggle active status
+document.querySelectorAll('.toggle-active').forEach(button => {
+    button.addEventListener('click', function() {
+        const waiterId = this.dataset.waiterId;
+
+        fetch(`/waiter/waiters/${waiterId}/toggle-active/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

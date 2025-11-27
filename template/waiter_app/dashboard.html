@@ -1,0 +1,224 @@
+{% extends 'waiter_template.html' %}
+{% load humanize %}
+
+{% block title %}داشبورد گارسون‌ها - رستوران من{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">
+            <i class="bi bi-speedometer2 me-2"></i>
+            داشبورد مدیریت گارسون‌ها
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'waiter:waiter_export' %}?format=csv" class="btn btn-outline-primary">
+                <i class="bi bi-download me-1"></i>
+                خروجی CSV
+            </a>
+            <a href="{% url 'waiter:waiter_create' %}" class="btn btn-primary">
+                <i class="bi bi-person-plus me-1"></i>
+                گارسون جدید
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ total_waiters|intcomma }}</h4>
+                        <span class="text-muted">کل گارسون‌ها</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ active_waiters|intcomma }}</h4>
+                        <span class="text-muted">گارسون‌های فعال</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
+                        <i class="bi bi-cart-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ today_orders|intcomma }}</h4>
+                        <span class="text-muted">سفارش‌های امروز</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">
+                            {% if waiters_stats %}
+                                {{ waiters_stats|length }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </h4>
+                        <span class="text-muted">گارسون‌های این رستوران</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiters List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        گارسون‌های رستوران {{ selected_restaurant.title }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if waiters_stats %}
+                    <div class="row g-4">
+                        {% for stats in waiters_stats %}
+                        <div class="col-xl-4 col-lg-6">
+                            <div class="waiter-card">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                            <i class="bi bi-person-fill text-primary fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ stats.waiter.fullname }}</h6>
+                                            <span class="text-muted small">{{ stats.waiter.code }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="status-badge {% if stats.waiter.isActive %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if stats.waiter.isActive %}فعال{% else %}غیرفعال{% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="row text-center mb-3">
+                                    <div class="col-4">
+                                        <div class="border-end">
+                                            <h6 class="fw-bold mb-0 text-primary">{{ stats.active_orders }}</h6>
+                                            <small class="text-muted">سفارش فعال</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border-end">
+                                            <h6 class="fw-bold mb-0 text-warning">{{ stats.today_orders }}</h6>
+                                            <small class="text-muted">امروز</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <h6 class="fw-bold mb-0 text-success">{{ stats.total_orders }}</h6>
+                                        <small class="text-muted">کل سفارش‌ها</small>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-light text-dark">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ stats.avg_preparation_time }} دقیقه
+                                    </span>
+                                    <div class="d-flex">
+                                        <a href="{% url 'waiter:waiter_detail' stats.waiter.id %}"
+                                           class="action-btn btn btn-outline-primary btn-sm"
+                                           title="مشاهده جزئیات">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'waiter:waiter_edit' stats.waiter.id %}"
+                                           class="action-btn btn btn-outline-warning btn-sm"
+                                           title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% if stats.waiter.isActive %}
+                                        <button class="action-btn btn btn-outline-danger btn-sm toggle-active"
+                                                data-waiter-id="{{ stats.waiter.id }}"
+                                                data-action="deactivate"
+                                                title="غیرفعال کردن">
+                                            <i class="bi bi-person-dash"></i>
+                                        </button>
+                                        {% else %}
+                                        <button class="action-btn btn btn-outline-success btn-sm toggle-active"
+                                                data-waiter-id="{{ stats.waiter.id }}"
+                                                data-action="activate"
+                                                title="فعال کردن">
+                                            <i class="bi bi-person-check"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-people display-1 text-muted"></i>
+                        <h5 class="text-muted mt-3">گارسونی یافت نشد</h5>
+                        <p class="text-muted">هنوز هیچ گارسونی برای این رستوران اضافه نکرده‌اید.</p>
+                        <a href="{% url 'waiter:waiter_create' %}" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-1"></i>
+                            افزودن اولین گارسون
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle waiter active status
+document.querySelectorAll('.toggle-active').forEach(button => {
+    button.addEventListener('click', function() {
+        const waiterId = this.dataset.waiterId;
+        const action = this.dataset.action;
+
+        fetch(`/waiter/waiters/${waiterId}/toggle-active/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در برقراری ارتباط با سرور');
+        });
+    });
+});
+</script>
+{% endblock %}

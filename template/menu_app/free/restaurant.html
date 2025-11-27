@@ -1310,6 +1310,419 @@
         }
     </script>
 
+    <script>
+// مدیریت WebSocket برای ارسال سفارش‌ها
+class OrderWebSocket {
+    constructor(restaurantId) {
+        this.restaurantId = restaurantId;
+        this.socket = null;
+        this.isConnected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+
+        this.connect();
+    }
+
+    connect() {
+        try {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/waiter/orders/${this.restaurantId}/`;
+
+            this.socket = new WebSocket(wsUrl);
+
+            this.socket.onopen = () => {
+                console.log('WebSocket connected successfully');
+                this.isConnected = true;
+                this.reconnectAttempts = 0;
+
+                // نمایش اعلان اتصال
+                this.showConnectionStatus('connected');
+            };
+
+            this.socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                this.handleMessage(data);
+            };
+
+            this.socket.onclose = (event) => {
+                console.log('WebSocket disconnected:', event);
+                this.isConnected = false;
+                this.handleDisconnection();
+            };
+
+            this.socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                this.showConnectionStatus('error');
+            };
+
+        } catch (error) {
+            console.error('Error connecting to WebSocket:', error);
+            this.handleDisconnection();
+        }
+    }
+
+    handleDisconnection() {
+        this.showConnectionStatus('disconnected');
+
+        // تلاش برای اتصال مجدد
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            const delay = Math.min(1000 * this.reconnectAttempts, 10000); // حداکثر 10 ثانیه
+
+            console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
+
+            setTimeout(() => {
+                this.connect();
+            }, delay);
+        } else {
+            console.error('Max reconnection attempts reached');
+            this.showConnectionStatus('failed');
+        }
+    }
+
+    showConnectionStatus(status) {
+        const statusMessages = {
+            'connected': '✅ متصل به سیستم گارسون',
+            'disconnected': '🔌 در حال اتصال مجدد...',
+            'error': '❌ خطا در اتصال',
+            'failed': '❌ اتصال قطع شد'
+        };
+
+        // می‌توانید این وضعیت را در UI نمایش دهید
+        console.log('Connection status:', statusMessages[status]);
+
+        // یا یک نوتیفیکیشن در صفحه نمایش دهید
+        this.showNotification(statusMessages[status], status);
+    }
+
+    showNotification(message, type = 'info') {
+        // ایجاد یک نوتیفیکیشن موقت
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg ${
+            type === 'connected' ? 'bg-green-500 text-white' :
+            type === 'error' ? 'bg-red-500 text-white' :
+            type === 'failed' ? 'bg-red-700 text-white' :
+            'bg-blue-500 text-white'
+        }`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        // حذف خودکار بعد از 3 ثانیه
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+
+    handleMessage(data) {
+        switch (data.type) {
+            case 'new_order':
+                this.handleNewOrder(data.order_data);
+                break;
+            case 'order_status_update':
+                this.handleOrderUpdate(data.order_data);
+                break;
+            default:
+                console.log('Unknown message type:', data.type);
+        }
+    }
+
+    sendOrder(orderData) {
+        if (this.isConnected && this.socket) {
+            this.socket.send(JSON.stringify({
+                'type': 'new_order',
+                'order_data': orderData
+            }));
+            return true;
+        } else {
+            console.error('WebSocket is not connected');
+            this.showNotification('خطا در ارسال سفارش. لطفاً صفحه را رفرش کنید.', 'error');
+            return false;
+        }
+    }
+
+    handleNewOrder(orderData) {
+        console.log('New order received:', orderData);
+        // این تابع در پنل گارسون استفاده می‌شود
+    }
+
+    handleOrderUpdate(orderData) {
+        console.log('Order update received:', orderData);
+        // این تابع در پنل گارسون استفاده می‌شود
+    }
+}
+
+// مدیریت لیست انتخاب و ارسال به گارسون
+class OrderManager {
+    constructor(restaurantId) {
+        this.restaurantId = restaurantId;
+        this.selectedItems = [];
+        this.totalPrice = 0;
+        this.tableNumber = null;
+        this.customerNotes = '';
+
+        this.websocket = new OrderWebSocket(restaurantId);
+        this.initializeEventListeners();
+    }
+
+    initializeEventListeners() {
+        // دکمه نمایش به گارسون
+        document.querySelector('.selection-list-show').addEventListener('click', () => {
+            this.showOrderToWaiter();
+        });
+
+        // دکمه فراخوانی گارسون
+        document.querySelector('.selection-display-call').addEventListener('click', () => {
+            this.callWaiter();
+        });
+
+        // دکمه‌های سفارش
+        document.querySelectorAll('.order-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                const foodTitle = e.currentTarget.getAttribute('data-food-title');
+                const foodPrice = parseInt(e.currentTarget.getAttribute('data-food-price'));
+                const foodImage = e.currentTarget.getAttribute('data-food-image');
+
+                this.addToSelectionList(foodId, foodTitle, foodPrice, foodImage);
+            });
+        });
+    }
+
+    addToSelectionList(foodId, foodTitle, foodPrice, foodImage) {
+        const existingItem = this.selectedItems.find(item => item.id === foodId);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+            existingItem.totalPrice = existingItem.quantity * existingItem.price;
+        } else {
+            this.selectedItems.push({
+                id: foodId,
+                title: foodTitle,
+                price: foodPrice,
+                image: foodImage,
+                quantity: 1,
+                totalPrice: foodPrice
+            });
+        }
+
+        this.updateSelectionList();
+        this.showNotification(`${foodTitle} به لیست انتخاب اضافه شد`);
+    }
+
+    updateSelectionList() {
+        this.calculateTotal();
+        this.updateSelectionUI();
+    }
+
+    calculateTotal() {
+        this.totalPrice = this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
+    }
+
+    updateSelectionUI() {
+        const badge = document.querySelector('.selection-list-badge');
+        const emptyState = document.querySelector('.selection-list-empty');
+        const itemsContainer = document.querySelector('.selection-list-items');
+        const displayItemsContainer = document.querySelector('.selection-display-items');
+        const totalPriceElement = document.querySelector('.selection-display-total-price');
+
+        // آپدیت badge
+        badge.textContent = this.selectedItems.reduce((total, item) => total + item.quantity, 0);
+
+        // آپدیت لیست آیتم‌ها
+        if (this.selectedItems.length > 0) {
+            emptyState.style.display = 'none';
+
+            // آپدیت لیست انتخاب
+            itemsContainer.innerHTML = this.selectedItems.map(item => `
+                <div class="selection-list-item" data-food-id="${item.id}">
+                    <div class="flex items-center gap-3">
+                        ${item.image ?
+                            `<img src="${item.image}" alt="${item.title}" class="w-12 h-12 rounded-lg object-cover">` :
+                            `<div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-utensils text-gray-400"></i>
+                            </div>`
+                        }
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm text-gray-800 truncate">${item.title}</div>
+                            <div class="text-xs text-gray-500">${item.price.toLocaleString()} تومان</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="quantity-btn decrease bg-gray-100 w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-gray-200" data-food-id="${item.id}">-</button>
+                        <span class="quantity text-sm font-medium w-8 text-center">${item.quantity}</span>
+                        <button class="quantity-btn increase bg-gray-100 w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-gray-200" data-food-id="${item.id}">+</button>
+                        <button class="remove-btn text-red-500 hover:text-red-700 p-1" data-food-id="${item.id}">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // آپدیت صفحه نمایش
+            displayItemsContainer.innerHTML = this.selectedItems.map(item => `
+                <div class="selection-display-item">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <div class="flex items-center gap-3">
+                            ${item.image ?
+                                `<img src="${item.image}" alt="${item.title}" class="w-16 h-16 rounded-lg object-cover">` :
+                                `<div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-utensils text-gray-400 text-lg"></i>
+                                </div>`
+                            }
+                            <div>
+                                <div class="font-semibold text-gray-800">${item.title}</div>
+                                <div class="text-sm text-gray-600">${item.price.toLocaleString()} تومان</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-gray-800">${item.quantity} ×</div>
+                            <div class="text-sm text-gray-600">${item.totalPrice.toLocaleString()} تومان</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // آپدیت قیمت کل
+            totalPriceElement.textContent = this.totalPrice.toLocaleString() + ' تومان';
+
+            // اضافه کردن event listeners برای دکمه‌های کم و زیاد
+            this.addQuantityEventListeners();
+        } else {
+            emptyState.style.display = 'block';
+            itemsContainer.innerHTML = '';
+            displayItemsContainer.innerHTML = '';
+            totalPriceElement.textContent = '0 تومان';
+        }
+    }
+
+    addQuantityEventListeners() {
+        // دکمه افزایش
+        document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                this.updateQuantity(foodId, 1);
+            });
+        });
+
+        // دکمه کاهش
+        document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                this.updateQuantity(foodId, -1);
+            });
+        });
+
+        // دکمه حذف
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                this.removeItem(foodId);
+            });
+        });
+    }
+
+    updateQuantity(foodId, change) {
+        const item = this.selectedItems.find(item => item.id === foodId);
+        if (item) {
+            item.quantity += change;
+
+            if (item.quantity <= 0) {
+                this.removeItem(foodId);
+            } else {
+                item.totalPrice = item.quantity * item.price;
+                this.updateSelectionList();
+            }
+        }
+    }
+
+    removeItem(foodId) {
+        this.selectedItems = this.selectedItems.filter(item => item.id !== foodId);
+        this.updateSelectionList();
+    }
+
+    showOrderToWaiter() {
+        if (this.selectedItems.length === 0) {
+            this.showNotification('لطفاً ابتدا غذا انتخاب کنید', 'error');
+            return;
+        }
+
+        // نمایش صفحه نمایش سفارش
+        document.querySelector('.selection-display').classList.add('active');
+    }
+
+    async callWaiter() {
+        if (this.selectedItems.length === 0) {
+            this.showNotification('لطفاً ابتدا غذا انتخاب کنید', 'error');
+            return;
+        }
+
+        try {
+            // ایجاد داده سفارش
+            const orderData = {
+                id: Date.now().toString(), // ID موقت
+                items: this.selectedItems,
+                total_price: this.totalPrice,
+                table_number: this.tableNumber || 'تعیین نشده',
+                customer_notes: this.customerNotes,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // ارسال از طریق WebSocket
+            const success = this.websocket.sendOrder(orderData);
+
+            if (success) {
+                this.showNotification('سفارش شما با موفقیت به گارسون‌ها ارسال شد', 'success');
+
+                // پاک کردن لیست پس از ارسال موفق
+                this.selectedItems = [];
+                this.updateSelectionList();
+
+                // بستن صفحه نمایش
+                document.querySelector('.selection-display').classList.remove('active');
+            }
+
+        } catch (error) {
+            console.error('Error sending order:', error);
+            this.showNotification('خطا در ارسال سفارش. لطفاً دوباره تلاش کنید.', 'error');
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        // استفاده از سیستم نوتیفیکیشن موجود یا ایجاد یک نوتیفیکیشن جدید
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 left-4 z-50 px-4 py-3 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-500 text-white' :
+            type === 'error' ? 'bg-red-500 text-white' :
+            'bg-blue-500 text-white'
+        }`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+}
+
+// مقداردهی اولیه وقتی صفحه لود شد
+document.addEventListener('DOMContentLoaded', function() {
+    const restaurantId = '{{ restaurant.id }}'; // از تمپلیت Django می‌آید
+
+    // ایجاد مدیر سفارش
+    window.orderManager = new OrderManager(restaurantId);
+
+    console.log('Order manager initialized for restaurant:', restaurantId);
+});
+</script>
+
+
     {% include "./resScript.html" %}
     {% include "./persianCall.html" %}
 

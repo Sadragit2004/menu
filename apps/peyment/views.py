@@ -8,7 +8,7 @@ from apps.order.models import Ordermenu
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from apps.peyment.models import Peyment
-from apps.user.models import CustomUser
+from apps.user.model.user import CustomUser
 import utils
 from django.contrib.auth.decorators import login_required
 from .zarinpal import ZarinPal

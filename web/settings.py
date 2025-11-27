@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,12 +54,19 @@ INSTALLED_APPS = [
     'apps.main.apps.MainConfig',
     'django_celery_results',
     'django_celery_beat',
-    'apps.table.apps.TableConfig'
+    'apps.table.apps.TableConfig',
+    'apps.waiter.apps.WaiterConfig',
+    'channels',
 
 ]
 
 
+
+
 MIDDLEWARE = [
+
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -137,13 +145,20 @@ THOUSAND_SEPARATOR = ','
 
 LANGUAGE_CODE = 'fa-ir'
 
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR,'static/'),)
-
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # مسیر فولدر استاتیک پروژه
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # مسیر جمع‌آوری فایل‌ها
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 
 AUTH_USER_MODEL = 'user.CustomUser'
@@ -206,3 +221,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tehran'
 
 
+ASGI_APPLICATION = 'web.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

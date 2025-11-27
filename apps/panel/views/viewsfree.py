@@ -12,7 +12,16 @@ from apps.product.models import ProductOrder
 from django.utils import timezone
 from django.db.models import Count, Sum
 from datetime import datetime, timedelta
-import qrcode
+try:
+    import qrcode
+    QRCODE_AVAILABLE = True
+    print("✅ qrcode imported successfully")
+except ImportError as e:
+    print(f"❌ qrcode import failed: {e}")
+    QRCODE_AVAILABLE = False
+    qrcode = None
+
+    
 import base64
 from io import BytesIO
 from django.urls import reverse

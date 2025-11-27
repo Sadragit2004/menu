@@ -1,0 +1,204 @@
+{% extends 'waiter_template.html' %}
+{% load humanize %}
+
+{% block title %}آمار و گزارش‌ها - رستوران من{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">
+            <i class="bi bi-graph-up me-2"></i>
+            آمار و گزارش‌های گارسون‌ها
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'waiter:waiter_export' %}?format=csv" class="btn btn-outline-primary">
+                <i class="bi bi-download me-1"></i>
+                خروجی CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">رستوران</label>
+                    <select class="form-select" id="restaurantFilter">
+                        <option value="">همه رستوران‌ها</option>
+                        {% for restaurant in restaurants %}
+                        <option value="{{ restaurant.id }}"
+                                {% if selected_restaurant and selected_restaurant.id == restaurant.id %}selected{% endif %}>
+                            {{ restaurant.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">بازه زمانی</label>
+                    <select class="form-select" id="daysFilter">
+                        <option value="7" {% if days_range == 7 %}selected{% endif %}>7 روز گذشته</option>
+                        <option value="30" {% if days_range == 30 %}selected{% endif %}>30 روز گذشته</option>
+                        <option value="90" {% if days_range == 90 %}selected{% endif %}>3 ماه گذشته</option>
+                        <option value="180" {% if days_range == 180 %}selected{% endif %}>6 ماه گذشته</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100" onclick="applyFilters()">
+                        <i class="bi bi-funnel me-1"></i>
+                        اعمال فیلتر
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Cards -->
+    {% if waiter_analytics %}
+    <div class="row g-4">
+        {% for analytics in waiter_analytics %}
+        <div class="col-xl-6">
+            <div class="waiter-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="position-relative">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-person-fill text-primary fs-4"></i>
+                            </div>
+                            {% if analytics.efficiency_score >= 80 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                                {{ analytics.efficiency_score }}
+                            </span>
+                            {% elif analytics.efficiency_score >= 60 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                {{ analytics.efficiency_score }}
+                            </span>
+                            {% else %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ analytics.efficiency_score }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ analytics.waiter.fullname }}</h6>
+                            <span class="text-muted small">
+                                {{ analytics.waiter.code }} | {{ analytics.waiter.restaurant.title }}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="status-badge {% if analytics.waiter.isActive %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if analytics.waiter.isActive %}فعال{% else %}غیرفعال{% endif %}
+                    </span>
+                </div>
+
+                <!-- Progress Bars -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">نرخ تکمیل</small>
+                        <small class="fw-bold">{{ analytics.completion_rate }}%</small>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: {{ analytics.completion_rate }}%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">نرخ لغو</small>
+                        <small class="fw-bold">{{ analytics.cancellation_rate }}%</small>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-danger" style="width: {{ analytics.cancellation_rate }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h6 class="fw-bold mb-0 text-primary">{{ analytics.total_orders }}</h6>
+                            <small class="text-muted">کل سفارش‌ها</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h6 class="fw-bold mb-0 text-success">{{ analytics.completed_orders }}</h6>
+                            <small class="text-muted">تکمیل شده</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h6 class="fw-bold mb-0 text-warning">{{ analytics.avg_preparation_time }}m</h6>
+                        <small class="text-muted">میانگین زمان</small>
+                    </div>
+                </div>
+
+                <!-- Revenue -->
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">درآمد کل:</span>
+                        <span class="fw-bold text-success">{{ analytics.total_revenue|intcomma }} تومان</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'waiter:waiter_detail' analytics.waiter.id %}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i>
+                            جزئیات
+                        </a>
+                        <span class="badge
+                            {% if analytics.efficiency_score >= 80 %}bg-success
+                            {% elif analytics.efficiency_score >= 60 %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            امتیاز: {{ analytics.efficiency_score }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-graph-up display-1 text-muted"></i>
+        <h5 class="text-muted mt-3">داده‌ای برای نمایش وجود ندارد</h5>
+        <p class="text-muted">هیچ گارسون یا سفارشی در بازه زمانی انتخاب شده وجود ندارد.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function applyFilters() {
+    const restaurant = document.getElementById('restaurantFilter').value;
+    const days = document.getElementById('daysFilter').value;
+
+    const params = new URLSearchParams();
+    if (restaurant) params.set('restaurant', restaurant);
+    if (days) params.set('days', days);
+
+    window.location.href = '?' + params.toString();
+}
+
+// Auto-apply filters on change
+document.getElementById('restaurantFilter').addEventListener('change', applyFilters);
+document.getElementById('daysFilter').addEventListener('change', applyFilters);
+</script>
+
+<style>
+.progress {
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+.position-relative .badge {
+    font-size: 10px;
+    padding: 4px 6px;
+}
+</style>
+{% endblock %}
