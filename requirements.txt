@@ -169,10 +169,7 @@ python-dotenv==1.0.1
 pytweening==1.2.0
 pytz==2024.2
 pywifi==1.1.12
-pywin32==306
-pywin32-ctypes==0.2.2
-PyYAML==6.0.2
-pyzmq==26.0.3
+
 qrcode==8.2
 redis==5.2.0
 referencing==0.35.1
@@ -181,14 +178,7 @@ requests==2.32.3
 requests-file==2.1.0
 requests-toolbelt==1.0.0
 rest-framework-simplejwt==0.0.2
-rpds-py==0.20.0
-rsa==4.9
-ruff==0.7.1
-safetensors==0.4.5
-scapy==2.5.0
-selenium==4.28.1
-service-identity==24.2.0
-six==1.16.0
+
 slugify==0.0.1
 smsir==1.0.5
 smsir-python==1.0.8
