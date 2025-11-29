@@ -102,16 +102,35 @@ WSGI_APPLICATION = 'web.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'mysql.connector.django',
+#         'NAME':'webmona',
+#         'USER':'root',
+#         'PASSWORD':'sadra1383@gmail.com',
+#         'HOST':'localhost',
+#         'PORT':'3306'
+#     }
+# }
+
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
-        'NAME':'webmona',
-        'USER':'root',
-        'PASSWORD':'sadra1383@gmail.com',
-        'HOST':'localhost',
-        'PORT':'3306'
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'optimistic_nightingale',  # نام دیتابیس
+        'USER': 'root',                    # نام کاربری
+        'PASSWORD': 'XjomClRJayAheMtDwB50RJQO',  # رمز عبور
+        'HOST': 'web',                     # هاست شبکه خصوصی
+        'PORT': '3306',                    # پورت
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+        },
+        'CONN_MAX_AGE': 600,  # افزایش کارایی اتصال
     }
 }
+
 
 
 # Password validation
