@@ -1,0 +1,5 @@
+platform: python
+build:
+  requirementsPath: ./requirements.txt
+run:
+  web: python -m daphne -b 0.0.0.0 -p $PORT web.asgi:application

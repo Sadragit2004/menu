@@ -133,8 +133,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Storage configuration for Liara
+# ==================== LIARA CONFIGURATION ====================
+
+# WebSocket and Redis settings for Liara
 if os.environ.get('LIARA'):
+    # تنظیمات Redis برای لیارا
+    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+
+    # تنظیمات Channels برای لیارا
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [REDIS_URL],
+            },
+        },
+    }
+
+    # تنظیمات Celery برای لیارا
+    CELERY_BROKER_URL = REDIS_URL
+    CELERY_RESULT_BACKEND = REDIS_URL
+
     # تنظیمات AWS S3 برای لیارا
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
@@ -153,10 +172,38 @@ if os.environ.get('LIARA'):
 
     # برای CKEditor
     CKEDITOR_STORAGE_BACKEND = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    # دیتابیس برای لیارا (اگر نیاز به تغییر داری)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'optimistic_nightingale'),
+            'USER': os.environ.get('DB_USER', 'root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'XjomClRJayAheMtDwB50RJQO'),
+            'HOST': os.environ.get('DB_HOST', 'web'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'use_unicode': True,
+            },
+            'CONN_MAX_AGE': 600,
+        }
+    }
+
 else:
     # تنظیمات لوکال
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     CKEDITOR_STORAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
+
+    # تنظیمات Channels برای لوکال
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [('127.0.0.1', 6379)],
+            },
+        },
+    }
 
 # Whitenoise برای فایل‌های استاتیک
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -205,7 +252,7 @@ CACHES = {
     }
 }
 
-# Celery settings
+# Celery settings (برای لوکال - در لیارا override می‌شود)
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -215,14 +262,6 @@ CELERY_TIMEZONE = 'Asia/Tehran'
 
 # Channels settings
 ASGI_APPLICATION = 'web.asgi.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
-    },
-}
 
 # Security settings for production
 if not DEBUG:
