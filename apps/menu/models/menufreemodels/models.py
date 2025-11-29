@@ -608,3 +608,83 @@ def get_current_exchange_rate():
     except:
         pass
     return getattr(settings, 'EXCHANGE_RATE', Decimal('60000.00'))
+
+
+
+class MenuView(models.Model):
+    """
+    مدل برای ثبت بازدید یکتا از منوی هر رستوران
+    """
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='menu_views',
+        verbose_name="رستوران"
+    )
+    session_key = models.CharField(
+        max_length=40,
+        db_index=True,
+        verbose_name="کلید سشن"
+    )
+    ip_address = models.GenericIPAddressField(
+        verbose_name="آدرس IP",
+        null=True,
+        blank=True
+    )
+    user_agent = models.TextField(
+        verbose_name="User Agent",
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
+
+    class Meta:
+        verbose_name = 'بازدید منو'
+        verbose_name_plural = 'بازدیدهای منو'
+        unique_together = ['restaurant', 'session_key']
+        indexes = [
+            models.Index(fields=['restaurant', 'created_at']),
+            models.Index(fields=['session_key', 'restaurant']),
+            models.Index(fields=['ip_address', 'restaurant']),
+        ]
+
+    def __str__(self):
+        return f"{self.restaurant.title} - {self.session_key} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+    @classmethod
+    def is_viewed(cls, restaurant, session_key):
+        """بررسی می‌کند که آیا این سشن قبلاً از این منو بازدید کرده است"""
+        return cls.objects.filter(
+            restaurant=restaurant,
+            session_key=session_key
+        ).exists()
+
+    @classmethod
+    def record_view(cls, restaurant, session_key, ip_address=None, user_agent=None):
+        """ثبت بازدید جدید اگر قبلاً ثبت نشده باشد"""
+        if not cls.is_viewed(restaurant, session_key):
+            return cls.objects.create(
+                restaurant=restaurant,
+                session_key=session_key,
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
+        return None
+
+    @classmethod
+    def get_views_count(cls, restaurant):
+        """تعداد بازدیدهای یکتا برای یک رستوران"""
+        return cls.objects.filter(restaurant=restaurant).count()
+
+    @classmethod
+    def get_recent_views(cls, restaurant, hours=24):
+        """تعداد بازدیدهای اخیر (مثلاً در 24 ساعت گذشته)"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        since = timezone.now() - timedelta(hours=hours)
+        return cls.objects.filter(
+            restaurant=restaurant,
+            created_at__gte=since
+        ).count()

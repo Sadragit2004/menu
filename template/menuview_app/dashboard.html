@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد مدیریت رستوران | آمار و تحلیل‌های پیشرفته</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* استایل‌های سفارشی حرفه‌ای */
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --secondary: #f59e0b;
+            --accent: #10b981;
+            --dark: #1f2937;
+            --light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Vazir', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.orders::before { background: var(--primary); }
+        .stat-card.views::before { background: var(--secondary); }
+        .stat-card.revenue::before { background: var(--accent); }
+        .stat-card.waiters::before { background: #8b5cf6; }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+        }
+
+        .filter-select {
+            background: white;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+        }
+
+        /* اسکرول بار سفارشی */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* انیمیشن‌های ظاهر شدن */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- هدر اصلی -->
+    <header class="dashboard-header text-white">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-utensils text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">داشبورد مدیریت رستوران</h1>
+                        <p class="text-white/90 text-sm mt-1">تحلیل زنده عملکرد و آمار فروش</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <!-- فیلتر رستوران -->
+                    <div class="relative">
+                        <select id="restaurantFilter" class="filter-select rounded-2xl px-4 py-3 pr-12 appearance-none focus:outline-none text-gray-700 font-medium">
+                            <option value="">همه شعبه‌ها</option>
+                            {% for restaurant in restaurants %}
+                            <option value="{{ restaurant.id }}">{{ restaurant.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+
+                    <!-- دکمه‌های اکشن -->
+                    <button id="refreshAll" class="btn-primary rounded-2xl px-6 py-3 text-white font-medium flex items-center space-x-2 space-x-reverse">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>بروزرسانی</span>
+                    </button>
+
+                    <!-- تاریخ و ساعت -->
+                    <div class="bg-white/20 rounded-2xl px-4 py-2 backdrop-blur-sm">
+                        <div id="currentDateTime" class="text-sm font-medium"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- آمار لحظه‌ای -->
+    <section class="container mx-auto px-6 -mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- کارت سفارش‌های فعال -->
+            <div class="stat-card orders animate-slide-up" style="animation-delay: 0.1s">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-shopping-cart text-red-600 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-green-600 text-sm font-bold bg-green-100 px-2 py-1 rounded-full">
+                                <i class="fas fa-arrow-up ml-1"></i>
+                                ۱۲٪
+                            </span>
+                        </div>
+                    </div>
+                    <h3 id="activeOrders" class="text-3xl font-bold text-gray-800 mb-2">۰</h3>
+                    <p class="text-gray-600 text-sm">سفارش‌های فعال</p>
+                    <div class="mt-3 text-xs text-gray-500">
+                        <i class="fas fa-clock ml-1"></i>
+                        به روزرسانی لحظه‌ای
+                    </div>
+                </div>
+            </div>
+
+            <!-- کارت بازدید امروز -->
+            <div class="stat-card views animate-slide-up" style="animation-delay: 0.2s">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-eye text-amber-600 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-green-600 text-sm font-bold bg-green-100 px-2 py-1 rounded-full">
+                                <i class="fas fa-arrow-up ml-1"></i>
+                                ۸٪
+                            </span>
+                        </div>
+                    </div>
+                    <h3 id="todayViews" class="text-3xl font-bold text-gray-800 mb-2">۰</h3>
+                    <p class="text-gray-600 text-sm">بازدید منوی امروز</p>
+                    <div class="mt-3 text-xs text-gray-500">
+                        <i class="fas fa-users ml-1"></i>
+                        مشتریان آنلاین
+                    </div>
+                </div>
+            </div>
+
+            <!-- کارت درآمد امروز -->
+            <div class="stat-card revenue animate-slide-up" style="animation-delay: 0.3s">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-green-600 text-sm font-bold bg-green-100 px-2 py-1 rounded-full">
+                                <i class="fas fa-arrow-up ml-1"></i>
+                                ۱۵٪
+                            </span>
+                        </div>
+                    </div>
+                    <h3 id="todayRevenue" class="text-3xl font-bold text-gray-800 mb-2">۰ تومان</h3>
+                    <p class="text-gray-600 text-sm">درآمد امروز</p>
+                    <div class="mt-3 text-xs text-gray-500">
+                        <i class="fas fa-chart-line ml-1"></i>
+                        رشد مثبت
+                    </div>
+                </div>
+            </div>
+
+            <!-- کارت گارسون‌های فعال -->
+            <div class="stat-card waiters animate-slide-up" style="animation-delay: 0.4s">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-user-tie text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-blue-600 text-sm font-bold bg-blue-100 px-2 py-1 rounded-full">
+                                فعال
+                            </span>
+                        </div>
+                    </div>
+                    <h3 id="onlineWaiters" class="text-3xl font-bold text-gray-800 mb-2">۰</h3>
+                    <p class="text-gray-600 text-sm">گارسون‌های فعال</p>
+                    <div class="mt-3 text-xs text-gray-500">
+                        <i class="fas fa-check-circle ml-1"></i>
+                        آماده به خدمت
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- محتوای اصلی -->
+    <main class="container mx-auto px-6 pb-12">
+        <!-- ردیف اول: نمودارهای اصلی -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+            <!-- نمودار فروش و بازدید -->
+            <div class="xl:col-span-2 chart-container animate-slide-up">
+                <div class="p-6 border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-chart-line text-red-500 ml-2"></i>
+                            روند فروش و بازدید
+                        </h3>
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <select id="daysFilter" class="filter-select rounded-xl px-3 py-2 text-sm">
+                                <option value="7">هفته گذشته</option>
+                                <option value="30" selected>ماه گذشته</option>
+                                <option value="90">۳ ماه گذشته</option>
+                            </select>
+                            <button onclick="loadSalesViewsData()" class="bg-gray-100 hover:bg-gray-200 rounded-xl w-10 h-10 flex items-center justify-center transition-colors">
+                                <i class="fas fa-sync-alt text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="h-80">
+                        <canvas id="salesViewsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- وضعیت سفارش‌ها -->
+            <div class="chart-container animate-slide-up">
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-clipboard-list text-green-500 ml-2"></i>
+                        وضعیت سفارش‌ها
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="h-80">
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ردیف دوم: محبوب‌ترین غذاها -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+            <!-- غذاهای پرفروش -->
+            <div class="chart-container animate-slide-up">
+                <div class="p-6 border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-utensils text-amber-500 ml-2"></i>
+                            پرفروش‌ترین غذاها
+                        </h3>
+                        <select id="topFoodsLimit" class="filter-select rounded-xl px-3 py-2 text-sm">
+                            <option value="5">۵ مورد</option>
+                            <option value="10" selected>۱۰ مورد</option>
+                            <option value="15">۱۵ مورد</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="h-80">
+                        <canvas id="topFoodsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عملکرد گارسون‌ها -->
+            <div class="chart-container animate-slide-up">
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-user-tie text-purple-500 ml-2"></i>
+                        عملکرد گارسون‌ها
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="h-80">
+                        <canvas id="waiterPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ردیف سوم: جداول اطلاعات -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <!-- نظرات مشتریان -->
+            <div class="table-container animate-slide-up">
+                <div class="table-header rounded-t-2xl px-6 py-4 text-white">
+                    <h3 class="text-xl font-bold">
+                        <i class="fas fa-comment-dots ml-2"></i>
+                        آخرین نظرات مشتریان
+                    </h3>
+                </div>
+                <div class="max-h-96 overflow-y-auto custom-scrollbar" id="customerNotesTable">
+                    <div class="p-8 text-center">
+                        <i class="fas fa-spinner loading-spinner text-2xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500">در حال دریافت نظرات...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نیاز به توجه -->
+            <div class="table-container animate-slide-up">
+                <div class="bg-amber-500 rounded-t-2xl px-6 py-4 text-white">
+                    <h3 class="text-xl font-bold">
+                        <i class="fas fa-exclamation-triangle ml-2"></i>
+                        نیاز به توجه
+                    </h3>
+                </div>
+                <div class="max-h-96 overflow-y-auto custom-scrollbar" id="attentionTable">
+                    <div class="p-8 text-center">
+                        <i class="fas fa-spinner loading-spinner text-2xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500">در حال بررسی...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- فوتر -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 space-x-reverse text-sm text-gray-600">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <i class="fas fa-shield-alt text-green-500"></i>
+                        <span>سیستم امن و پایدار</span>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <i class="fas fa-bolt text-amber-500"></i>
+                        <span>پردازش زنده</span>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <span id="lastUpdate">آخرین بروزرسانی: --:--</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // متغیرهای گلوبال
+        let charts = {};
+        let currentRestaurantId = '';
+        let lastRealTimeData = null;
+
+        // اینیشالایز چارت‌ها
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        rtl: true,
+                        labels: {
+                            font: {
+                                family: 'Vazir, sans-serif'
+                            }
+                        }
+                    }
+                }
+            };
+
+            // نمودار فروش و بازدید
+            charts.salesViews = new Chart(document.getElementById('salesViewsChart'), {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'تعداد سفارشات',
+                            borderColor: '#dc2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'بازدید منو',
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }
+                    }
+                }
+            });
+
+            // نمودار وضعیت سفارش‌ها
+            charts.orderStatus = new Chart(document.getElementById('orderStatusChart'), {
+                type: 'doughnut',
+                data: { labels: [], datasets: [] },
+                options: chartOptions
+            });
+
+            // نمودار غذاهای پرفروش
+            charts.topFoods = new Chart(document.getElementById('topFoodsChart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
+                    indexAxis: 'y'
+                }
+            });
+
+            // نمودار عملکرد گارسون‌ها
+            charts.waiterPerformance = new Chart(document.getElementById('waiterPerformanceChart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: chartOptions
+            });
+        }
+
+        // توابع لود داده‌ها با URL های اصلاح شده
+        async function loadSalesViewsData() {
+            const days = document.getElementById('daysFilter').value;
+            const url = `/menu/api/daily-views/?days=${days}&restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                charts.salesViews.data = {
+                    labels: data.map(item => item.date),
+                    datasets: [
+                        {
+                            label: 'بازدید منو',
+                            data: data.map(item => item.views),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                };
+                charts.salesViews.update();
+            } catch (error) {
+                console.error('Error loading sales views data:', error);
+            }
+        }
+
+        async function loadOrderAnalytics() {
+            const url = `/menu/api/order-analytics/?restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // آپدیت کارت‌های آمار
+                document.getElementById('activeOrders').textContent = data.today.total_orders || 0;
+                document.getElementById('todayRevenue').textContent =
+                    data.today.total_revenue ? (data.today.total_revenue).toLocaleString() + ' تومان' : '۰ تومان';
+
+                // نمودار وضعیت سفارش‌ها
+                const statusData = data.status_breakdown;
+                const statusColors = {
+                    'pending': '#f59e0b',
+                    'confirmed': '#3b82f6',
+                    'preparing': '#8b5cf6',
+                    'ready': '#10b981',
+                    'served': '#059669',
+                    'cancelled': '#ef4444',
+                    'paid': '#dc2626'
+                };
+
+                const statusLabels = {
+                    'pending': 'در انتظار',
+                    'confirmed': 'تایید شده',
+                    'preparing': 'در حال آماده‌سازی',
+                    'ready': 'آماده',
+                    'served': 'سرو شده',
+                    'cancelled': 'لغو شده',
+                    'paid': 'پرداخت شده'
+                };
+
+                charts.orderStatus.data = {
+                    labels: statusData.map(item => statusLabels[item.status] || item.status),
+                    datasets: [{
+                        data: statusData.map(item => item.count),
+                        backgroundColor: statusData.map(item => statusColors[item.status] || '#6b7280'),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                };
+                charts.orderStatus.update();
+            } catch (error) {
+                console.error('Error loading order analytics:', error);
+            }
+        }
+
+        async function loadTopFoods() {
+            const limit = document.getElementById('topFoodsLimit').value;
+            const url = `/menu/api/top-foods/?limit=${limit}&restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                charts.topFoods.data = {
+                    labels: data.map(item => item.food_name),
+                    datasets: [{
+                        label: 'تعداد فروش',
+                        data: data.map(item => item.total_quantity),
+                        backgroundColor: '#dc2626',
+                        borderColor: '#b91c1c',
+                        borderWidth: 1
+                    }]
+                };
+                charts.topFoods.update();
+            } catch (error) {
+                console.error('Error loading top foods:', error);
+            }
+        }
+
+        async function loadWaiterPerformance() {
+            const url = `/menu/api/waiter-performance/?restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                charts.waiterPerformance.data = {
+                    labels: data.map(item => item.waiter_name),
+                    datasets: [{
+                        label: 'تعداد سفارشات',
+                        data: data.map(item => item.total_orders),
+                        backgroundColor: '#8b5cf6',
+                        borderColor: '#7c3aed',
+                        borderWidth: 1
+                    }]
+                };
+                charts.waiterPerformance.update();
+            } catch (error) {
+                console.error('Error loading waiter performance:', error);
+            }
+        }
+
+        async function loadCustomerNotes() {
+            const url = `/menu/api/customer-notes/?restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                const tableHtml = data.map(item => `
+                    <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center space-x-2 space-x-reverse">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600 text-sm"></i>
+                                </div>
+                                <span class="font-medium text-gray-800">سفارش #${item.order_id}</span>
+                            </div>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${item.date}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2 leading-relaxed">${item.note}</p>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span class="flex items-center">
+                                <i class="fas fa-chair ml-1"></i>
+                                میز ${item.table_number}
+                            </span>
+                            <span>${item.restaurant}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('customerNotesTable').innerHTML =
+                    tableHtml || `
+                    <div class="p-8 text-center text-gray-500">
+                        <i class="fas fa-comment-slash text-3xl mb-3 opacity-50"></i>
+                        <p>هنوز نظری ثبت نشده است</p>
+                    </div>`;
+            } catch (error) {
+                console.error('Error loading customer notes:', error);
+            }
+        }
+
+        async function loadAttentionItems() {
+            const url = `/menu/api/low-performing-foods/?restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                const tableHtml = data.map(item => `
+                    <div class="p-4 border-b border-gray-100 hover:bg-amber-50 transition-colors">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium text-gray-800">${item.food_name}</span>
+                            <span class="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded">${item.total_quantity} فروش</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-600">
+                            <span>${item.total_revenue.toLocaleString()} تومان</span>
+                            <span>${item.order_count} سفارش</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('attentionTable').innerHTML =
+                    tableHtml || `
+                    <div class="p-8 text-center text-gray-500">
+                        <i class="fas fa-check-circle text-3xl mb-3 opacity-50"></i>
+                        <p>همه موارد به خوبی پیش می‌روند</p>
+                    </div>`;
+            } catch (error) {
+                console.error('Error loading attention items:', error);
+            }
+        }
+
+        async function loadRealTimeStats() {
+            const url = `/menu/api/real-time-stats/?restaurant_id=${currentRestaurantId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // آپدیت کارت‌های آمار
+                document.getElementById('todayViews').textContent = data.today_views;
+                document.getElementById('onlineWaiters').textContent = data.online_waiters;
+
+                lastRealTimeData = data;
+                document.getElementById('lastUpdate').textContent = `آخرین بروزرسانی: ${data.timestamp}`;
+            } catch (error) {
+                console.error('Error loading real-time stats:', error);
+            }
+        }
+
+        // بروزرسانی تاریخ و ساعت
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            const dateTime = now.toLocaleDateString('fa-IR', options);
+            document.getElementById('currentDateTime').textContent = dateTime;
+        }
+
+        // لود همه داده‌ها
+        async function loadAllData() {
+            try {
+                await Promise.all([
+                    loadSalesViewsData(),
+                    loadOrderAnalytics(),
+                    loadTopFoods(),
+                    loadWaiterPerformance(),
+                    loadCustomerNotes(),
+                    loadAttentionItems(),
+                    loadRealTimeStats()
+                ]);
+            } catch (error) {
+                console.error('Error loading all data:', error);
+            }
+        }
+
+        // مدیریت فیلتر رستوران
+        document.getElementById('restaurantFilter').addEventListener('change', function() {
+            currentRestaurantId = this.value;
+            loadAllData();
+        });
+
+        // دکمه بروزرسانی
+        document.getElementById('refreshAll').addEventListener('click', loadAllData);
+
+        // اینیشالایز وقتی صفحه لود شد
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            updateDateTime();
+            loadAllData();
+
+            // بروزرسانی خودکار
+            setInterval(updateDateTime, 60000); // هر 1 دقیقه
+            setInterval(loadRealTimeStats, 15000); // هر 15 ثانیه
+            setInterval(loadAllData, 300000); // هر 5 دقیقه
+        });
+    </script>
+</body>
+</html>
