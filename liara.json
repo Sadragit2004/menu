@@ -1,0 +1,18 @@
+{
+  "platform": "python",
+  "python": {
+    "version": "3.11",
+    "manage": "manage.py",
+    "run": "gunicorn web.wsgi:application --bind 0.0.0.0:$PORT"
+  },
+  "build": {
+    "commands": [
+      "python manage.py collectstatic --noinput",
+      "python manage.py migrate --noinput"
+    ]
+  },
+  "env": {
+    "DEBUG": "False",
+    "LIARA": "true"
+  }
+}
