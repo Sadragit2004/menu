@@ -162,10 +162,7 @@ python-dotenv==1.0.1
 pytweening==1.2.0
 pytz==2024.2
 pywifi==1.1.12
-pywin32==306
-pywin32-ctypes==0.2.2
-PyYAML==6.0.2
-pyzmq==26.0.3
+
 qrcode==8.2
 redis==5.2.0
 referencing==0.35.1
