@@ -742,7 +742,7 @@
                         <i class="fas fa-clock text-xs"></i>
                         <span class="text-xs font-medium image-modal-time"></span>
                     </div>
-                    <button style='background-color:orange;' class="order-btn image-modal-order-btn">
+                    <button style='background-color:#ef4444;' class="order-btn image-modal-order-btn">
                         <span class="order-text">سفارش</span>
                     </button>
                 </div>
@@ -782,7 +782,7 @@
 
                 <div class="header-actions flex items-center gap-2" style="flex-shrink: 0;">
                     <a href="javascript:void(0);"
-                       class="reservation-btn bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-2 py-1.5 rounded-xl font-medium flex items-center gap-1 transition-all duration-300 shadow-md hover:shadow-lg text-xs"
+                       class="reservation-btn bg-gradient-to-r from-#ef4444-500 to-red-500 hover:from-#ef4444-600 hover:to-red-600 text-white px-2 py-1.5 rounded-xl font-medium flex items-center gap-1 transition-all duration-300 shadow-md hover:shadow-lg text-xs"
                        data-bs-toggle="modal"
                        data-bs-target="#reservationModal">
                         <i class="fas fa-chair text-xs"></i>
@@ -815,7 +815,7 @@
         <div class="categories-scroll-container">
             <div class="container mx-auto px-3">
                 <div class="categories-scroll">
-                    <div style='color:background-color:orange;;' class="category-bottom-item category-bottom-active" data-category="all">
+                    <div style='color:background-color:#ef4444;;' class="category-bottom-item category-bottom-active" data-category="all">
                         <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
                             <i class="fas fa-utensils"></i>
                         </div>
@@ -892,7 +892,7 @@
                                     <button class="order-btn"
                                             data-food-id="{{ food.id }}"
                                             data-food-title="{{ food.title }}"
-                                            style='background-color:orange;'
+                                            style='background-color:#ef4444;'
                                             data-food-price="{{ food.final_price }}"
                                             data-food-image="{% if food.final_image %}{{ food.final_image.url }}{% endif %}">
                                         <span class="order-text">سفارش</span>
@@ -999,7 +999,7 @@
     </div>
 
     <!-- دکمه باز کردن منوی کشویی - فلش به سمت راست و در سمت چپ صفحه -->
-    <div style='background-color:orange;' class="categories-toggle">
+    <div style='background-color:#ef4444;' class="categories-toggle">
         <i class="fas fa-chevron-right"></i>
     </div>
 
@@ -1007,7 +1007,7 @@
     <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                <div class="modal-header bg-gradient-to-r from-#ef4444-500 to-red-500 text-white">
                     <h5 class="modal-title font-bold" id="reservationModalLabel">
                         <i class="fas fa-calendar-check ml-2"></i>
                         رزرو میز در {{ restaurant.title }}
@@ -1067,7 +1067,7 @@
 
                         <div class="flex justify-end">
                             <button type="button"
-                                    class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
+                                    class="bg-gradient-to-r from-#ef4444-500 to-red-500 hover:from-#ef4444-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
                                     onclick="checkAvailability()">
                                 <i class="fas fa-search"></i>
                                 بررسی دسترسی
