@@ -99,7 +99,7 @@
         }
 
         .category-bottom-active {
-            background-color: #3b82f6 !important;
+            background-color:#ff7d2d !important;
             color: white !important;
         }
 
@@ -226,7 +226,7 @@
         }
 
         .slider-category-active {
-           
+
             color: white !important;
         }
 
@@ -261,7 +261,7 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            background: linear-gradient(135deg,#ff7d2d 0%, #1e40af 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -309,7 +309,7 @@
         .food-price {
             font-weight: 700;
             font-size: 0.9rem;
-            color: #3b82f6;
+            color:#ff7d2d;
             white-space: nowrap;
         }
 
@@ -403,7 +403,7 @@
 
         /* منوی همبرگر */
         .hamburger-menu {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #1e40af 0%,#ff7d2d 100%);
             backdrop-filter: blur(20px);
         }
 
@@ -447,7 +447,7 @@
         }
 
         .sound-btn.playing {
-            color: #3b82f6 !important;
+            color:#ff7d2d !important;
             animation: pulse 1s infinite;
         }
 
@@ -690,7 +690,7 @@
         }
 
         .selection-list-item-price {
-            color: #3b82f6;
+            color:#ff7d2d;
             font-weight: 600;
             font-size: 0.8rem;
         }
@@ -805,7 +805,7 @@
 
         /* دکمه سفارش با حالت‌های مختلف */
         .order-btn {
-            background-color: #3b82f6;
+            background-color:#ff7d2d;
             color: white;
             padding: 8px 12px;
             border-radius: 8px;
@@ -941,7 +941,7 @@
         }
 
         .selection-display-item-price {
-            color: #3b82f6;
+            color:#ff7d2d;
             font-weight: 600;
         }
 
@@ -980,7 +980,7 @@
         .selection-display-total-price {
             font-weight: 700;
             font-size: 1.1rem;
-            color: #3b82f6;
+            color:#ff7d2d;
         }
 
         .selection-display-actions {
