@@ -196,14 +196,15 @@ else:
     CKEDITOR_STORAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
 
     # تنظیمات Channels برای لوکال
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                "hosts": [('127.0.0.1', 6379)],
-            },
-        },
+CHANNEL_LAYERS = {
+    "default": {
+    "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
+    "CONFIG": {
+        "hosts":[{
+            "address": os.getenv('REDIS_URI'),
+        }]}
     }
+}
 
 # Whitenoise برای فایل‌های استاتیک
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
