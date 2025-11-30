@@ -742,7 +742,7 @@
                         <i class="fas fa-clock text-xs"></i>
                         <span class="text-xs font-medium image-modal-time"></span>
                     </div>
-                    <button class="order-btn image-modal-order-btn">
+                    <button style='background-color:orange;' class="order-btn image-modal-order-btn">
                         <span class="order-text">سفارش</span>
                     </button>
                 </div>
@@ -892,6 +892,7 @@
                                     <button class="order-btn"
                                             data-food-id="{{ food.id }}"
                                             data-food-title="{{ food.title }}"
+                                            style='background-color:orange;'
                                             data-food-price="{{ food.final_price }}"
                                             data-food-image="{% if food.final_image %}{{ food.final_image.url }}{% endif %}">
                                         <span class="order-text">سفارش</span>
