@@ -760,7 +760,14 @@
                     </div>
                     <div class="logo-container flex items-center gap-2" style="min-width: 0; flex: 1;">
                         <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs flex-shrink: 0;">
-                            ر
+                        {% if restaurant.logo %}
+                        <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title_en|default:restaurant.title }}"
+                             class="w-10 h-10 rounded-xl object-cover border border-gray-200">
+                        {% else %}
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                            {{ restaurant.title_en|default:restaurant.title|first }}
+                        </div>
+                        {% endif %}
                         </div>
                         <div class="restaurant-info" style="min-width: 0;">
                             <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis" style="max-width: 120px;">
