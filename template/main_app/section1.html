@@ -1,100 +1,459 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+<div class="hero-section">
     {% for content in contents %}
-    <div class="flex flex-col lg:grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+    <div class="hero-item {% cycle 'reverse' '' %}">
+        <div class="hero-container">
 
-        <!-- سمت چپ - محتوای متنی -->
-        <div class="order-2 lg:order-1 space-y-6 sm:space-y-8 text-center lg:text-right">
-            <!-- عنوان اصلی -->
-            <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight whitespace-nowrap">
-                {{ content.title }}
-            </h1>
-
-            <!-- دکمه‌ها -->
-            <div class="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
-                <a href='/panel/' class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition text-sm sm:text-base flex-1 sm:flex-none">
-                    منو رستوران 10 دقیقه
-                </a>
-                <a href='accounts/login' class="border border-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition text-sm sm:text-base flex-1 sm:flex-none">
-                    ثبت نام
-                </a>
+            <!-- سمت راست - عکس بزرگ -->
+            <div class="hero-image-container">
+                <div class="hero-image-frame">
+                    <img
+                        src="{{ content.image.url }}"
+                        alt="{{ content.title }}"
+                        class="hero-image"
+                    >
+                    <div class="image-overlay"></div>
+                </div>
             </div>
 
-            <!-- توضیحات -->
-            <p class="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                {{ content.description }}
-            </p>
+            <!-- سمت چپ - محتوای متنی -->
+            <div class="hero-content-container">
+                <!-- برچسب ویژه -->
+                <div class="hero-badge">
+                    <span class="badge-text">ویژه</span>
+                </div>
+
+                <!-- عنوان اصلی -->
+                <h1 class="hero-title">
+                    <span class="title-text">{{ content.title }}</span>
+                </h1>
+
+                <!-- خط تزئینی -->
+                <div class="hero-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-icon">✧</div>
+                    <div class="divider-line"></div>
+                </div>
+
+                <!-- توضیحات -->
+                <p class="hero-description">
+                    {{ content.description }}
+                </p>
+
+                <!-- دکمه‌های اقدام -->
+                <div class="hero-buttons">
+                    <a href='/panel/' class="btn-primary">
+                        <span class="btn-icon">⏱️</span>
+                        <span class="btn-text">منو رستوران 10 دقیقه</span>
+                    </a>
+                    <a href='accounts/login' class="btn-secondary">
+                        <span class="btn-icon">👤</span>
+                        <span class="btn-text">ثبت نام</span>
+                    </a>
+                </div>
+
+                <!-- اطلاعات اضافی -->
+                <div class="hero-info">
+                    <div class="info-item">
+                        <span class="info-icon">✅</span>
+                        <span class="info-text">تضمین کیفیت</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🚚</span>
+                        <span class="info-text">تحویل سریع</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">⭐</span>
+                        <span class="info-text">امتیاز ۴.۹</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- سمت راست - عکس بزرگ -->
-        <div class="order-1 lg:order-2 food-image w-full h-64 sm:h-80 lg:h-96">
-            <img
-                src="{{ content.image.url }}"
-                alt="{{ content.title }}"
-                class="w-full h-full object-cover"
-            >
+        <!-- آمار فقط برای اولین آیتم -->
+        {% if forloop.first %}
+        <div class="hero-stats">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number" data-count="500">0+</div>
+                    <div class="stat-label">رستوران فعال</div>
+                    <div class="stat-icon">🏪</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="50">0k+</div>
+                    <div class="stat-label">سفارش موفق</div>
+                    <div class="stat-icon">📦</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="4.9">4.9</div>
+                    <div class="stat-label">امتیاز کاربران</div>
+                    <div class="stat-icon">⭐</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="98">98%</div>
+                    <div class="stat-label">رضایت مشتری</div>
+                    <div class="stat-icon">❤️</div>
+                </div>
+            </div>
         </div>
+        {% endif %}
     </div>
 
-    <!-- خط جداکننده بین محتواها -->
+    <!-- جداکننده تزئینی -->
     {% if not forloop.last %}
-    <hr class="my-12 border-gray-800">
+    <div class="separator">
+        <div class="separator-dots">•••</div>
+    </div>
     {% endif %}
 
     {% endfor %}
-
-    <!-- آمار و ارقام (فقط یک بار نمایش داده شود) -->
-    {% if contents %}
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-12 sm:mt-20 pt-8 border-t border-gray-800">
-        <div class="text-center">
-            <div class="text-2xl sm:text-3xl font-black text-white">۵۰۰+</div>
-            <div class="text-gray-400 text-xs sm:text-sm">رستوران فعال</div>
-        </div>
-        <div class="text-center">
-            <div class="text-2xl sm:text-3xl font-black text-white">۵۰k+</div>
-            <div class="text-gray-400 text-xs sm:text-sm">سفارش موفق</div>
-        </div>
-        <div class="text-center">
-            <div class="text-2xl sm:text-3xl font-black text-white">۴.۹</div>
-            <div class="text-gray-400 text-xs sm:text-sm">امتیاز کاربران</div>
-        </div>
-        <div class="text-center">
-            <div class="text-2xl sm:text-3xl font-black text-white">۹۸٪</div>
-            <div class="text-gray-400 text-xs sm:text-sm">رضایت مشتری</div>
-        </div>
-    </div>
-    {% endif %}
 </div>
 
 <style>
-/* استایل‌های اضافی برای زیبایی بیشتر */
-.food-image {
-    border-radius: 20px;
+/* استایل‌های اصلی */
+.hero-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.hero-item {
+    margin-bottom: 4rem;
+}
+
+.hero-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.hero-item.reverse .hero-container {
+    direction: rtl;
+}
+
+/* استایل‌های عکس */
+.hero-image-container {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-image-frame {
+    position: relative;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.food-image:hover {
-    transform: scale(1.02);
+.hero-item.reverse .hero-image-frame {
+    transform: perspective(1000px) rotateY(5deg);
 }
 
-.food-image img {
-    transition: transform 0.5s ease;
+.hero-image-frame:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.02);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
 }
 
-.food-image:hover img {
+.hero-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.8s ease;
+}
+
+.hero-image-frame:hover .hero-image {
     transform: scale(1.1);
 }
 
-/* استایل‌های ریسپانسیو */
-@media (max-width: 768px) {
-    .food-image {
-        height: 200px;
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 100%);
+}
+
+/* استایل‌های محتوا */
+.hero-content-container {
+    padding: 2rem;
+    position: relative;
+}
+
+.hero-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    transform: rotate(3deg);
+    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+}
+
+.hero-item.reverse .hero-badge {
+    right: auto;
+    left: 20px;
+    transform: rotate(-3deg);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #2c3e50, #4a69bd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.title-text {
+    display: inline-block;
+    animation: textReveal 0.8s ease-out;
+}
+
+.hero-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a69bd, transparent);
+}
+
+.divider-icon {
+    color: #FF6B6B;
+    font-size: 24px;
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 2rem;
+    padding-right: 1rem;
+    border-right: 3px solid #4a69bd;
+}
+
+.hero-item.reverse .hero-description {
+    padding-right: 0;
+    padding-left: 1rem;
+    border-right: none;
+    border-left: 3px solid #4a69bd;
+}
+
+/* استایل‌های دکمه‌ها */
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.btn-primary, .btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4a69bd, #1e3799);
+    color: white;
+    box-shadow: 0 10px 20px rgba(74, 105, 189, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(74, 105, 189, 0.4);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid #4a69bd;
+    color: #4a69bd;
+}
+
+.btn-secondary:hover {
+    background: #4a69bd;
+    color: white;
+    transform: translateY(-5px);
+}
+
+.btn-icon {
+    font-size: 20px;
+}
+
+/* اطلاعات اضافی */
+.hero-info {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+}
+
+.info-icon {
+    font-size: 18px;
+}
+
+/* آمار */
+.hero-stats {
+    margin-top: 3rem;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    position: relative;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+}
+
+/* جداکننده */
+.separator {
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.separator-dots {
+    color: #4a69bd;
+    font-size: 2rem;
+    letter-spacing: 10px;
+    opacity: 0.5;
+}
+
+/* ریسپانسیو */
+@media (max-width: 1024px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
     }
 
-    h1 {
-        font-size: 2rem !important;
-        white-space: normal !important;
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-image {
+        height: 400px;
+    }
+
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-buttons {
+        flex-direction: column;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-info {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+}
+
+/* انیمیشن‌ها */
+@keyframes textReveal {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 </style>
+
+<script>
+// انیمیشن اعداد آمار
+document.addEventListener('DOMContentLoaded', function() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+
+    statNumbers.forEach(stat => {
+        const target = parseInt(stat.getAttribute('data-count'));
+        const suffix = stat.textContent.includes('+') ? '+' :
+                      stat.textContent.includes('k') ? 'k+' :
+                      stat.textContent.includes('%') ? '%' : '';
+
+        let start = 0;
+        const duration = 2000;
+        const increment = target / (duration / 16);
+
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                stat.textContent = target + suffix;
+                clearInterval(timer);
+            } else {
+                stat.textContent = Math.floor(start) + suffix;
+            }
+        }, 16);
+    });
+});
+</script>
