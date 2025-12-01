@@ -1,153 +1,65 @@
-<div class="content-section">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
     {% for content in contents %}
-    <div class="content-item {% cycle 'right-image' 'left-image' %}">
-        <div class="content-wrapper">
+    <div class="flex flex-col lg:grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
 
-            <!-- عکس -->
-            <div class="content-image-side">
-                <div class="image-wrapper">
-                    <img
-                        src="{{ content.image.url }}"
-                        alt="{{ content.title }}"
-                        class="content-image"
-                    >
-                </div>
+        <!-- سمت چپ - محتوای متنی -->
+        <div class="order-2 lg:order-1 space-y-6 sm:space-y-8 text-center lg:text-right">
+            <!-- عنوان اصلی -->
+            <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight whitespace-nowrap">
+                {{ content.title }}
+            </h1>
+
+            <div class="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                <a href='/panel/' class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition text-sm sm:text-base flex-1 sm:flex-none">
+                    منو رستوران 10 دقیقه
+                </a>
+                <a href='accounts/login' class="border border-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition text-sm sm:text-base flex-1 sm:flex-none">
+                    ثبت نام
+                </a>
             </div>
 
-            <!-- عنوان -->
-            <div class="content-title-side">
-                <h2 class="content-title">{{ content.title }}</h2>
-            </div>
+            <!-- توضیحات -->
+            <p class="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                {{ content.description }}
+            </p>
+        </div>
 
+        <!-- سمت راست - عکس بزرگ -->
+        <div class="order-1 lg:order-2 food-image w-full h-64 sm:h-80 lg:h-96">
+            <img
+                src="{{ content.image.url }}"
+                alt="{{ content.title }}"
+                class="w-full h-full object-cover"
+            >
         </div>
     </div>
+
+    <!-- آمار و ارقام (فقط برای اولین آیتم) -->
+    {% if forloop.first %}
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-12 sm:mt-20 pt-8 border-t border-gray-800">
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۵۰۰+</div>
+            <div class="text-gray-400 text-xs sm:text-sm">رستوران فعال</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۵۰k+</div>
+            <div class="text-gray-400 text-xs sm:text-sm">سفارش موفق</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۴.۹</div>
+            <div class="text-gray-400 text-xs sm:text-sm">امتیاز کاربران</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۹۸٪</div>
+            <div class="text-gray-400 text-xs sm:text-sm">رضایت مشتری</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- جداکننده بین آیتم‌ها -->
+    {% if not forloop.last %}
+    <div class="my-12"></div>
+    {% endif %}
+
     {% endfor %}
 </div>
-
-<style>
-/* استایل‌های اصلی */
-.content-section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-}
-
-.content-item {
-    margin-bottom: 3rem;
-}
-
-.content-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    min-height: 400px;
-}
-
-/* حالت اول: عکس سمت راست، عنوان سمت چپ */
-.content-item.right-image .content-wrapper {
-    direction: rtl;
-}
-
-.content-item.right-image .content-image-side {
-    order: 2;
-}
-
-.content-item.right-image .content-title-side {
-    order: 1;
-    text-align: left;
-}
-
-/* حالت دوم: عکس سمت چپ، عنوان سمت راست */
-.content-item.left-image .content-wrapper {
-    direction: ltr;
-}
-
-.content-item.left-image .content-image-side {
-    order: 1;
-}
-
-.content-item.left-image .content-title-side {
-    order: 2;
-    text-align: right;
-}
-
-/* استایل عکس */
-.content-image-side {
-    flex: 1;
-}
-
-.image-wrapper {
-    position: relative;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.content-image {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s ease;
-}
-
-.image-wrapper:hover .content-image {
-    transform: scale(1.05);
-}
-
-/* استایل عنوان */
-.content-title-side {
-    flex: 1;
-    padding: 2rem;
-}
-
-.content-title {
-    font-size: 3rem;
-    font-weight: 800;
-    line-height: 1.3;
-    color: #2c3e50;
-    margin: 0;
-}
-
-/* ریسپانسیو */
-@media (max-width: 1024px) {
-    .content-wrapper {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .content-item.right-image .content-wrapper,
-    .content-item.left-image .content-wrapper {
-        direction: rtl;
-    }
-
-    .content-item.right-image .content-image-side,
-    .content-item.left-image .content-image-side {
-        order: 1;
-    }
-
-    .content-item.right-image .content-title-side,
-    .content-item.left-image .content-title-side {
-        order: 2;
-        text-align: center;
-    }
-
-    .content-title {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .content-image {
-        height: 250px;
-    }
-
-    .content-title {
-        font-size: 2rem;
-    }
-
-    .content-wrapper {
-        min-height: 300px;
-    }
-}
-</style>
