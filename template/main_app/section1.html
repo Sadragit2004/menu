@@ -4,16 +4,21 @@
 
         <!-- سمت چپ - محتوای متنی -->
         <div class="order-2 lg:order-1 space-y-6 sm:space-y-8 text-center lg:text-right">
-            <!-- عنوان اصلی -->
-            <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight whitespace-nowrap">
+
+            <!-- عنوان اصلی - بدون whitespace-nowrap -->
+            <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight">
                 {{ content.title }}
             </h1>
 
+            <!-- دکمه‌ها - کاملاً ریسپانسیو -->
             <div class="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start flex-wrap">
-                <a href='/panel/' class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition text-sm sm:text-base flex-1 sm:flex-none max-w-full">
+                <a href="/panel/"
+                   class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition text-sm sm:text-base">
                     منو رستوران 10 دقیقه
                 </a>
-                <a href='accounts/login' class="border border-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition text-sm sm:text-base flex-1 sm:flex-none max-w-full">
+
+                <a href="/accounts/login"
+                   class="border border-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition text-sm sm:text-base">
                     ثبت نام
                 </a>
             </div>
@@ -22,9 +27,10 @@
             <p class="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 {{ content.description }}
             </p>
+
         </div>
 
-        <!-- سمت راست - عکس بزرگ -->
+        <!-- سمت راست - تصویر -->
         <div class="order-1 lg:order-2 food-image w-full h-64 sm:h-80 lg:h-96">
             <img
                 src="{{ content.image.url }}"
@@ -32,10 +38,11 @@
                 class="w-full h-full object-cover"
             >
         </div>
+
     </div>
 
-    <!-- آمار و ارقام (فقط برای اولین آیتم) -->
     {% if forloop.first %}
+    <!-- آمار و ارقام -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-12 sm:mt-20 pt-8 border-t border-gray-800">
         <div class="text-center">
             <div class="text-2xl sm:text-3xl font-black text-white">۵۰۰+</div>
@@ -56,10 +63,8 @@
     </div>
     {% endif %}
 
-    <!-- جداکننده بین آیتم‌ها -->
     {% if not forloop.last %}
     <div class="my-12"></div>
     {% endif %}
-
     {% endfor %}
 </div>
