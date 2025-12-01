@@ -1,459 +1,153 @@
-<div class="hero-section">
+<div class="content-section">
     {% for content in contents %}
-    <div class="hero-item {% cycle 'reverse' '' %}">
-        <div class="hero-container">
+    <div class="content-item {% cycle 'right-image' 'left-image' %}">
+        <div class="content-wrapper">
 
-            <!-- سمت راست - عکس بزرگ -->
-            <div class="hero-image-container">
-                <div class="hero-image-frame">
+            <!-- عکس -->
+            <div class="content-image-side">
+                <div class="image-wrapper">
                     <img
                         src="{{ content.image.url }}"
                         alt="{{ content.title }}"
-                        class="hero-image"
+                        class="content-image"
                     >
-                    <div class="image-overlay"></div>
                 </div>
             </div>
 
-            <!-- سمت چپ - محتوای متنی -->
-            <div class="hero-content-container">
-                <!-- برچسب ویژه -->
-                <div class="hero-badge">
-                    <span class="badge-text">ویژه</span>
-                </div>
-
-                <!-- عنوان اصلی -->
-                <h1 class="hero-title">
-                    <span class="title-text">{{ content.title }}</span>
-                </h1>
-
-                <!-- خط تزئینی -->
-                <div class="hero-divider">
-                    <div class="divider-line"></div>
-                    <div class="divider-icon">✧</div>
-                    <div class="divider-line"></div>
-                </div>
-
-                <!-- توضیحات -->
-                <p class="hero-description">
-                    {{ content.description }}
-                </p>
-
-                <!-- دکمه‌های اقدام -->
-                <div class="hero-buttons">
-                    <a href='/panel/' class="btn-primary">
-                        <span class="btn-icon">⏱️</span>
-                        <span class="btn-text">منو رستوران 10 دقیقه</span>
-                    </a>
-                    <a href='accounts/login' class="btn-secondary">
-                        <span class="btn-icon">👤</span>
-                        <span class="btn-text">ثبت نام</span>
-                    </a>
-                </div>
-
-                <!-- اطلاعات اضافی -->
-                <div class="hero-info">
-                    <div class="info-item">
-                        <span class="info-icon">✅</span>
-                        <span class="info-text">تضمین کیفیت</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-icon">🚚</span>
-                        <span class="info-text">تحویل سریع</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-icon">⭐</span>
-                        <span class="info-text">امتیاز ۴.۹</span>
-                    </div>
-                </div>
+            <!-- عنوان -->
+            <div class="content-title-side">
+                <h2 class="content-title">{{ content.title }}</h2>
             </div>
+
         </div>
-
-        <!-- آمار فقط برای اولین آیتم -->
-        {% if forloop.first %}
-        <div class="hero-stats">
-            <div class="stats-container">
-                <div class="stat-item">
-                    <div class="stat-number" data-count="500">0+</div>
-                    <div class="stat-label">رستوران فعال</div>
-                    <div class="stat-icon">🏪</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-count="50">0k+</div>
-                    <div class="stat-label">سفارش موفق</div>
-                    <div class="stat-icon">📦</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-count="4.9">4.9</div>
-                    <div class="stat-label">امتیاز کاربران</div>
-                    <div class="stat-icon">⭐</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-count="98">98%</div>
-                    <div class="stat-label">رضایت مشتری</div>
-                    <div class="stat-icon">❤️</div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
-
-    <!-- جداکننده تزئینی -->
-    {% if not forloop.last %}
-    <div class="separator">
-        <div class="separator-dots">•••</div>
-    </div>
-    {% endif %}
-
     {% endfor %}
 </div>
 
 <style>
 /* استایل‌های اصلی */
-.hero-section {
-    max-width: 1400px;
+.content-section {
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
-.hero-item {
-    margin-bottom: 4rem;
-}
-
-.hero-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: center;
+.content-item {
     margin-bottom: 3rem;
 }
 
-.hero-item.reverse .hero-container {
+.content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    min-height: 400px;
+}
+
+/* حالت اول: عکس سمت راست، عنوان سمت چپ */
+.content-item.right-image .content-wrapper {
     direction: rtl;
 }
 
-/* استایل‌های عکس */
-.hero-image-container {
-    position: relative;
-    z-index: 1;
+.content-item.right-image .content-image-side {
+    order: 2;
 }
 
-.hero-image-frame {
+.content-item.right-image .content-title-side {
+    order: 1;
+    text-align: left;
+}
+
+/* حالت دوم: عکس سمت چپ، عنوان سمت راست */
+.content-item.left-image .content-wrapper {
+    direction: ltr;
+}
+
+.content-item.left-image .content-image-side {
+    order: 1;
+}
+
+.content-item.left-image .content-title-side {
+    order: 2;
+    text-align: right;
+}
+
+/* استایل عکس */
+.content-image-side {
+    flex: 1;
+}
+
+.image-wrapper {
     position: relative;
-    border-radius: 24px;
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-    transform: perspective(1000px) rotateY(-5deg);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.hero-item.reverse .hero-image-frame {
-    transform: perspective(1000px) rotateY(5deg);
-}
-
-.hero-image-frame:hover {
-    transform: perspective(1000px) rotateY(0deg) scale(1.02);
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
-}
-
-.hero-image {
+.content-image {
     width: 100%;
-    height: 500px;
+    height: 350px;
     object-fit: cover;
     display: block;
-    transition: transform 0.8s ease;
+    transition: transform 0.5s ease;
 }
 
-.hero-image-frame:hover .hero-image {
-    transform: scale(1.1);
+.image-wrapper:hover .content-image {
+    transform: scale(1.05);
 }
 
-.image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 100%);
-}
-
-/* استایل‌های محتوا */
-.hero-content-container {
-    padding: 2rem;
-    position: relative;
-}
-
-.hero-badge {
-    position: absolute;
-    top: -10px;
-    right: 20px;
-    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 14px;
-    transform: rotate(3deg);
-    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
-}
-
-.hero-item.reverse .hero-badge {
-    right: auto;
-    left: 20px;
-    transform: rotate(-3deg);
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 900;
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, #2c3e50, #4a69bd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.title-text {
-    display: inline-block;
-    animation: textReveal 0.8s ease-out;
-}
-
-.hero-divider {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.divider-line {
+/* استایل عنوان */
+.content-title-side {
     flex: 1;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #4a69bd, transparent);
-}
-
-.divider-icon {
-    color: #FF6B6B;
-    font-size: 24px;
-    animation: spin 4s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.hero-description {
-    font-size: 1.25rem;
-    line-height: 1.8;
-    color: #555;
-    margin-bottom: 2rem;
-    padding-right: 1rem;
-    border-right: 3px solid #4a69bd;
-}
-
-.hero-item.reverse .hero-description {
-    padding-right: 0;
-    padding-left: 1rem;
-    border-right: none;
-    border-left: 3px solid #4a69bd;
-}
-
-/* استایل‌های دکمه‌ها */
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.btn-primary, .btn-secondary {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    min-width: 200px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #4a69bd, #1e3799);
-    color: white;
-    box-shadow: 0 10px 20px rgba(74, 105, 189, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(74, 105, 189, 0.4);
-}
-
-.btn-secondary {
-    background: transparent;
-    border: 2px solid #4a69bd;
-    color: #4a69bd;
-}
-
-.btn-secondary:hover {
-    background: #4a69bd;
-    color: white;
-    transform: translateY(-5px);
-}
-
-.btn-icon {
-    font-size: 20px;
-}
-
-/* اطلاعات اضافی */
-.hero-info {
-    display: flex;
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #666;
-}
-
-.info-icon {
-    font-size: 18px;
-}
-
-/* آمار */
-.hero-stats {
-    margin-top: 3rem;
-}
-
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
     padding: 2rem;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 20px;
 }
 
-.stat-item {
-    text-align: center;
-    position: relative;
-}
-
-.stat-number {
+.content-title {
     font-size: 3rem;
-    font-weight: 900;
+    font-weight: 800;
+    line-height: 1.3;
     color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.stat-icon {
-    font-size: 2rem;
-    opacity: 0.7;
-}
-
-/* جداکننده */
-.separator {
-    text-align: center;
-    margin: 3rem 0;
-}
-
-.separator-dots {
-    color: #4a69bd;
-    font-size: 2rem;
-    letter-spacing: 10px;
-    opacity: 0.5;
+    margin: 0;
 }
 
 /* ریسپانسیو */
 @media (max-width: 1024px) {
-    .hero-container {
-        grid-template-columns: 1fr;
+    .content-wrapper {
+        flex-direction: column;
         gap: 2rem;
     }
 
-    .hero-title {
+    .content-item.right-image .content-wrapper,
+    .content-item.left-image .content-wrapper {
+        direction: rtl;
+    }
+
+    .content-item.right-image .content-image-side,
+    .content-item.left-image .content-image-side {
+        order: 1;
+    }
+
+    .content-item.right-image .content-title-side,
+    .content-item.left-image .content-title-side {
+        order: 2;
+        text-align: center;
+    }
+
+    .content-title {
         font-size: 2.5rem;
-    }
-
-    .hero-image {
-        height: 400px;
-    }
-
-    .stats-container {
-        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .hero-buttons {
-        flex-direction: column;
+    .content-image {
+        height: 250px;
     }
 
-    .btn-primary, .btn-secondary {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .hero-info {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .hero-title {
+    .content-title {
         font-size: 2rem;
     }
 
-    .hero-description {
-        font-size: 1rem;
-    }
-}
-
-/* انیمیشن‌ها */
-@keyframes textReveal {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .content-wrapper {
+        min-height: 300px;
     }
 }
 </style>
-
-<script>
-// انیمیشن اعداد آمار
-document.addEventListener('DOMContentLoaded', function() {
-    const statNumbers = document.querySelectorAll('.stat-number');
-
-    statNumbers.forEach(stat => {
-        const target = parseInt(stat.getAttribute('data-count'));
-        const suffix = stat.textContent.includes('+') ? '+' :
-                      stat.textContent.includes('k') ? 'k+' :
-                      stat.textContent.includes('%') ? '%' : '';
-
-        let start = 0;
-        const duration = 2000;
-        const increment = target / (duration / 16);
-
-        const timer = setInterval(() => {
-            start += increment;
-            if (start >= target) {
-                stat.textContent = target + suffix;
-                clearInterval(timer);
-            } else {
-                stat.textContent = Math.floor(start) + suffix;
-            }
-        }, 16);
-    });
-});
-</script>
