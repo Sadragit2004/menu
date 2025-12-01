@@ -25,3 +25,13 @@ def main(request):
 def main_content_view(request):
     contents = TextImageBlock.objects.all()
     return render(request, 'main_app/main_content.html', {'text_image_blocks': contents})
+
+
+
+
+
+from .models import Content
+
+def section1_view(request):
+    contents = Content.objects.filter(is_active=True).order_by('-created_at')
+    return render(request, 'main_app/section1.html', {'contents': contents})

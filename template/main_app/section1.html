@@ -1,0 +1,100 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+    {% for content in contents %}
+    <div class="flex flex-col lg:grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+
+        <!-- سمت چپ - محتوای متنی -->
+        <div class="order-2 lg:order-1 space-y-6 sm:space-y-8 text-center lg:text-right">
+            <!-- عنوان اصلی -->
+            <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight whitespace-nowrap">
+                {{ content.title }}
+            </h1>
+
+            <!-- دکمه‌ها -->
+            <div class="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                <a href='/panel/' class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition text-sm sm:text-base flex-1 sm:flex-none">
+                    منو رستوران 10 دقیقه
+                </a>
+                <a href='accounts/login' class="border border-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition text-sm sm:text-base flex-1 sm:flex-none">
+                    ثبت نام
+                </a>
+            </div>
+
+            <!-- توضیحات -->
+            <p class="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                {{ content.description }}
+            </p>
+        </div>
+
+        <!-- سمت راست - عکس بزرگ -->
+        <div class="order-1 lg:order-2 food-image w-full h-64 sm:h-80 lg:h-96">
+            <img
+                src="{{ content.image.url }}"
+                alt="{{ content.title }}"
+                class="w-full h-full object-cover"
+            >
+        </div>
+    </div>
+
+    <!-- خط جداکننده بین محتواها -->
+    {% if not forloop.last %}
+    <hr class="my-12 border-gray-800">
+    {% endif %}
+
+    {% endfor %}
+
+    <!-- آمار و ارقام (فقط یک بار نمایش داده شود) -->
+    {% if contents %}
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-12 sm:mt-20 pt-8 border-t border-gray-800">
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۵۰۰+</div>
+            <div class="text-gray-400 text-xs sm:text-sm">رستوران فعال</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۵۰k+</div>
+            <div class="text-gray-400 text-xs sm:text-sm">سفارش موفق</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۴.۹</div>
+            <div class="text-gray-400 text-xs sm:text-sm">امتیاز کاربران</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-black text-white">۹۸٪</div>
+            <div class="text-gray-400 text-xs sm:text-sm">رضایت مشتری</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* استایل‌های اضافی برای زیبایی بیشتر */
+.food-image {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.food-image:hover {
+    transform: scale(1.02);
+}
+
+.food-image img {
+    transition: transform 0.5s ease;
+}
+
+.food-image:hover img {
+    transform: scale(1.1);
+}
+
+/* استایل‌های ریسپانسیو */
+@media (max-width: 768px) {
+    .food-image {
+        height: 200px;
+    }
+
+    h1 {
+        font-size: 2rem !important;
+        white-space: normal !important;
+    }
+}
+</style>
