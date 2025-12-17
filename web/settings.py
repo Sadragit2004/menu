@@ -128,6 +128,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # settings.py
 TIME_ZONE = 'Asia/Tehran'
 USE_TZ = True
+USE_L10N = True
+USE_I18N = True
+
+LANGUAGE_CODE = 'fa-ir'
 
 
 USE_L10N = True

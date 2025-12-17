@@ -52,7 +52,7 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Sum, F
 from apps.plan.models import Plan
-from apps.user.models import CustomUser
+from apps.user.model.user import CustomUser
 
 class ProductOrder(models.Model):
     """سفارش اصلی که شامل پلن و کاربر است"""
@@ -112,7 +112,7 @@ class ProductOrder(models.Model):
     def calculate_prices(self):
         """محاسبه قیمت کل، مالیات و قیمت نهایی"""
         # قیمت محصولات
-    
+
         # قیمت محصولات (به تومان)
         items_total = self.items.aggregate(
             total=Sum(F('price') * F('quantity'))

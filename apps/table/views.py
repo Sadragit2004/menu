@@ -23,7 +23,7 @@ def restaurant_owner_required(view_func):
             return redirect('login')
         if not hasattr(request.user, 'restaurants') or not request.user.restaurants.exists():
             messages.error(request, "شما دسترسی به این بخش را ندارید")
-            return redirect('dashboard')
+            return redirect('panel:panel')
         return view_func(request, *args, **kwargs)
     return wrapper
 

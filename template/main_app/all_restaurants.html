@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}همه رستوران‌ها{% endblock %}
+
+{% block extra_css %}
+<style>
+    .restaurant-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    .restaurant-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    .restaurant-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .restaurant-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid white;
+        position: absolute;
+        top: -30px;
+        right: 20px;
+        object-fit: cover;
+    }
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 30px;
+    }
+    .no-more {
+        text-align: center;
+        padding: 30px;
+        color: #6b7280;
+        font-size: 16px;
+    }
+    .search-box {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+    }
+    .category-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .category-badge {
+        padding: 8px 16px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .category-badge:hover {
+        background: #e5e7eb;
+    }
+    .category-badge.active {
+        background: #3b82f6;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- هدر و جستجو -->
+        <div class="search-box">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">همه رستوران‌ها</h1>
+                <p class="text-gray-600">تعداد کل رستوران‌های فعال: <span class="font-bold">{{ total_restaurants }}</span></p>
+            </div>
+
+            <!-- فرم جستجو -->
+            <form method="get" id="searchForm">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow relative">
+                        <input type="text"
+                               name="search"
+                               id="searchInput"
+                               value="{{ request.GET.search }}"
+                               placeholder="جستجوی نام رستوران..."
+                               class="w-full px-6 py-4 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg">
+                        <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <select name="category" id="categorySelect" class="px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg">
+                        <option value="">همه دسته‌بندی‌ها</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+                                {{ cat.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- دسته‌بندی‌های سریع -->
+                <div class="category-filter">
+                    <div class="category-badge {% if not request.GET.category %}active{% endif %}"
+                         data-category="">
+                        همه
+                    </div>
+                    {% for cat in categories|slice:":8" %}
+                    <div class="category-badge {% if request.GET.category == cat.slug %}active{% endif %}"
+                         data-category="{{ cat.slug }}">
+                        {{ cat.title }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+
+        <!-- لیست رستوران‌ها -->
+        <div id="restaurantsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% include './_restaurant_list.html' %}
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
+            <p class="text-gray-600">در حال بارگذاری رستوران‌های بیشتر...</p>
+        </div>
+
+        <!-- No More Content -->
+        <div id="noMoreContent" class="no-more" style="display: none;">
+            <p class="mb-4">همه رستوران‌ها را مشاهده کردید!</p>
+            <a href="{% url 'latest_restaurants' %}" class="text-blue-600 hover:underline">
+                بازگشت به رستوران‌های جدید
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPage = 1;
+let isLoading = false;
+let hasMore = true;
+let searchQuery = "{{ request.GET.search|default:'' }}";
+let categoryQuery = "{{ request.GET.category|default:'' }}";
+
+// تابع لود رستوران‌های بیشتر
+function loadMoreRestaurants() {
+    if (isLoading || !hasMore) return;
+
+    isLoading = true;
+    currentPage++;
+
+    // نمایش اسپینر
+    document.getElementById('loadingSpinner').style.display = 'block';
+
+    // ارسال درخواست AJAX
+    fetch(`/api/restaurants/load-more/?page=${currentPage}&search=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(categoryQuery)}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // اضافه کردن رستوران‌های جدید
+            const container = document.getElementById('restaurantsContainer');
+            data.restaurants.forEach(restaurant => {
+                const restaurantCard = `
+                    <div class="restaurant-card">
+                        <div class="relative">
+                            ${restaurant.is_expired ?
+                                '<div class="expired-badge">منقضی شده</div>' :
+                                restaurant.days_until_expiry && restaurant.days_until_expiry <= 7 ?
+                                '<div class="expiring-soon-badge">انقضای نزدیک</div>' : ''}
+
+                            ${restaurant.cover_image ?
+                                `<img src="${restaurant.cover_image}" alt="${restaurant.title}" class="restaurant-image">` :
+                                `<div class="restaurant-image bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                                    <span class="text-gray-500 text-lg">بدون تصویر</span>
+                                </div>`}
+
+                            ${restaurant.logo ?
+                                `<img src="${restaurant.logo}" alt="${restaurant.title}" class="restaurant-logo">` : ''}
+                        </div>
+
+                        <div class="p-6 pt-8">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">${restaurant.title}</h3>
+
+                            ${restaurant.description ?
+                                `<p class="text-gray-600 text-sm mb-4 line-clamp-2">${restaurant.description}</p>` : ''}
+
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="text-sm text-gray-500">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        ${restaurant.created_at}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="${restaurant.menu_url}"
+                               class="block w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300">
+                                مشاهده منوی رستوران
+                            </a>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', restaurantCard);
+            });
+
+            // بررسی آیا محتوای بیشتری وجود دارد
+            hasMore = data.has_next;
+            if (!hasMore) {
+                document.getElementById('noMoreContent').style.display = 'block';
+            }
+        } else {
+            console.error('Error loading restaurants:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+    })
+    .finally(() => {
+        isLoading = false;
+        document.getElementById('loadingSpinner').style.display = 'none';
+    });
+}
+
+// تشخیص اسکرول برای Infinite Scroll
+let scrollTimeout;
+function handleScroll() {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        const scrollPosition = window.innerHeight + window.scrollY;
+        const pageHeight = document.documentElement.scrollHeight;
+
+        // اگر کاربر به 300px پایین صفحه رسید
+        if (pageHeight - scrollPosition < 300 && hasMore) {
+            loadMoreRestaurants();
+        }
+    }, 100);
+}
+
+// تغییر دسته‌بندی
+document.querySelectorAll('.category-badge').forEach(badge => {
+    badge.addEventListener('click', function() {
+        const category = this.dataset.category;
+        document.getElementById('categorySelect').value = category;
+        document.querySelectorAll('.category-badge').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('searchForm').submit();
+    });
+});
+
+// جستجوی تایپ با تاخیر
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        document.getElementById('searchForm').submit();
+    }, 500);
+});
+
+// بار اول که صفحه لود شد
+document.addEventListener('DOMContentLoaded', function() {
+    // بررسی آیا محتوای بیشتری برای لود وجود دارد
+    hasMore = {% if page_obj.has_next %}true{% else %}false{% endif %};
+
+    if (!hasMore && {{ page_obj.number }} > 1) {
+        document.getElementById('noMoreContent').style.display = 'block';
+    }
+
+    // افزودن listener برای اسکرول
+    window.addEventListener('scroll', handleScroll);
+
+    // اگر تعداد کمی رستوران داریم، فوراً بیشتر لود کنیم
+    if (document.querySelectorAll('.restaurant-card').length < 10 && hasMore) {
+        loadMoreRestaurants();
+    }
+});
+</script>
+{% endblock %}

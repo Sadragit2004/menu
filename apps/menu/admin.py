@@ -1,7 +1,9 @@
 from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from .models.menufreemodels.models import Category, Restaurant, MenuCategory, Food, ExchangeRate
+from django.utils import timezone
+from django.db.models import Count
+from .models.menufreemodels.models import Category, Restaurant, MenuCategory, Food, ExchangeRate, FoodRestaurant, MenuView
 from .helper import update_all_food_prices
 
 
@@ -59,20 +61,68 @@ class CategoryAdmin(admin.ModelAdmin, BilingualAdminMixin):
 
 @admin.register(Restaurant)
 class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
-    list_display = ['get_title_display', 'slug', 'phone', 'isActive', 'displayOrder', 'createdAt', 'get_logo_preview']
-    list_filter = ['isActive', 'createdAt']
-    search_fields = ['title', 'title_en', 'slug', 'phone', 'address', 'address_en']
-    readonly_fields = ['createdAt', 'updatedAt', 'get_logo_preview', 'get_cover_preview', 'get_title_display']
-    list_editable = ['isActive', 'displayOrder']
+    list_display = [
+        'get_title_display',
+        'slug',
+        'phone',
+        'total_menu_views',
+        'recent_menu_views',
+        'isActive',
+        'displayOrder',
+        'expiry_status_display',
+        'createdAt',
+        'get_logo_preview'
+    ]
+
+    list_filter = [
+        'isActive',
+        'createdAt',
+        'expireDate',
+    ]
+
+    search_fields = [
+        'title',
+        'title_en',
+        'slug',
+        'phone',
+        'address',
+        'address_en'
+    ]
+
+    readonly_fields = [
+        'createdAt',
+        'updatedAt',
+        'get_logo_preview',
+        'get_cover_preview',
+        'get_title_display',
+        'total_menu_views_display',
+        'daily_menu_views_display',
+        'weekly_menu_views_display',
+        'expiry_status_display',
+    ]
+
+    list_editable = [
+        'isActive',
+        'displayOrder'
+    ]
+
     prepopulated_fields = {"slug": ("title",)}
 
     fieldsets = (
         (_('Basic Information'), {
             'fields': (
                 'owner', 'get_title_display', 'title', 'title_en', 'slug', 'text',
-                'description', 'description_en','isSeo',
+                'description', 'description_en', 'isSeo',
                 'isActive', 'displayOrder'
             )
+        }),
+        (_('Menu View Statistics'), {
+            'fields': (
+                'total_menu_views_display',
+                'daily_menu_views_display',
+                'weekly_menu_views_display',
+            ),
+            'classes': ('collapse',)
         }),
         (_('Contact Information'), {
             'fields': ('phone', 'address', 'address_en')
@@ -83,8 +133,14 @@ class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
         (_('Business Settings'), {
             'fields': ('openingTime', 'closingTime', 'minimumOrder', 'deliveryFee', 'taxRate')
         }),
+        (_('Expiry Management'), {
+            'fields': (
+                'expireDate',
+                'expiry_status_display',
+            )
+        }),
         (_('Timestamps'), {
-            'fields': ('expireDate','createdAt', 'updatedAt'),
+            'fields': ('createdAt', 'updatedAt'),
             'classes': ('collapse',)
         }),
     )
@@ -100,6 +156,143 @@ class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
             return format_html('<img src="{}" width="80" height="40" style="border-radius: 3px;" />', obj.coverImage.url)
         return _("No Cover")
     get_cover_preview.short_description = _('Cover Preview')
+
+    # آمار بازدید منو
+    def total_menu_views(self, obj):
+        return obj.menu_views.count()
+    total_menu_views.short_description = _('Total Menu Views')
+    total_menu_views.admin_order_field = 'menu_views_count'
+
+    def recent_menu_views(self, obj):
+        from datetime import timedelta
+        since = timezone.now() - timedelta(days=7)
+        return obj.menu_views.filter(created_at__gte=since).count()
+    recent_menu_views.short_description = _('Recent Views (7d)')
+
+    def total_menu_views_display(self, obj):
+        count = self.total_menu_views(obj)
+        return format_html('<strong style="color: #007bff;">{:,}</strong>', count)
+    total_menu_views_display.short_description = _('Total Menu Views')
+
+    def daily_menu_views_display(self, obj):
+        from datetime import timedelta
+        since = timezone.now() - timedelta(hours=24)
+        count = obj.menu_views.filter(created_at__gte=since).count()
+        color = "green" if count > 0 else "gray"
+        return format_html('<strong style="color: {};">{:,}</strong>', color, count)
+    daily_menu_views_display.short_description = _('Daily Menu Views')
+
+    def weekly_menu_views_display(self, obj):
+        from datetime import timedelta
+        since = timezone.now() - timedelta(days=7)
+        count = obj.menu_views.filter(created_at__gte=since).count()
+        color = "orange" if count > 0 else "gray"
+        return format_html('<strong style="color: {};">{:,}</strong>', color, count)
+    weekly_menu_views_display.short_description = _('Weekly Menu Views')
+
+    # مدیریت انقضا
+    def expiry_status_display(self, obj):
+        status = obj.expiry_status
+        if "منقضی شده" in status:
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>', status)
+        elif "در آستانه انقضا" in status:
+            return format_html('<span style="color: orange; font-weight: bold;">{}</span>', status)
+        elif "فعال" in status:
+            return format_html('<span style="color: green; font-weight: bold;">{}</span>', status)
+        else:
+            return format_html('<span style="color: gray;">{}</span>', status)
+    expiry_status_display.short_description = _('Expiry Status')
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            menu_views_count=Count('menu_views')
+        )
+
+    # اکشن‌های سفارشی برای مدیریت انقضا
+    actions = ['extend_expiry_30_days', 'extend_expiry_90_days', 'deactivate_expired']
+
+    def extend_expiry_30_days(self, request, queryset):
+        success_count = 0
+        for restaurant in queryset:
+            success, message = restaurant.extend_expiry(30)
+            if success:
+                success_count += 1
+
+        if success_count > 0:
+            self.message_user(
+                request,
+                f"تاریخ انقضا برای {success_count} رستوران با موفقیت 30 روز تمدید شد",
+                messages.SUCCESS
+            )
+        else:
+            self.message_user(
+                request,
+                "هیچ رستورانی تمدید نشد",
+                messages.WARNING
+            )
+    extend_expiry_30_days.short_description = _("تمدید 30 روزه تاریخ انقضا برای رستوران‌های انتخاب شده")
+
+    def extend_expiry_90_days(self, request, queryset):
+        success_count = 0
+        for restaurant in queryset:
+            success, message = restaurant.extend_expiry(90)
+            if success:
+                success_count += 1
+
+        if success_count > 0:
+            self.message_user(
+                request,
+                f"تاریخ انقضا برای {success_count} رستوران با موفقیت 90 روز تمدید شد",
+                messages.SUCCESS
+            )
+        else:
+            self.message_user(
+                request,
+                "هیچ رستورانی تمدید نشد",
+                messages.WARNING
+            )
+    extend_expiry_90_days.short_description = _("تمدید 90 روزه تاریخ انقضا برای رستوران‌های انتخاب شده")
+
+    def deactivate_expired(self, request, queryset):
+        expired_restaurants = queryset.filter(expireDate__lt=timezone.now())
+        count = expired_restaurants.update(isActive=False)
+
+        if count > 0:
+            self.message_user(
+                request,
+                f"{count} رستوران منقضی شده غیرفعال شدند",
+                messages.SUCCESS
+            )
+        else:
+            self.message_user(
+                request,
+                "هیچ رستوران منقضی شده‌ای در بین موارد انتخاب شده وجود ندارد",
+                messages.WARNING
+            )
+    deactivate_expired.short_description = _("غیرفعال کردن رستوران‌های منقضی شده")
+
+    # نمایش وضعیت در لیست
+    def get_list_display(self, request):
+        list_display = super().get_list_display(request)
+        if not request.user.has_perm('menu.view_menuview'):
+            # اگر کاربر دسترسی به آمار بازدید ندارد، فیلدهای آمار را حذف کن
+            list_display = [field for field in list_display if 'menu_views' not in field]
+        return list_display
+
+    # دسترسی شرطی به فیلدها
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if not request.user.has_perm('menu.view_menuview'):
+            # اگر کاربر دسترسی به آمار بازدید ندارد، فیلدهای آمار را از readonly حذف کن
+            readonly_fields = [field for field in readonly_fields if 'menu_views' not in field]
+        return readonly_fields
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if not request.user.has_perm('menu.view_menuview'):
+            # اگر کاربر دسترسی به آمار بازدید ندارد، بخش آمار را حذف کن
+            fieldsets = [fieldset for fieldset in fieldsets if fieldset[0] != _('Menu View Statistics')]
+        return fieldsets
 
 
 @admin.register(MenuCategory)
@@ -241,7 +434,7 @@ class FoodAdmin(admin.ModelAdmin, BilingualAdminMixin):
             'fields': ('price', 'get_price_info', 'price_usd_cents')
         }),
         (_('Time & Settings'), {
-            'fields': ('preparationTime', 'isActive', 'displayOrder')
+            'fields': ('preparationTime', 'isActive', 'displayOrder','created_by')
         }),
         (_('Media'), {
             'fields': ('image', 'image_preview', 'sound', 'sound_preview')
@@ -279,3 +472,280 @@ class ExchangeRateAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(FoodRestaurant)
+class FoodRestaurantAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'restaurant_display',
+        'food_display',
+        'custom_price_display',
+        'final_price_display',
+        'custom_image_display',
+        'is_active',
+        'display_order',
+        'created_at'
+    ]
+
+    list_filter = [
+        'restaurant',
+        'is_active',
+        'created_at',
+        'updated_at'
+    ]
+
+    search_fields = [
+        'restaurant__title',
+        'food__title',
+        'food__description'
+    ]
+
+    readonly_fields = [
+        'created_at',
+        'updated_at',
+        'final_price_display',
+        'final_image_display'
+    ]
+
+    fieldsets = (
+        ('اطلاعات اصلی', {
+            'fields': (
+                'restaurant',
+                'food',
+                'is_active',
+                'display_order'
+            )
+        }),
+        ('شخصی‌سازی', {
+            'fields': (
+                'custom_price',
+                'custom_image',
+                'final_price_display',
+                'final_image_display'
+            )
+        }),
+        ('تاریخ‌ها', {
+            'fields': (
+                'created_at',
+                'updated_at'
+            )
+        }),
+    )
+
+    def restaurant_display(self, obj):
+        return obj.restaurant.title
+    restaurant_display.short_description = 'رستوران'
+
+    def food_display(self, obj):
+        return obj.food.title
+    food_display.short_description = 'غذا'
+
+    def custom_price_display(self, obj):
+        if obj.custom_price:
+            return f"{obj.custom_price:,} تومان"
+        return "---"
+    custom_price_display.short_description = 'قیمت کاستوم'
+
+    def final_price_display(self, obj):
+        return f"{obj.final_price:,} تومان"
+    final_price_display.short_description = 'قیمت نهایی'
+
+    def custom_image_display(self, obj):
+        if obj.custom_image:
+            return format_html(
+                '<img src="{}" width="50" height="50" style="border-radius: 5px;" />',
+                obj.custom_image.url
+            )
+        return "---"
+    custom_image_display.short_description = 'عکس کاستوم'
+
+    def final_image_display(self, obj):
+        if obj.final_image:
+            return format_html(
+                '<img src="{}" width="80" height="80" style="border-radius: 5px;" />',
+                obj.final_image.url
+            )
+        return "---"
+    final_image_display.short_description = 'عکس نهایی'
+
+    def has_customizations_display(self, obj):
+        return "✅" if obj.has_customizations() else "❌"
+    has_customizations_display.short_description = 'کاستوم شده'
+
+    actions = ['activate_selected', 'deactivate_selected', 'reset_customizations']
+
+    def activate_selected(self, request, queryset):
+        queryset.update(is_active=True)
+        self.message_user(request, "موارد انتخاب شده فعال شدند")
+    activate_selected.short_description = "فعال کردن موارد انتخاب شده"
+
+    def deactivate_selected(self, request, queryset):
+        queryset.update(is_active=False)
+        self.message_user(request, "موارد انتخاب شده غیرفعال شدند")
+    deactivate_selected.short_description = "غیرفعال کردن موارد انتخاب شده"
+
+    def reset_customizations(self, request, queryset):
+        updated_count = 0
+        for obj in queryset:
+            obj.custom_price = None
+            obj.custom_image = None
+            obj.save()
+            updated_count += 1
+        self.message_user(request, f"کاستومایزهای {updated_count} مورد بازنشانی شد")
+    reset_customizations.short_description = "بازنشانی کاستومایزها"
+
+    list_per_page = 25
+    ordering = ['-created_at']
+
+
+class SessionKeyFilter(admin.SimpleListFilter):
+    title = 'نوع بازدیدکننده'
+    parameter_name = 'session_type'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('with_session', 'با سشن'),
+            ('without_session', 'بدون سشن'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'with_session':
+            return queryset.exclude(session_key__isnull=True).exclude(session_key='')
+        if self.value() == 'without_session':
+            return queryset.filter(session_key__isnull=True) | queryset.filter(session_key='')
+
+
+class IPAddressFilter(admin.SimpleListFilter):
+    title = 'آدرس IP'
+    parameter_name = 'ip_type'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('with_ip', 'با IP'),
+            ('without_ip', 'بدون IP'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'with_ip':
+            return queryset.exclude(ip_address__isnull=True).exclude(ip_address='')
+        if self.value() == 'without_ip':
+            return queryset.filter(ip_address__isnull=True) | queryset.filter(ip_address='')
+
+
+@admin.register(MenuView)
+class MenuViewAdmin(admin.ModelAdmin):
+    list_display = [
+        'restaurant_name',
+        'session_short',
+        'ip_short',
+        'user_agent_short',
+        'created_at_formatted',
+        'is_recent'
+    ]
+
+    list_filter = [
+        'restaurant',
+        SessionKeyFilter,
+        IPAddressFilter,
+        'created_at',
+    ]
+
+    search_fields = [
+        'restaurant__title',
+        'restaurant__title_en',
+        'session_key',
+        'ip_address',
+        'user_agent',
+    ]
+
+    readonly_fields = [
+        'created_at',
+        'updated_at',
+        'view_duration',
+        'restaurant_name',
+    ]
+
+    fieldsets = (
+        ('اطلاعات اصلی', {
+            'fields': (
+                'restaurant_name',
+                'session_key',
+                'ip_address',
+            )
+        }),
+        ('اطلاعات مرورگر', {
+            'fields': (
+                'user_agent',
+            ),
+            'classes': ('collapse',)
+        }),
+        ('تاریخ‌ها', {
+            'fields': (
+                'created_at',
+                'updated_at',
+                'view_duration',
+            )
+        }),
+    )
+
+    def restaurant_name(self, obj):
+        return obj.restaurant.title
+    restaurant_name.short_description = 'رستوران'
+    restaurant_name.admin_order_field = 'restaurant__title'
+
+    def session_short(self, obj):
+        if obj.session_key:
+            return obj.session_key[:15] + '...' if len(obj.session_key) > 15 else obj.session_key
+        return 'بدون سشن'
+    session_short.short_description = 'سشن'
+
+    def ip_short(self, obj):
+        return obj.ip_address or 'ندارد'
+    ip_short.short_description = 'آدرس IP'
+
+    def user_agent_short(self, obj):
+        if obj.user_agent:
+            return obj.user_agent[:30] + '...' if len(obj.user_agent) > 30 else obj.user_agent
+        return 'ندارد'
+    user_agent_short.short_description = 'مرورگر'
+
+    def created_at_formatted(self, obj):
+        return obj.created_at.strftime('%Y-%m-%d %H:%M')
+    created_at_formatted.short_description = 'تاریخ ایجاد'
+    created_at_formatted.admin_order_field = 'created_at'
+
+    def is_recent(self, obj):
+        now = timezone.now()
+        if (now - obj.created_at).days < 1:
+            return 'امروز'
+        elif (now - obj.created_at).days < 7:
+            return 'هفته جاری'
+        return 'قدیمی'
+    is_recent.short_description = 'وضعیت'
+    is_recent.admin_order_field = 'created_at'
+
+    def view_duration(self, obj):
+        if obj.created_at and obj.updated_at:
+            duration = obj.updated_at - obj.created_at
+            seconds = duration.total_seconds()
+            if seconds < 60:
+                return f"{int(seconds)} ثانیه"
+            elif seconds < 3600:
+                return f"{int(seconds/60)} دقیقه"
+            else:
+                return f"{int(seconds/3600)} ساعت"
+        return "نامشخص"
+    view_duration.short_description = 'مدت بازدید'
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('restaurant')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return True

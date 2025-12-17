@@ -2,7 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import CustomUser, UserSecurity, UserDevice
+from .model.user import CustomUser
+from .model.security import UserSecurity
+from .model.device import UserDevice
 
 
 # =========================

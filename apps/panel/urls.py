@@ -37,4 +37,19 @@ urlpatterns = [
     path('orders/<int:order_id>/cancel/', viewsfree.cancel_order, name='cancel_order'),
     path('<slug:slug>/foods/<int:food_id>/toggle-selection/', viewsfree.toggle_food_selection, name='toggle_food_selection'),
     path('<slug:slug>/foods/<int:food_id>/assign-category/', viewsfree.assign_food_to_category, name='assign_food_to_category'),
+
+
+    # =================
+
+       path('<slug:restaurant_slug>/customized-foods/', viewsfree.get_customized_foods, name='get_customized_foods'),
+    path('<slug:restaurant_slug>/reset-customization/<int:food_id>/', viewsfree.reset_food_customization, name='reset_food_customization'),
+    path('<slug:restaurant_slug>/toggle-custom-food/<int:food_id>/', viewsfree.toggle_custom_food_status, name='toggle_custom_food_status'),
+    path('<slug:restaurant_slug>/bulk-customize-foods/', viewsfree.bulk_customize_foods, name='bulk_customize_foods'),
+    path('api/restaurant/food/<int:food_id>/details/', viewsfree.get_food_details, name='get_food_details'),
+    path('<slug:restaurant_slug>/settings/', viewsfree.restaurant_settings, name='restaurant_settings'),
+
+
+
+
+
 ]

@@ -39,6 +39,11 @@
             <nav class="mt-6">
               z
 
+
+                <a href="{% url 'table:dashboard' %}" class="nav-item flex items-center px-4 py-3 text-white hover:bg-blue-700 {% if 'table' in request.resolver_match.url_name %}bg-blue-900{% endif %}">
+                    <i class="fas fa-chair w-6"></i>
+                    <span class="nav-text mr-3"> داشبورد</span>
+                </a>
                 <a href="{% url 'table:table_list' %}" class="nav-item flex items-center px-4 py-3 text-white hover:bg-blue-700 {% if 'table' in request.resolver_match.url_name %}bg-blue-900{% endif %}">
                     <i class="fas fa-chair w-6"></i>
                     <span class="nav-text mr-3">مدیریت میزها</span>

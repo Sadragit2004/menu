@@ -1,3 +1,4 @@
+
 {% extends "panel_template.html" %}
 {% load static %}
 
@@ -10,9 +11,8 @@
     <title>پنل مدیریت - {{ restaurant.title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- اضافه کردن Select2 برای جستجوی بهتر -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="{% static 'assets/css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/admin236.css' %}">
 
 </head>
 
@@ -26,12 +26,14 @@
                 </div>
                 <span class="category-name">همه موارد</span>
             </div>
-             <div class="category-sidebar-item category-sidebar-btn add-category-mobile md:hidden" id="add-category-mobile-btn">
+
+            <div class="category-sidebar-item category-sidebar-btn add-category-mobile md:hidden" id="add-category-mobile-btn">
                 <div class="category-icon bg-gradient-to-br from-gray-400 to-gray-500 text-white shadow-md">
                     <i class="fas fa-plus"></i>
                 </div>
                 <span class="category-name">افزودن دسته</span>
             </div>
+
             {% for menu_category in menu_categories %}
             <div class="category-sidebar-item category-sidebar-btn {% if not menu_category.isActive %}category-inactive{% endif %}"
                  data-category="{{ menu_category.category.id }}" data-menu-category-id="{{ menu_category.id }}">
@@ -60,9 +62,6 @@
                 {% endif %}
             </div>
             {% endfor %}
-
-            <!-- Add Category Button for Mobile -->
-
         </aside>
 
         <!-- Main Content Section -->
@@ -70,74 +69,80 @@
             <!-- Header Controls -->
             <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">مدیریت منو - {{ restaurant.title }}</h2>
-                        <p class="text-gray-600 mt-1" id="current-category-text">همه غذاها</p>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">مدیریت منو - {{ restaurant.title }}</h2>
+                        <p class="text-gray-600" id="current-category-text">همه غذاها</p>
                     </div>
 
                     <!-- بخش اطلاعات انقضا -->
-                    <div class="flex flex-col items-end">
-                        <!-- وضعیت انقضا -->
-                        <div class="flex items-center gap-2 mb-2">
+                    <div class="flex flex-col items-end gap-3">
+                        <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-700">وضعیت انقضا:</span>
                             {% if expiry_info.is_expired %}
-                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                                <span class="bg-red-100 text-red-800 text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     منقضی شده
                                 </span>
                             {% elif expiry_info.days_until_expiry <= 7 %}
-                                <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                                <span class="bg-orange-100 text-orange-800 text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
                                     <i class="fas fa-clock"></i>
-                                    {{ expiry_info.days_until_expiry }} روز باقی مانده
+                                    {{ expiry_info.days_until_expiry }} روز باقی‌مانده
                                 </span>
                             {% else %}
-                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                                <span class="bg-green-100 text-green-800 text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
                                     <i class="fas fa-check-circle"></i>
-                                    {{ expiry_info.days_until_expiry }} روز باقی مانده
+                                    {{ expiry_info.days_until_expiry }} روز باقی‌مانده
                                 </span>
                             {% endif %}
                         </div>
 
-                        <!-- تاریخ انقضا -->
                         {% if expiry_info.expire_date %}
-                        <div class="text-xs text-gray-500">
+                        <div class="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
+                            <i class="fas fa-calendar-alt ml-1"></i>
                             انقضا: {{ expiry_info.expire_date|date:"Y/m/d - H:i" }}
                         </div>
                         {% else %}
-                        <div class="text-xs text-gray-500">
+                        <div class="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
+                            <i class="fas fa-infinity ml-1"></i>
                             بدون تاریخ انقضا
                         </div>
                         {% endif %}
                     </div>
+                </div>
 
-                    <div class="flex gap-3">
-                        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hidden md:flex" id="add-food-btn">
-                            <i class="fas fa-plus"></i>
-                            افزودن غذا
-                        </button>
+                <!-- دکمه‌های عملیاتی -->
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="add-food-btn">
+                        <i class="fas fa-plus"></i>
+                        افزودن غذا
+                    </button>
 
-                        <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hidden md:flex" id="quick-category-btn">
-                            <i class="fas fa-bolt"></i>
-                            افزودن سریع دسته
-                        </button>
+                    <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="quick-category-btn">
+                        <i class="fas fa-bolt"></i>
+                        افزودن سریع دسته
+                    </button>
 
-                        <button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hidden md:flex" id="manage-categories-btn">
-                            <i class="fas fa-tags"></i>
-                            دسته‌بندی‌ها
-                        </button>
+                    <button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="manage-categories-btn">
+                        <i class="fas fa-tags"></i>
+                        مدیریت دسته‌ها
+                    </button>
 
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hidden md:flex" id="restaurant-settings-btn">
-                            <i class="fas fa-cog"></i>
-                            تنظیمات رستوران
-                        </button>
-                    </div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="restaurant-settings-btn">
+                        <i class="fas fa-cog"></i>
+                        تنظیمات
+                    </button>
+
+                    <button class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="customize-foods-btn">
+                        <i class="fas fa-palette"></i>
+                        شخصی‌سازی
+                    </button>
                 </div>
 
                 <!-- Search and Filter -->
                 <div class="mt-6 flex flex-col md:flex-row gap-4 search-filter">
                     <div class="flex-1">
                         <div class="relative">
-                            <input type="text" placeholder="جستجوی غذا..." class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="search-input">
+                            <input type="text" placeholder="جستجوی غذا، دسته‌بندی یا قیمت..." class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" id="search-input">
                             <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
                             <button class="absolute left-3 top-3 text-gray-400 hover:text-gray-600 clear-search hidden" id="clear-search">
                                 <i class="fas fa-times"></i>
@@ -145,15 +150,18 @@
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent status-filter" id="status-filter">
+                        <select class="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" id="status-filter">
                             <option value="all">همه وضعیت‌ها</option>
                             <option value="active">فعال</option>
                             <option value="inactive">غیرفعال</option>
                         </select>
+                        <button class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium" id="filter-btn">
+                            <i class="fas fa-filter"></i>
+                            فیلتر
+                        </button>
                     </div>
                 </div>
             </div>
-
             <!-- Tab Navigation -->
             <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
                 <div class="flex border-b border-gray-200">
@@ -163,235 +171,446 @@
                     <button class="tab-btn py-2 px-4 font-medium text-gray-500 hover:text-gray-700 transition-colors" data-tab="all-foods">
                         همه غذاهای شرکت
                     </button>
+                    <button class="tab-btn py-2 px-4 font-medium text-gray-500 hover:text-gray-700 transition-colors" data-tab="customize-foods">
+                        شخصی‌سازی غذا
+                    </button>
                 </div>
             </div>
 
             <!-- Selected Foods Tab -->
-            <div id="selected-foods-tab" class="tab-content active">
-                <div id="foods-container">
-                    <!-- بخش همه غذاهای انتخاب شده -->
-                    <div class="foods-section active" id="foods-all">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 food-grid">
-                             {% if foods %}
-                            <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center min-h-64">
-                                <button class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 transition-colors p-6 add-food-to-category" data-category="all">
-                                    <i class="fas fa-plus-circle text-4xl mb-2"></i>
-                                    <span class="font-medium">افزودن غذای جدید</span>
-                                </button>
+           <!-- Selected Foods Tab -->
+           <!-- Selected Foods Tab -->
+<div id="selected-foods-tab" class="tab-content active">
+    <!-- هدر تب با دکمه رفرش -->
+    <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex gap-3">
+            <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                <i class="fas fa-building ml-1"></i>
+                غذاهای شرکت: {{ selected_company_foods_count }}
+            </span>
+            <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                <i class="fas fa-store ml-1"></i>
+                غذاهای خودم: {{ restaurant_own_foods_count }}
+            </span>
+        </div>
+
+        <!-- دکمه رفرش -->
+        <button class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="refresh-selected-foods-btn" title="رفرش صفحه">
+            <i class="fas fa-sync-alt"></i>
+
+           نهایی کردن محصولات
+        </button>
+    </div>
+
+    <div id="foods-container">
+        <!-- بخش همه غذاهای انتخاب شده -->
+        <div class="foods-section active" id="foods-all">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 food-grid">
+                {% if foods_data %}
+                <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center min-h-64">
+                    <button class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 transition-colors p-6 add-food-to-category" data-category="all">
+                        <i class="fas fa-plus-circle text-4xl mb-2"></i>
+                        <span class="font-medium">افزودن غذای جدید</span>
+                    </button>
+                </div>
+                {% endif %}
+
+                {% for food_data in foods_data %}
+                <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden selected"
+                    data-category="{{ food_data.menuCategory.category.id|default:'none' }}"
+                    data-status="{{ food_data.isActive|yesno:'active,inactive' }}"
+                    data-food-id="{{ food_data.id }}"
+                    data-created-by="{{ food_data.created_by }}">
+                    <div class="relative">
+                        {% if food_data.image %}
+                            <img src="{{ food_data.image.url }}" alt="{{ food_data.title }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-utensils text-gray-400 text-3xl"></i>
                             </div>
+                        {% endif %}
+                        <div class="absolute top-3 left-3 flex flex-col gap-1">
+                            <span class="status-badge {% if food_data.isActive %}status-active{% else %}status-inactive{% endif %}">
+                                {% if food_data.isActive %}فعال{% else %}غیرفعال{% endif %}
+                            </span>
+                            {% if food_data.is_customized %}
+                            <span class="customized-badge">
+                                <i class="fas fa-palette ml-1"></i> شخصی‌سازی شده
+                            </span>
                             {% endif %}
-                            {% for food in foods %}
-
-                            <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden selected" data-category="{{ food.menuCategory.category.id|default:'none' }}" data-status="{{ food.isActive|yesno:'active,inactive' }}" data-food-id="{{ food.id }}">
-                                <div class="relative">
-                                    {% if food.image %}
-                                        <img src="{{ food.image.url }}" alt="{{ food.title }}" class="w-full h-48 object-cover">
-                                    {% else %}
-                                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="{{ food.title }}" class="w-full h-48 object-cover">
-                                    {% endif %}
-                                    <div class="absolute top-3 left-3">
-                                        <span class="status-badge {% if food.isActive %}status-active{% else %}status-inactive{% endif %}">
-                                            {% if food.isActive %}فعال{% else %}غیرفعال{% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
-                                        <span class="font-bold text-green-600">{{ food.price|floatformat:0 }} تومان</span>
-                                    </div>
-                                    <div class="absolute bottom-3 left-3">
-                                        <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                            <i class="fas fa-check ml-1"></i> انتخاب شده
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-bold text-lg text-gray-800">{{ food.title }}</h3>
-                                        <div class="flex gap-1">
-                                            <button class="toggle-food-status text-{% if food.isActive %}orange{% else %}green{% endif %}-500 hover:text-{% if food.isActive %}orange{% else %}green{% endif %}-700 p-1 rounded" data-food-id="{{ food.id }}" title="{% if food.isActive %}غیرفعال کردن{% else %}فعال کردن{% endif %}">
-                                                <i class="fas fa-power-off"></i>
-                                            </button>
-                                            <button class="edit-food-btn text-blue-500 hover:text-blue-700 p-1 rounded" data-food-id="{{ food.id }}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded" data-food-id="{{ food.id }}" title="حذف از منو">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <p class="text-gray-600 text-sm mb-3">{{ food.description|default:"بدون توضیحات" }}</p>
-                                    <div class="flex justify-between items-center text-sm text-gray-500">
-                                        <div class="flex items-center gap-1">
-                                            <i class="fas fa-clock"></i>
-                                            <span>{{ food.preparationTime }} دقیقه</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <i class="fas fa-tag"></i>
-                                            <span>{{ food.menuCategory.category.title|default:"بدون دسته" }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <div class="col-span-full text-center py-12">
-                                <i class="fas fa-utensils text-4xl text-gray-300 mb-4"></i>
-                                <p class="text-gray-500 text-lg">هنوز غذایی اضافه نکرده‌اید</p>
-                                <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors" id="add-first-food-btn">
-                                    افزودن اولین غذا
-                                </button>
-                            </div>
-                            {% endfor %}
-
-                            <!-- Add New Food Card برای بخش همه -->
-
+                        </div>
+                        <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
+                            <span class="font-bold text-green-600">{{ food_data.price  }} تومان</span>
+                        </div>
+                        <div class="absolute bottom-3 left-3">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                <i class="fas fa-check ml-1"></i> انتخاب شده
+                            </span>
                         </div>
                     </div>
-
-                    <!-- بخش‌های دسته‌بندی‌ها -->
-                    {% for menu_category in menu_categories %}
-                    <div class="foods-section" id="foods-category-{{ menu_category.category.id }}">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 food-grid">
-                            {% for food in foods %}
-                                {% if food.menuCategory and food.menuCategory.category.id == menu_category.category.id %}
-                                <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden selected" data-category="{{ food.menuCategory.category.id|default:'none' }}" data-status="{{ food.isActive|yesno:'active,inactive' }}" data-food-id="{{ food.id }}">
-                                    <div class="relative">
-                                        {% if food.image %}
-                                            <img src="{{ food.image.url }}" alt="{{ food.title }}" class="w-full h-48 object-cover">
-                                        {% else %}
-                                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="{{ food.title }}" class="w-full h-48 object-cover">
-                                        {% endif %}
-                                        <div class="absolute top-3 left-3">
-                                            <span class="status-badge {% if food.isActive %}status-active{% else %}status-inactive{% endif %}">
-                                                {% if food.isActive %}فعال{% else %}غیرفعال{% endif %}
-                                            </span>
-                                        </div>
-                                        <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
-                                            <span class="font-bold text-green-600">{{ food.price|floatformat:0 }} تومان</span>
-                                        </div>
-                                        <div class="absolute bottom-3 left-3">
-                                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                                <i class="fas fa-check ml-1"></i> انتخاب شده
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="p-4">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-bold text-lg text-gray-800">{{ food.title }}</h3>
-                                            <div class="flex gap-1">
-                                                <button class="toggle-food-status text-{% if food.isActive %}orange{% else %}green{% endif %}-500 hover:text-{% if food.isActive %}orange{% else %}green{% endif %}-700 p-1 rounded" data-food-id="{{ food.id }}" title="{% if food.isActive %}غیرفعال کردن{% else %}فعال کردن{% endif %}">
-                                                    <i class="fas fa-power-off"></i>
-                                                </button>
-                                                <button class="edit-food-btn text-blue-500 hover:text-blue-700 p-1 rounded" data-food-id="{{ food.id }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded" data-food-id="{{ food.id }}" title="حذف از منو">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <p class="text-gray-600 text-sm mb-3">{{ food.description|default:"بدون توضیحات" }}</p>
-                                        <div class="flex justify-between items-center text-sm text-gray-500">
-                                            <div class="flex items-center gap-1">
-                                                <i class="fas fa-clock"></i>
-                                                <span>{{ food.preparationTime }} دقیقه</span>
-                                            </div>
-                                            <div class="flex items-center gap-1">
-                                                <i class="fas fa-tag"></i>
-                                                <span>{{ food.menuCategory.category.title|default:"بدون دسته" }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-gray-800">
+                                {% if food_data.created_by == 'company' %}
+                                    <i class="fas fa-building text-blue-500 ml-1" title="غذای شرکت"></i>
+                                {% else %}
+                                    <i class="fas fa-store text-green-500 ml-1" title="غذای رستوران"></i>
                                 {% endif %}
-                            {% endfor %}
-
-                            <!-- Add New Food Card برای این دسته‌بندی -->
-                            <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center min-h-64">
-                                <button class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 transition-colors p-6 add-food-to-category" data-category="{{ menu_category.id }}">
-                                    <i class="fas fa-plus-circle text-4xl mb-2"></i>
-                                    <span class="font-medium">افزودن غذای جدید</span>
+                                {% if food_data.is_customized %}
+                                <i class="fas fa-palette text-pink-500 ml-1" title="شخصی‌سازی شده"></i>
+                                {% endif %}
+                                {{ food_data.title }}
+                            </h3>
+                            <div class="flex gap-1">
+                                <button class="toggle-food-status text-{% if food_data.isActive %}orange{% else %}green{% endif %}-500 hover:text-{% if food_data.isActive %}orange{% else %}green{% endif %}-700 p-1 rounded"
+                                        data-food-id="{{ food_data.id }}"
+                                        title="{% if food_data.isActive %}غیرفعال کردن{% else %}فعال کردن{% endif %}">
+                                    <i class="fas fa-power-off"></i>
+                                </button>
+                                <button class="edit-food-btn text-blue-500 hover:text-blue-700 p-1 rounded"
+                                        data-food-id="{{ food_data.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded"
+                                        data-food-id="{{ food_data.id }}"
+                                        title="حذف از منو">
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </div>
+                        <p class="text-gray-600 text-sm mb-3">{{ food_data.description|default:"بدون توضیحات" }}</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ food_data.preparationTime|default:"-" }} دقیقه</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-tag"></i>
+                                <span>{{ food_data.menuCategory.category.title|default:"بدون دسته" }}</span>
+                            </div>
+                        </div>
                     </div>
-                    {% endfor %}
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-utensils text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">هنوز غذایی اضافه نکرده‌اید</p>
+                    <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors" id="add-first-food-btn">
+                        افزودن اولین غذا
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- بخش‌های دسته‌بندی‌ها -->
+        {% for menu_category in menu_categories %}
+        <div class="foods-section" id="foods-category-{{ menu_category.category.id }}">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 food-grid">
+                {% for food_data in foods_data %}
+                    {% if food_data.menuCategory and food_data.menuCategory.category.id == menu_category.category.id %}
+                    <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden selected"
+                        data-category="{{ food_data.menuCategory.category.id|default:'none' }}"
+                        data-status="{{ food_data.isActive|yesno:'active,inactive' }}"
+                        data-food-id="{{ food_data.id }}"
+                        data-created-by="{{ food_data.created_by }}">
+                        <div class="relative">
+                            {% if food_data.image %}
+                                <img src="{{ food_data.image.url }}" alt="{{ food_data.title }}" class="w-full h-48 object-cover">
+                            {% else %}
+                                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-utensils text-gray-400 text-3xl"></i>
+                                </div>
+                            {% endif %}
+                            <div class="absolute top-3 left-3 flex flex-col gap-1">
+                                <span class="status-badge {% if food_data.isActive %}status-active{% else %}status-inactive{% endif %}">
+                                    {% if food_data.isActive %}فعال{% else %}غیرفعال{% endif %}
+                                </span>
+                                {% if food_data.is_customized %}
+                                <span class="customized-badge">
+                                    <i class="fas fa-palette ml-1"></i> شخصی‌سازی شده
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
+                                <span class="font-bold text-green-600">{{ food_data.price  }} تومان</span>
+                            </div>
+                            <div class="absolute bottom-3 left-3">
+                                <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                    <i class="fas fa-check ml-1"></i> انتخاب شده
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-lg text-gray-800">
+                                    {% if food_data.created_by == 'company' %}
+                                        <i class="fas fa-building text-blue-500 ml-1" title="غذای شرکت"></i>
+                                    {% else %}
+                                        <i class="fas fa-store text-green-500 ml-1" title="غذای رستوران"></i>
+                                    {% endif %}
+                                    {% if food_data.is_customized %}
+                                    <i class="fas fa-palette text-pink-500 ml-1" title="شخصی‌سازی شده"></i>
+                                    {% endif %}
+                                    {{ food_data.title }}
+                                </h3>
+                                <div class="flex gap-1">
+                                    <button class="toggle-food-status text-{% if food_data.isActive %}orange{% else %}green{% endif %}-500 hover:text-{% if food_data.isActive %}orange{% else %}green{% endif %}-700 p-1 rounded"
+                                            data-food-id="{{ food_data.id }}"
+                                            title="{% if food_data.isActive %}غیرفعال کردن{% else %}فعال کردن{% endif %}">
+                                        <i class="fas fa-power-off"></i>
+                                    </button>
+                                    <button class="edit-food-btn text-blue-500 hover:text-blue-700 p-1 rounded"
+                                            data-food-id="{{ food_data.id }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded"
+                                            data-food-id="{{ food_data.id }}"
+                                            title="حذف از منو">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">{{ food_data.description|default:"بدون توضیحات" }}</p>
+                            <div class="flex justify-between items-center text-sm text-gray-500">
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-clock"></i>
+                                    <span>{{ food_data.preparationTime|default:"-" }} دقیقه</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-tag"></i>
+                                    <span>{{ food_data.menuCategory.category.title|default:"بدون دسته" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Add New Food Card برای این دسته‌بندی -->
+                <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center min-h-64">
+                    <button class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 transition-colors p-6 add-food-to-category" data-category="{{ menu_category.id }}">
+                        <i class="fas fa-plus-circle text-4xl mb-2"></i>
+                        <span class="font-medium">افزودن غذای جدید</span>
+                    </button>
                 </div>
             </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
-            <!-- All Foods Tab -->
-            <div id="all-foods-tab" class="tab-content">
+
+
+
+
+<!-- All Foods Tab -->
+<div id="all-foods-tab" class="tab-content">
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">همه غذاهای شرکت</h3>
+        <p class="text-gray-600 mb-4">
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm mr-2">سبز: انتخاب شده</span>
+            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">آبی: قابل انتخاب</span>
+        </p>
+
+        <!-- فیلتر دسته‌بندی -->
+       <!-- فیلتر دسته‌بندی -->
+<div class="mb-6">
+    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">دسته‌بندی:</label>
+        <div class="flex flex-wrap gap-2">
+            <button class="category-filter-btn px-4 py-2 bg-blue-500 text-white rounded-lg transition-colors text-sm font-medium active" data-category="all">
+                همه
+            </button>
+            {% for category in company_categories %}
+            <button class="category-filter-btn px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium" data-category="{{ category.id }}">
+                {{ category.title }}
+            </button>
+            {% empty %}
+            <span class="text-gray-500 text-sm">دسته‌بندی‌ای یافت نشد</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 food-grid" id="all-foods-container">
+            {% for food in all_foods %}
+            <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden {% if food.id in selected_food_ids %}border-2 border-green-500{% else %}border-2 border-blue-500{% endif %} fade-in food-item"
+                data-food-id="{{ food.id }}"
+                data-category="{{ food.menuCategory.category.id|default:'none' }}"
+                data-status="{{ food.isActive|yesno:'active,inactive' }}"
+                data-created-by="{{ food.created_by }}">
+                <div class="relative">
+                    {% if food.image %}
+                        <img src="{{ food.image.url }}" alt="{{ food.title }}" class="w-full h-48 object-cover">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-utensils text-gray-400 text-3xl"></i>
+                        </div>
+                    {% endif %}
+                    <div class="absolute top-3 left-3">
+                        <span class="status-badge {% if food.isActive %}status-active{% else %}status-inactive{% endif %}">
+                            {% if food.isActive %}فعال{% else %}غیرفعال{% endif %}
+                        </span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
+                        <span class="font-bold text-green-600">{{ food.price  }} تومان</span>
+                    </div>
+                    <div class="absolute bottom-3 left-3">
+                        {% if food.id in selected_food_ids %}
+                        <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check ml-1"></i> در منوی شما
+                        </span>
+                        {% else %}
+                        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-plus ml-1"></i> افزودن به منو
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-gray-800">
+                            <i class="fas fa-building text-blue-500 ml-1" title="غذای شرکت"></i>
+                            {{ food.title }}
+                        </h3>
+                        <div class="flex gap-1">
+                            {% if food.id in selected_food_ids %}
+                            <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded" data-food-id="{{ food.id }}" title="حذف از منو">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            {% else %}
+                            <button class="add-food-btn text-green-500 hover:text-green-700 p-1 rounded" data-food-id="{{ food.id }}" title="افزودن به منو">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            {% endif %}
+                            <button class="view-food-btn text-blue-500 hover:text-blue-700 p-1 rounded" data-food-id="{{ food.id }}" title="مشاهده جزئیات">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="food-stats-btn text-purple-500 hover:text-purple-700 p-1 rounded"
+                                    data-food-id="{{ food.id }}"
+                                    data-food-title="{{ food.title }}"
+                                    data-restaurant-count="{{ food.stats.restaurant_count }}"
+                                    data-avg-price="{{ food.stats.avg_price }}"
+                                    data-min-price="{{ food.stats.min_price }}"
+                                    data-max-price="{{ food.stats.max_price }}"
+                                    data-base-price="{{ food.price }}"
+                                    data-has-customizations="{{ food.stats.has_customizations|yesno:'true,false' }}"
+                                    title="مشاهده آمار">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">{{ food.description|default:"بدون توضیحات"|truncatewords:15 }}</p>
+
+                    <!-- آمار مختصر -->
+                    <div class="mb-3 p-2 bg-gray-50 rounded-lg">
+                        <div class="flex justify-between items-center text-xs text-gray-600">
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-store"></i>
+                                <span>{{ food.stats.restaurant_count }} رستوران</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>{{ food.stats.avg_price  }} تومان</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <div class="flex items-center gap-1">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ food.preparationTime|default:"-" }} دقیقه</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i class="fas fa-tag"></i>
+                            <span>{{ food.menuCategory.category.title|default:"بدون دسته" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-utensils text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg">هیچ غذایی توسط شرکت ثبت نشده است</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+            <!-- Customize Foods Tab -->
+            <!-- Customize Foods Tab -->
+            <div id="customize-foods-tab" class="tab-content">
                 <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">همه غذاهای شرکت</h3>
-                    <p class="text-gray-600 mb-4">غذاهای سبز رنگ قبلاً انتخاب شده‌اند و غذاهای قرمز رنگ قابل انتخاب هستند.</p>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">شخصی‌سازی غذاها</h3>
+                            <p class="text-gray-600 mt-1">در این بخش می‌توانید غذاهای شرکت را شخصی‌سازی کنید</p>
+                        </div>
+                        <button class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" id="open-customize-modal-btn">
+                            <i class="fas fa-palette"></i>
+                            شخصی‌سازی
+                        </button>
+                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 food-grid" id="all-foods-container">
-                        {% for food in all_foods %}
-                        <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden {% if food.id in selected_food_ids %}selected{% else %}available{% endif %} fade-in"
-                             data-food-id="{{ food.id }}"
-                             data-category="{{ food.menuCategory.category.id|default:'none' }}"
-                             data-status="{{ food.isActive|yesno:'active,inactive' }}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="customized-foods-container">
+                        {% for food_data in foods_data %}
+                        {% if food_data.is_customized and food_data.created_by == 'company' %}
+                        <div class="food-card bg-white rounded-xl shadow-sm overflow-hidden border-2 border-pink-200">
                             <div class="relative">
-                                {% if food.image %}
-                                    <img src="{{ food.image.url }}" alt="{{ food.title }}" class="w-full h-48 object-cover">
+                                {% if food_data.image %}
+                                    <img src="{{ food_data.image.url }}" alt="{{ food_data.title }}" class="w-full h-48 object-cover">
                                 {% else %}
-                                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="{{ food.title }}" class="w-full h-48 object-cover">
+                                    <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-utensils text-gray-400 text-3xl"></i>
+                                    </div>
                                 {% endif %}
                                 <div class="absolute top-3 left-3">
-                                    <span class="status-badge {% if food.isActive %}status-active{% else %}status-inactive{% endif %}">
-                                        {% if food.isActive %}فعال{% else %}غیرفعال{% endif %}
+                                    <span class="bg-pink-500 text-white text-xs px-2 py-1 rounded-full">
+                                        <i class="fas fa-palette ml-1"></i> شخصی‌سازی شده
                                     </span>
                                 </div>
                                 <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
-                                    <span class="font-bold text-green-600">{{ food.price|floatformat:0 }} تومان</span>
-                                </div>
-                                <div class="absolute bottom-3 left-3">
-                                    {% if food.id in selected_food_ids %}
-                                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                        <i class="fas fa-check ml-1"></i> انتخاب شده
-                                    </span>
-                                    {% else %}
-                                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                                        <i class="fas fa-plus ml-1"></i> قابل انتخاب
-                                    </span>
-                                    {% endif %}
+                                    <span class="font-bold text-green-600">{{ food_data.price  }} تومان</span>
                                 </div>
                             </div>
                             <div class="p-4">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-lg text-gray-800">{{ food.title }}</h3>
-                                    <div class="flex gap-1">
-                                        {% if food.id in selected_food_ids %}
-                                        <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded" data-food-id="{{ food.id }}" title="حذف از منو">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        {% else %}
-                                        <button class="add-food-btn text-green-500 hover:text-green-700 p-1 rounded" data-food-id="{{ food.id }}" title="افزودن به منو">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                        {% endif %}
-                                        <button class="view-food-btn text-blue-500 hover:text-blue-700 p-1 rounded" data-food-id="{{ food.id }}" title="مشاهده جزئیات">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-3">{{ food.description|default:"بدون توضیحات" }}</p>
+                                <h3 class="font-bold text-lg text-gray-800 mb-2">
+                                    <i class="fas fa-building text-blue-500 ml-1"></i>
+                                    {{ food_data.title }}
+                                </h3>
+                                <p class="text-gray-600 text-sm mb-3">{{ food_data.description|default:"بدون توضیحات"|truncatewords:15 }}</p>
                                 <div class="flex justify-between items-center text-sm text-gray-500">
                                     <div class="flex items-center gap-1">
                                         <i class="fas fa-clock"></i>
-                                        <span>{{ food.preparationTime }} دقیقه</span>
+                                        <span>{{ food_data.preparationTime|default:"-" }} دقیقه</span>
                                     </div>
                                     <div class="flex items-center gap-1">
                                         <i class="fas fa-tag"></i>
-                                        <span>{{ food.menuCategory.category.title|default:"بدون دسته" }}</span>
+                                        <span>{{ food_data.menuCategory.category.title|default:"بدون دسته" }}</span>
                                     </div>
+                                </div>
+                                <div class="mt-3 flex gap-2">
+                                    <button class="edit-custom-food-btn text-blue-500 hover:text-blue-700 text-sm" data-food-id="{{ food_data.id }}">
+                                        <i class="fas fa-edit ml-1"></i> ویرایش
+                                    </button>
+                                    <button class="reset-custom-food-btn text-red-500 hover:text-red-700 text-sm" data-food-id="{{ food_data.id }}">
+                                        <i class="fas fa-undo ml-1"></i> بازنشانی
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        {% empty %}
-                        <div class="col-span-full text-center py-12">
-                            <i class="fas fa-utensils text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500 text-lg">هیچ غذایی در سیستم ثبت نشده است</p>
-                        </div>
+                        {% endif %}
                         {% endfor %}
+
+                        {% if not foods_data %}
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-palette text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500 text-lg">هنوز غذایی شخصی‌سازی نکرده‌اید</p>
+                            <p class="text-gray-400 text-sm mt-2">برای شروع، غذاهایی از شرکت به منو اضافه کنید</p>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -420,10 +639,214 @@
                 <i class="fas fa-cog"></i>
                 <span class="fab-label">تنظیمات</span>
             </div>
+            <div class="fab-item" id="fab-customize-foods">
+                <i class="fas fa-palette"></i>
+                <span class="fab-label">شخصی‌سازی</span>
+            </div>
         </div>
     </div>
 
-    <div id="food-modal" class="modal">
+    <!-- مودال آمار غذا -->
+    <div id="food-stats-modal" class="modal">
+        <div class="modal-content p-6" style="max-width: 500px;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800" id="stats-modal-title">آمار غذا</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- کارت آمار اصلی -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800" id="stats-food-title"></h4>
+                            <p class="text-sm text-gray-600">آمار کلی در بین رستوران‌ها</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white rounded-lg p-3 text-center border">
+                            <div class="text-2xl font-bold text-blue-600" id="stats-restaurant-count">0</div>
+                            <div class="text-xs text-gray-600 mt-1">تعداد رستوران</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border">
+                            <div class="text-2xl font-bold text-green-600" id="stats-avg-price">0</div>
+                            <div class="text-xs text-gray-600 mt-1">میانگین قیمت</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- محدوده قیمت -->
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <h5 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-money-bill-wave text-green-500"></i>
+                        محدوده قیمت
+                    </h5>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">قیمت پایه شرکت:</span>
+                            <span class="font-bold text-gray-800" id="stats-base-price">0 تومان</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">کمترین قیمت:</span>
+                            <span class="font-bold text-green-600" id="stats-min-price">0 تومان</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">بالاترین قیمت:</span>
+                            <span class="font-bold text-red-600" id="stats-max-price">0 تومان</span>
+                        </div>
+                    </div>
+
+                    <!-- نوار پیشرفت قیمت -->
+                    <div class="mt-3">
+                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                            <span id="stats-min-label">0</span>
+                            <span id="stats-max-label">0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-green-400 to-red-400 h-2 rounded-full" id="price-range-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- اطلاعات تکمیلی -->
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <h5 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                        اطلاعات تکمیلی
+                    </h5>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span id="stats-customization-status">این غذا توسط رستوران‌ها شخصی‌سازی شده است</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                            <span>میانگین قیمت می‌تواند راهنمای خوبی برای قیمت‌گذاری باشد</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors close-modal">بستن</button>
+                <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2" id="customize-from-stats-btn">
+                    <i class="fas fa-palette"></i>
+                    شخصی‌سازی این غذا
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال شخصی‌سازی غذا -->
+    <div id="customize-foods-modal" class="modal">
+    <div class="modal-content p-6" style="max-width: 900px;">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800">شخصی‌سازی غذاهای شرکت</h3>
+            <button class="close-modal text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-2">در این بخش می‌توانید غذاهای شرکت را شخصی‌سازی کنید</p>
+            <div class="relative">
+                <input type="text" id="customize-search" placeholder="جستجوی غذا برای شخصی‌سازی..."
+                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50" id="customize-foods-list">
+            {% for food_data in company_foods_for_customization %}
+            <div class="customize-food-item bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-200">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-start gap-3">
+                            {% if food_data.image %}
+                                <img src="{{ food_data.image.url }}" alt="{{ food_data.title }}" class="w-16 h-16 rounded-lg object-cover">
+                            {% else %}
+                                <div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-utensils text-gray-400"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800">
+                                    {% if food_data.is_customized %}
+                                    <i class="fas fa-palette text-pink-500 ml-1" title="شخصی‌سازی شده"></i>
+                                    {% endif %}
+                                    {{ food_data.title }}
+                                </h4>
+                                <p class="text-gray-600 text-sm mt-1">{{ food_data.description|default:"بدون توضیحات"|truncatewords:10 }}</p>
+                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-clock"></i>
+                                        <span>{{ food_data.preparationTime }} دقیقه</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-tag"></i>
+                                        <span>{{ food_data.menuCategory.category.title|default:"بدون دسته" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3 min-w-64">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">قیمت جدید (تومان)</label>
+                            <input type="number"
+                                   class="custom-price-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   value="{{ food_data.price  }}"
+                                   min="0"
+                                   data-food-id="{{ food_data.id }}"
+                                   data-original-price="{{ food_data.price  }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">تصویر جدید</label>
+                            <div class="file-input-container">
+                                <input type="file" class="custom-image-input hidden" data-food-id="{{ food_data.id }}" accept="image/*" id="custom-image-{{ food_data.id }}">
+                                <label for="custom-image-{{ food_data.id }}" class="block w-full px-3 py-2 border border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-50 transition-colors text-sm">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    انتخاب تصویر
+                                </label>
+                            </div>
+                            {% if food_data.image %}
+                            <div class="mt-2 text-center">
+                                <img src="{{ food_data.image.url }}" class="custom-image-preview max-w-20 max-h-20 rounded-lg mx-auto" id="preview-{{ food_data.id }}">
+                                <p class="text-xs text-gray-500 mt-1">تصویر فعلی</p>
+                            </div>
+                            {% else %}
+                            <img class="custom-image-preview mt-2 hidden max-w-20 max-h-20 rounded-lg mx-auto" id="preview-{{ food_data.id }}">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-8">
+                <i class="fas fa-utensils text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">هیچ غذایی از شرکت در منوی شما وجود ندارد</p>
+                <p class="text-gray-400 text-sm mt-2">برای شخصی‌سازی، ابتدا غذاهایی از شرکت به منو اضافه کنید</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors close-modal">انصراف</button>
+            <button type="button" class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center gap-2" id="confirm-customization-btn">
+                <i class="fas fa-check"></i>
+                تأیید شخصی‌سازی
+            </button>
+        </div>
+    </div>
+</div>
+    <!-- سایر مودال‌ها -->
+   <div id="food-modal" class="modal">
         <div class="modal-content p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800" id="modal-title">افزودن غذا</h3>
@@ -631,75 +1054,902 @@
 
 
     <!-- مودال انتخاب سریع دسته‌بندی -->
-<!-- مودال انتخاب سریع دسته‌بندی -->
-<div id="quick-category-modal" class="modal">
-    <div class="modal-content p-6" style="max-width: 800px;">
+    <div id="quick-category-modal" class="modal">
+        <div class="modal-content p-6" style="max-width: 800px;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">انتخاب سریع دسته‌بندی‌ها</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <div class="relative">
+                    <input type="text" id="category-search" placeholder="جستجوی دسته‌بندی..."
+                           class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50" id="category-tree-container">
+                <!-- محتوای درخت دسته‌بندی‌ها اینجا لود می‌شود -->
+                <div class="text-center py-8">
+                    <div class="loading mx-auto"></div>
+                    <p class="text-gray-500 mt-2">در حال بارگذاری دسته‌بندی‌ها...</p>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 hidden" id="selected-categories-info">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-check text-blue-500"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-blue-800" id="selected-categories-count">0 دسته‌بندی انتخاب شده</p>
+                        <p class="text-sm text-blue-600">برای افزودن به منو روی دکمه تأیید کلیک کنید</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-2" id="selected-categories-list">
+                    <!-- لیست دسته‌بندی‌های انتخاب شده اینجا نمایش داده می‌شود -->
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mt-6">
+                <div class="flex gap-2">
+                    <button type="button" class="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" id="select-all-categories">
+                        انتخاب همه
+                    </button>
+                    <button type="button" class="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" id="deselect-all-categories">
+                        لغو انتخاب همه
+                    </button>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors close-modal">انصراف</button>
+                    <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 disabled:bg-blue-300 disabled:cursor-not-allowed" id="confirm-categories-btn" disabled>
+                        <i class="fas fa-check"></i>
+                        تأیید  افزودن
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+<!-- Modal for Restaurant Settings -->
+<div id="restaurant-settings-modal" class="modal">
+    <div class="modal-content p-6" style="max-width: 900px;">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold text-gray-800">انتخاب سریع دسته‌بندی‌ها</h3>
+            <h3 class="text-lg font-bold text-gray-800">تنظیمات رستوران - {{ restaurant.title }}</h3>
             <button class="close-modal text-gray-500 hover:text-gray-700">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <div class="mb-4">
-            <div class="relative">
-                <input type="text" id="category-search" placeholder="جستجوی دسته‌بندی..."
-                       class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-            </div>
-        </div>
+        <form id="restaurant-settings-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" id="restaurant-id" value="{{ restaurant.id }}">
 
-        <div class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50" id="category-tree-container">
-            <!-- محتوای درخت دسته‌بندی‌ها اینجا لود می‌شود -->
-            <div class="text-center py-8">
-                <div class="loading mx-auto"></div>
-                <p class="text-gray-500 mt-2">در حال بارگذاری دسته‌بندی‌ها...</p>
-            </div>
-        </div>
+            <!-- Color Palette Section -->
+            <div class="mb-8">
+                <h4 class="text-md font-semibold text-gray-800 mb-3 pb-2 border-b">
+                    <i class="fas fa-palette text-purple-500 ml-2"></i>
+                    پالت رنگی رستوران
+                </h4>
+                <p class="text-sm text-gray-600 mb-4">رنگ‌های اصلی رستوران خود را انتخاب کنید. این رنگ‌ها در منو و صفحات عمومی نمایش داده می‌شوند.</p>
 
-        <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 hidden" id="selected-categories-info">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <i class="fas fa-check text-blue-500"></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Primary Color -->
+                    <div class="color-picker-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رنگ اصلی</label>
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <input type="color"
+                                       id="primary-color"
+                                       name="primary_color"
+                                       value="{{ restaurant.primary_color|default:'#3B82F6' }}"
+                                       class="w-12 h-12 cursor-pointer rounded-lg border border-gray-300">
+                                <input type="text"
+                                       id="primary-color-hex"
+                                       value="{{ restaurant.primary_color|default:'#3B82F6' }}"
+                                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                                       maxlength="7">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-500">رنگ اصلی برای دکمه‌ها و المان‌های مهم</p>
+                                <div class="mt-1 flex gap-2">
+                                    <button type="button" class="preset-color-btn px-2 py-1 text-xs border border-gray-200 rounded"
+                                            data-color="#3B82F6" title="آبی">
+                                        <div class="w-4 h-4 rounded bg-blue-500 inline-block ml-1"></div>
+                                        آبی
+                                    </button>
+                                    <button type="button" class="preset-color-btn px-2 py-1 text-xs border border-gray-200 rounded"
+                                            data-color="#10B981" title="سبز">
+                                        <div class="w-4 h-4 rounded bg-green-500 inline-block ml-1"></div>
+                                        سبز
+                                    </button>
+                                    <button type="button" class="preset-color-btn px-2 py-1 text-xs border border-gray-200 rounded"
+                                            data-color="#F59E0B" title="نارنجی">
+                                        <div class="w-4 h-4 rounded bg-orange-500 inline-block ml-1"></div>
+                                        نارنجی
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Color -->
+                    <div class="color-picker-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رنگ ثانویه</label>
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <input type="color"
+                                       id="secondary-color"
+                                       name="secondary_color"
+                                       value="{{ restaurant.secondary_color|default:'#10B981' }}"
+                                       class="w-12 h-12 cursor-pointer rounded-lg border border-gray-300">
+                                <input type="text"
+                                       id="secondary-color-hex"
+                                       value="{{ restaurant.secondary_color|default:'#10B981' }}"
+                                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                                       maxlength="7">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-500">رنگ برای دکمه‌های ثانویه و حاشیه‌ها</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Color -->
+                    <div class="color-picker-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رنگ پس‌زمینه</label>
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <input type="color"
+                                       id="background-color"
+                                       name="background_color"
+                                       value="{{ restaurant.background_color|default:'#F9FAFB' }}"
+                                       class="w-12 h-12 cursor-pointer rounded-lg border border-gray-300">
+                                <input type="text"
+                                       id="background-color-hex"
+                                       value="{{ restaurant.background_color|default:'#F9FAFB' }}"
+                                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                                       maxlength="7">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-500">رنگ پس‌زمینه صفحات منو</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Color -->
+                    <div class="color-picker-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رنگ متن</label>
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <input type="color"
+                                       id="text-color"
+                                       name="text_color"
+                                       value="{{ restaurant.text_color|default:'#1F2937' }}"
+                                       class="w-12 h-12 cursor-pointer rounded-lg border border-gray-300">
+                                <input type="text"
+                                       id="text-color-hex"
+                                       value="{{ restaurant.text_color|default:'#1F2937' }}"
+                                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                                       maxlength="7">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-500">رنگ اصلی متن‌ها</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-medium text-blue-800" id="selected-categories-count">0 دسته‌بندی انتخاب شده</p>
-                    <p class="text-sm text-blue-600">برای افزودن به منو روی دکمه تأیید کلیک کنید</p>
+
+                <!-- Color Preview -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h5 class="text-sm font-medium text-gray-700 mb-2">پیش‌نمایش پالت رنگی</h5>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <div class="h-8 rounded-lg mb-2" id="preview-primary" style="background-color: #3B82F6;"></div>
+                            <div class="text-xs text-center text-gray-600">رنگ اصلی</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="h-8 rounded-lg mb-2" id="preview-secondary" style="background-color: #10B981;"></div>
+                            <div class="text-xs text-center text-gray-600">رنگ ثانویه</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="h-8 rounded-lg mb-2 border border-gray-300" id="preview-background" style="background-color: #F9FAFB;"></div>
+                            <div class="text-xs text-center text-gray-600">پس‌زمینه</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="h-8 rounded-lg mb-2 flex items-center justify-center" id="preview-text" style="background-color: #1F2937; color: white;">
+                                متن
+                            </div>
+                            <div class="text-xs text-center text-gray-600">متن</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2 mt-2" id="selected-categories-list">
-                <!-- لیست دسته‌بندی‌های انتخاب شده اینجا نمایش داده می‌شود -->
-            </div>
-        </div>
 
-        <div class="flex justify-between items-center mt-6">
-            <div class="flex gap-2">
-                <button type="button" class="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" id="select-all-categories">
-                    انتخاب همه
+            <!-- Logo Section -->
+            <div class="mb-8">
+                <h4 class="text-md font-semibold text-gray-800 mb-3 pb-2 border-b">
+                    <i class="fas fa-image text-blue-500 ml-2"></i>
+                    لوگو و تصاویر رستوران
+                </h4>
+
+                <!-- Current Logo -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">لوگو فعلی</label>
+                    <div class="flex items-center gap-4">
+                        {% if restaurant.logo %}
+                            <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title }}" class="w-24 h-24 rounded-lg border border-gray-300 object-cover">
+                        {% else %}
+                            <div class="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                <i class="fas fa-store text-gray-400 text-2xl"></i>
+                            </div>
+                        {% endif %}
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-600 mb-2">لوگو در بالای منو و صفحات عمومی نمایش داده می‌شود.</p>
+                            <p class="text-xs text-gray-500">توصیه می‌شود از تصویر مربعی با ابعاد 200×200 پیکسل استفاده کنید.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload New Logo -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">آپلود لوگو جدید</label>
+                    <div class="file-input-container">
+                        <input type="file" id="restaurant-logo" name="logo" class="file-input" accept="image/*">
+                        <label for="restaurant-logo" class="block w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                            <p class="font-medium text-gray-700">برای آپلود کلیک کنید یا فایل را اینجا بکشید</p>
+                            <p class="text-sm text-gray-500 mt-1">JPG, PNG یا GIF - حداکثر 2MB</p>
+                        </label>
+                    </div>
+                    <div class="mt-2 flex justify-center">
+                        <img id="logo-preview" class="hidden w-32 h-32 rounded-lg border border-gray-300 object-cover">
+                    </div>
+                </div>
+
+                <!-- Cover Image -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">تصویر کاور (اختیاری)</label>
+                    <div class="flex items-center gap-4 mb-3">
+                        {% if restaurant.coverImage %}
+                            <img src="{{ restaurant.coverImage.url }}" alt="{{ restaurant.title }}" class="w-32 h-20 rounded-lg border border-gray-300 object-cover">
+                        {% else %}
+                            <div class="w-32 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-xl"></i>
+                            </div>
+                        {% endif %}
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-600">تصویر کاور در صفحه اصلی رستوران نمایش داده می‌شود.</p>
+                        </div>
+                    </div>
+                    <div class="file-input-container">
+                        <input type="file" id="restaurant-cover" name="cover_image" class="file-input" accept="image/*">
+                        <label for="restaurant-cover" class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-50 transition-colors text-sm">
+                            <i class="fas fa-upload mr-2"></i>
+                            انتخاب تصویر کاور
+                        </label>
+                    </div>
+                    <div class="mt-2 flex justify-center">
+                        <img id="cover-preview" class="hidden w-48 h-24 rounded-lg border border-gray-300 object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Settings -->
+            <div class="mb-8">
+                <h4 class="text-md font-semibold text-gray-800 mb-3 pb-2 border-b">
+                    <i class="fas fa-cogs text-gray-500 ml-2"></i>
+                    تنظیمات اضافی
+                </h4>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Theme Preference -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تم رستوران</label>
+                        <select id="theme-preference" name="theme" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="light" {% if restaurant.theme == 'light' %}selected{% endif %}>روشن</option>
+                            <option value="dark" {% if restaurant.theme == 'dark' %}selected{% endif %}>تیره</option>
+                            <option value="auto" {% if restaurant.theme == 'auto' or not restaurant.theme %}selected{% endif %}>خودکار (متناسب با سیستم)</option>
+                        </select>
+                    </div>
+
+                    <!-- Menu Style -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سبک نمایش منو</label>
+                        <select id="menu-style" name="menu_style" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="grid" {% if restaurant.menu_style == 'grid' %}selected{% endif %}>شبکه‌ای (کارت‌ها)</option>
+                            <option value="list" {% if restaurant.menu_style == 'list' %}selected{% endif %}>لیستی</option>
+                            <option value="compact" {% if restaurant.menu_style == 'compact' %}selected{% endif %}>فشرده</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Toggle Settings -->
+                <div class="mt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">نمایش قیمت به دلار</label>
+                            <p class="text-xs text-gray-500">نمایش همزمان قیمت به تومان و دلار</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-usd-price" name="show_usd_price" {% if restaurant.show_usd_price %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">نمایش زمان آماده‌سازی</label>
+                            <p class="text-xs text-gray-500">نمایش زمان آماده‌سازی غذاها</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-preparation-time" name="show_preparation_time" {% if restaurant.show_preparation_time|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">فعال‌سازی منو</label>
+                            <p class="text-xs text-gray-500">منو برای کاربران قابل مشاهده باشد</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="menu-active" name="menu_active" {% if restaurant.menu_active|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors close-modal">
+                    انصراف
                 </button>
-                <button type="button" class="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" id="deselect-all-categories">
-                    لغو انتخاب همه
+                <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2" id="reset-settings-btn">
+                    <i class="fas fa-undo"></i>
+                    بازنشانی
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2" id="save-settings-btn">
+                    <i class="fas fa-save"></i>
+                    ذخیره تنظیمات
+                    <div class="loading hidden" id="settings-loading"></div>
                 </button>
             </div>
-            <div class="flex gap-3">
-                <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors close-modal">انصراف</button>
-                <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 disabled:bg-blue-300 disabled:cursor-not-allowed" id="confirm-categories-btn" disabled>
-                    <i class="fas fa-check"></i>
-                    تأیید  افزودن
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
+
+<!-- JavaScript for Settings Modal -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Open Settings Modal
+    document.getElementById('restaurant-settings-btn').addEventListener('click', function() {
+        openModal('restaurant-settings-modal');
+        updateColorPreviews();
+    });
+
+    // Color picker functionality
+    function setupColorPicker(colorInputId, hexInputId) {
+        const colorInput = document.getElementById(colorInputId);
+        const hexInput = document.getElementById(hexInputId);
+
+        colorInput.addEventListener('input', function() {
+            hexInput.value = this.value.toUpperCase();
+            updateColorPreviews();
+        });
+
+        hexInput.addEventListener('input', function() {
+            let value = this.value;
+            if (!value.startsWith('#')) {
+                value = '#' + value;
+            }
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                colorInput.value = value;
+                updateColorPreviews();
+            }
+        });
+
+        hexInput.addEventListener('blur', function() {
+            let value = this.value.trim();
+            if (!value.startsWith('#')) {
+                value = '#' + value;
+            }
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                this.value = value.toUpperCase();
+                colorInput.value = value;
+                updateColorPreviews();
+            } else {
+                this.value = colorInput.value.toUpperCase();
+            }
+        });
+    }
+
+    // Setup color pickers
+    setupColorPicker('primary-color', 'primary-color-hex');
+    setupColorPicker('secondary-color', 'secondary-color-hex');
+    setupColorPicker('background-color', 'background-color-hex');
+    setupColorPicker('text-color', 'text-color-hex');
+
+    // Preset color buttons
+    document.querySelectorAll('.preset-color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const color = this.getAttribute('data-color');
+            document.getElementById('primary-color').value = color;
+            document.getElementById('primary-color-hex').value = color;
+            updateColorPreviews();
+        });
+    });
+
+    // Update color previews
+    function updateColorPreviews() {
+        document.getElementById('preview-primary').style.backgroundColor =
+            document.getElementById('primary-color').value;
+        document.getElementById('preview-secondary').style.backgroundColor =
+            document.getElementById('secondary-color').value;
+        document.getElementById('preview-background').style.backgroundColor =
+            document.getElementById('background-color').value;
+        document.getElementById('preview-text').style.backgroundColor =
+            document.getElementById('text-color').value;
+    }
+
+    // Logo preview
+    document.getElementById('restaurant-logo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('logo-preview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Cover preview
+    document.getElementById('restaurant-cover').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('cover-preview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Reset settings
+    document.getElementById('reset-settings-btn').addEventListener('click', function() {
+        if (confirm('آیا مطمئن هستید که می‌خواهید تمام تنظیمات به حالت پیش‌فرض بازنشانی شوند؟')) {
+            document.getElementById('primary-color').value = '#3B82F6';
+            document.getElementById('primary-color-hex').value = '#3B82F6';
+            document.getElementById('secondary-color').value = '#10B981';
+            document.getElementById('secondary-color-hex').value = '#10B981';
+            document.getElementById('background-color').value = '#F9FAFB';
+            document.getElementById('background-color-hex').value = '#F9FAFB';
+            document.getElementById('text-color').value = '#1F2937';
+            document.getElementById('text-color-hex').value = '#1F2937';
+            document.getElementById('theme-preference').value = 'auto';
+            document.getElementById('menu-style').value = 'grid';
+            document.getElementById('show-usd-price').checked = false;
+            document.getElementById('show-preparation-time').checked = true;
+            document.getElementById('menu-active').checked = true;
+
+            updateColorPreviews();
+
+            showToast('تنظیمات با موفقیت بازنشانی شدند', 'success');
+        }
+    });
+
+    // Save settings
+    document.getElementById('restaurant-settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const restaurantId = document.getElementById('restaurant-id').value;
+
+        // Show loading
+        const saveBtn = document.getElementById('save-settings-btn');
+        const loading = document.getElementById('settings-loading');
+        saveBtn.disabled = true;
+        loading.classList.remove('hidden');
+
+        // Send AJAX request
+       fetch(`/panel/${restaurantSlug}/settings/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('تنظیمات با موفقیت ذخیره شد', 'success');
+                setTimeout(() => {
+                    closeModals();
+                }, 1500);
+            } else {
+                showToast(data.message || 'خطا در ذخیره تنظیمات', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('خطا در ارتباط با سرور', 'error');
+        })
+        .finally(() => {
+            saveBtn.disabled = false;
+            loading.classList.add('hidden');
+        });
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        // Remove existing toasts
+        const existingToasts = document.querySelectorAll('.toast-notification');
+        existingToasts.forEach(toast => toast.remove());
+
+        // Create toast
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 animate-slide-in ${
+            type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+            type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+            'bg-blue-100 text-blue-800 border border-blue-200'
+        }`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('animate-slide-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+});
+
+// Animation styles (add to your CSS)
+
+</script>
+
+<style>
+.toast-notification {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.animate-slide-out {
+    animation: slideOut 0.3s ease-in forwards;
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.color-picker-group input[type="color"] {
+    -webkit-appearance: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch {
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.preset-color-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.file-input-container input[type="file"]:focus + label {
+    outline: 2px solid #3B82F6;
+    outline-offset: 2px;
+}
+</style>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         const restaurantSlug = "{{ restaurant.slug }}";
         const csrfToken = "{{ csrf_token }}";
-    </script>
-    <script defer src="{% static '/assets/script/admin.js' %}"></script>
 
+        // مدیریت مودال آمار غذا
+document.addEventListener('DOMContentLoaded', function() {
+    // دکمه‌های مشاهده آمار
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.food-stats-btn')) {
+            const btn = e.target.closest('.food-stats-btn');
+            const foodId = btn.getAttribute('data-food-id');
+            const foodTitle = btn.getAttribute('data-food-title');
+            const stats = JSON.parse(btn.getAttribute('data-stats'));
+
+            showFoodStats(foodId, foodTitle, stats);
+        }
+    });
+
+    // دکمه شخصی‌سازی از مودال آمار
+    document.getElementById('customize-from-stats-btn').addEventListener('click', function() {
+        const foodId = this.getAttribute('data-food-id');
+        closeModals();
+        // رفتن به تب شخصی‌سازی و باز کردن مودال شخصی‌سازی برای این غذا
+        setTimeout(() => {
+            switchToCustomizeTab();
+            // اینجا می‌توانید مودال شخصی‌سازی را برای غذای خاص باز کنید
+        }, 300);
+    });
+});
+
+function showFoodStats(foodId, foodTitle, stats) {
+    // بررسی اینکه stats معتبر باشد
+    if (!stats) {
+        console.error('Stats is null or undefined for food:', foodId);
+        stats = {
+            restaurant_count: 0,
+            avg_price: 0,
+            min_price: 0,
+            max_price: 0,
+            base_price: 0,
+            has_customizations: false
+        };
+    }
+
+    // پر کردن اطلاعات مودال
+    document.getElementById('stats-modal-title').textContent = `آمار ${foodTitle}`;
+    document.getElementById('stats-food-title').textContent = foodTitle;
+
+    // استفاده از مقادیر پیش‌فرض اگر stats null باشد
+    document.getElementById('stats-restaurant-count').textContent =
+        (stats.restaurant_count || 0).toLocaleString();
+    document.getElementById('stats-avg-price').textContent =
+        (stats.avg_price || 0).toLocaleString() + ' تومان';
+    document.getElementById('stats-base-price').textContent =
+        (stats.base_price || 0).toLocaleString() + ' تومان';
+    document.getElementById('stats-min-price').textContent =
+        (stats.min_price || 0).toLocaleString() + ' تومان';
+    document.getElementById('stats-max-price').textContent =
+        (stats.max_price || 0).toLocaleString() + ' تومان';
+
+    // بروزرسانی لیبل‌های نوار قیمت
+    document.getElementById('stats-min-label').textContent =
+        (stats.min_price || 0).toLocaleString();
+    document.getElementById('stats-max-label').textContent =
+        (stats.max_price || 0).toLocaleString();
+
+    // بروزرسانی وضعیت شخصی‌سازی
+    const statusElement = document.getElementById('stats-customization-status');
+    if (stats.has_customizations) {
+        statusElement.innerHTML = '<i class="fas fa-check-circle text-green-500 ml-1"></i> این غذا توسط رستوران‌ها شخصی‌سازی شده است';
+    } else {
+        statusElement.innerHTML = '<i class="fas fa-info-circle text-blue-500 ml-1"></i> این غذا هنوز شخصی‌سازی نشده است';
+    }
+
+    // تنظیم دکمه شخصی‌سازی
+    document.getElementById('customize-from-stats-btn').setAttribute('data-food-id', foodId);
+
+    // محاسبه و نمایش نوار پیشرفت قیمت
+    updatePriceRangeBar(stats);
+
+    // باز کردن مودال
+    openModal('food-stats-modal');
+}
+
+// تابع جدید برای به‌روزرسانی نوار قیمت
+function updatePriceRangeBar(stats) {
+    const minPrice = stats.min_price || 0;
+    const maxPrice = stats.max_price || 0;
+    const basePrice = stats.base_price || 0;
+
+    const priceRangeBar = document.getElementById('price-range-bar');
+
+    if (maxPrice > minPrice) {
+        // محاسبه موقعیت قیمت پایه در محدوده
+        const range = maxPrice - minPrice;
+        const basePosition = ((basePrice - minPrice) / range) * 100;
+
+        // تنظیم عرض نوار
+        priceRangeBar.style.width = '100%';
+    } else {
+        // اگر همه قیمت‌ها یکسان باشند
+        priceRangeBar.style.width = '100%';
+    }
+}
+
+function switchToCustomizeTab() {
+    // تغییر به تب شخصی‌سازی
+    document.querySelectorAll('.tab-btn').forEach(tab => {
+        tab.classList.remove('active', 'text-blue-600', 'border-blue-600');
+        tab.classList.add('text-gray-500');
+    });
+
+    const customizeTab = document.querySelector('[data-tab="customize-foods"]');
+    if (customizeTab) {
+        customizeTab.classList.add('active', 'text-blue-600', 'border-blue-600');
+        customizeTab.classList.remove('text-gray-500');
+    }
+
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    const customizeContent = document.getElementById('customize-foods-tab');
+    if (customizeContent) {
+        customizeContent.classList.add('active');
+    }
+}
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+    console.log('صفحه لود شد - بررسی دکمه‌ها');
+
+    // دکمه رفرش
+    const refreshBtn = document.getElementById('refresh-selected-foods-btn');
+    if (refreshBtn) {
+        console.log('دکمه رفرش پیدا شد');
+
+        refreshBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('دکمه رفرش کلیک شد');
+
+            // اضافه کردن انیمیشن چرخش
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.classList.add('fa-spin');
+            }
+
+            // نمایش پیام
+            this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> در حال رفرش...';
+            this.disabled = true;
+
+            // رفرش صفحه بعد از 500ms
+            setTimeout(() => {
+                location.reload(true); // رفرش کامل از سرور
+            }, 500);
+        });
+    } else {
+        console.error('دکمه رفرش پیدا نشد!');
+        // بررسی کنیم که آیا Element وجود دارد
+        console.log('همه دکمه‌ها:', document.querySelectorAll('button'));
+    }
+
+    // برای تست، کلیک روی هر جایی از صفحه
+    document.addEventListener('click', function(e) {
+        console.log('کلیک در:', e.target);
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // فیلتر دسته‌بندی در تب همه غذاهای شرکت
+    document.querySelectorAll('.category-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const categoryId = this.getAttribute('data-category');
+
+            // حذف کلاس active از همه دکمه‌ها
+            document.querySelectorAll('.category-filter-btn').forEach(b => {
+                b.classList.remove('active', 'bg-blue-500', 'text-white');
+                b.classList.add('bg-gray-100', 'text-gray-700');
+            });
+
+            // اضافه کردن کلاس active به دکمه انتخاب شده
+            this.classList.remove('bg-gray-100', 'text-gray-700');
+            this.classList.add('active', 'bg-blue-500', 'text-white');
+
+            // فیلتر غذاها
+            const foodItems = document.querySelectorAll('#all-foods-container .food-item');
+            foodItems.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+
+                if (categoryId === 'all' || itemCategory === categoryId ||
+                    (categoryId === 'none' && itemCategory === 'none')) {
+                    item.style.display = 'block';
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        item.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+})
+
+    </script>
+
+
+    <style>
+        /* استایل‌های اضافی برای آمار */
+.price-range-bar {
+    transition: all 0.3s ease;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.stats-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stats-label {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.food-item {
+    transition: all 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.category-filter-btn {
+    transition: all 0.2s ease;
+}
+
+.category-filter-btn:hover {
+    transform: translateY(-1px);
+}
+
+.category-filter-btn.active {
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+    </style>
+
+    <!-- اسکریپت اصلی پنل -->
+    <script defer src="{% static '/assets/script/admin333.js' %}"></script>
+
+
+{% include "./giud.html" %}
 </body>
 </html>
 {% endblock content %}

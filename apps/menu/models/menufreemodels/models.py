@@ -3,56 +3,10 @@ from uuid import uuid4
 from decimal import Decimal
 from django.db import models
 from django.utils.text import slugify
-from apps.user.models import CustomUser
+from apps.user.model.user import CustomUser
 from django.utils.translation import gettext as _
 from django.conf import settings
 from ckeditor_uploader.fields import RichTextUploadingField
-
-
-# ----------------------------
-# Base abstract model
-# ----------------------------
-class BaseModel(models.Model):
-    title = models.CharField(max_length=255, null=True, blank=True, verbose_name="عنوان فارسی")
-    title_en = models.CharField(max_length=255, null=True, blank=True, verbose_name="عنوان انگلیسی")
-    slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
-    isActive = models.BooleanField(default=True, null=True, blank=True)
-    displayOrder = models.IntegerField(default=0, null=True, blank=True)
-    createdAt = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updatedAt = models.DateTimeField(auto_now=True, null=True, blank=True)
-
-
-    class Meta:
-        abstract = True
-        ordering = ['displayOrder']
-
-    def save(self, *args, **kwargs):
-        # ساخت اسلاگ بر اساس عنوان انگلیسی یا فارسی
-        if not self.slug:
-            base_title = self.title_en or self.title or "item"
-            base_slug = slugify(base_title)
-            slug = base_slug
-            counter = 1
-            while self.__class__.objects.filter(slug=slug).exclude(id=self.id).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
-            self.slug = slug
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title or self.title_en or ''
-
-    def get_title(self, lang):
-        if lang == 'en':
-            return self.title_en or self.title or ''
-        return self.title or self.title_en or ''
-
-    def get_description(self, lang='fa'):
-        if hasattr(self, 'description') and hasattr(self, 'description_en'):
-            if lang == 'en':
-                return self.description_en or self.description or ''
-            return self.description or self.description_en or ''
-        return ''
 
 
 # ----------------------------
@@ -88,6 +42,55 @@ def upload_to_food_sound(instance, filename):
     return f'sound/menu/{uuid4()}{ext}'
 
 
+def upload_to_food_restaurant_image(instance, filename):
+    name, ext = os.path.splitext(filename)
+    return f'restaurants/foods/images/{uuid4()}{ext}'
+
+
+# ----------------------------
+# Base abstract model
+# ----------------------------
+class BaseModel(models.Model):
+    title = models.CharField(max_length=255, null=True, blank=True, verbose_name="عنوان فارسی")
+    title_en = models.CharField(max_length=255, null=True, blank=True, verbose_name="عنوان انگلیسی")
+    slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
+    isActive = models.BooleanField(default=True, null=True, blank=True)
+    displayOrder = models.IntegerField(default=0, null=True, blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updatedAt = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+        ordering = ['displayOrder']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_title = self.title_en or self.title or "item"
+            base_slug = slugify(base_title)
+            slug = base_slug
+            counter = 1
+            while self.__class__.objects.filter(slug=slug).exclude(id=self.id).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title or self.title_en or ''
+
+    def get_title(self, lang):
+        if lang == 'en':
+            return self.title_en or self.title or ''
+        return self.title or self.title_en or ''
+
+    def get_description(self, lang='fa'):
+        if hasattr(self, 'description') and hasattr(self, 'description_en'):
+            if lang == 'en':
+                return self.description_en or self.description or ''
+            return self.description or self.description_en or ''
+        return ''
+
+
 # ----------------------------
 # Category
 # ----------------------------
@@ -121,10 +124,6 @@ class Category(BaseModel):
 from django.utils import timezone
 from datetime import timedelta
 
-# ----------------------------
-# Restaurant
-# ----------------------------
-
 class Restaurant(BaseModel):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='restaurants', null=True, blank=True)
     english_name = models.CharField(max_length=255, unique=True, null=True, blank=True, help_text="نام انگلیسی برای تولید اسلاگ")
@@ -142,17 +141,37 @@ class Restaurant(BaseModel):
     deliveryFee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     taxRate = models.DecimalField(max_digits=5, decimal_places=2, default=9.0, null=True, blank=True)
     isSeo = models.BooleanField(default=False,verbose_name='ایا سئو شده',blank=True,null=True)
-
     expireDate = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ انقضا")
-   
+    primary_color = models.CharField(max_length=7, default='#3B82F6', verbose_name="رنگ اصلی")
+    secondary_color = models.CharField(max_length=7, default='#10B981', verbose_name="رنگ ثانویه")
+    background_color = models.CharField(max_length=7, default='#F9FAFB', verbose_name="رنگ پس‌زمینه")
+    text_color = models.CharField(max_length=7, default='#1F2937', verbose_name="رنگ متن")
+
+    # Theme Settings
+    theme = models.CharField(
+        max_length=10,
+        choices=[('light', 'روشن'), ('dark', 'تیره'), ('auto', 'خودکار')],
+        default='auto',
+        verbose_name="تم"
+    )
+    menu_style = models.CharField(
+        max_length=10,
+        choices=[('grid', 'شبکه‌ای'), ('list', 'لیستی'), ('compact', 'فشرده')],
+        default='grid',
+        verbose_name="سبک منو"
+    )
+
+    # Toggle Settings
+    show_usd_price = models.BooleanField(default=False, verbose_name="نمایش قیمت دلار")
+    show_preparation_time = models.BooleanField(default=True, verbose_name="نمایش زمان آماده‌سازی")
+    menu_active = models.BooleanField(default=True, verbose_name="منو فعال")
+
     def save(self, *args, **kwargs):
-        # ✅ جلوگیری از خطای رشته خالی در TimeField
         if self.openingTime == "":
             self.openingTime = None
         if self.closingTime == "":
             self.closingTime = None
 
-        # ساخت اسلاگ بر اساس نام انگلیسی
         if not self.slug and self.english_name:
             base_slug = slugify(self.english_name)
             slug = base_slug
@@ -172,20 +191,14 @@ class Restaurant(BaseModel):
             return self.address_en or self.address or ''
         return self.address or self.address_en or ''
 
-    # ----------------------------
-    # متدهای مدیریت تاریخ انقضا
-    # ----------------------------
-
     @property
     def is_expired(self):
-        """بررسی می‌کند که آیا رستوران منقضی شده است"""
         if not self.expireDate:
             return False
         return timezone.now() > self.expireDate
 
     @property
     def days_until_expiry(self):
-        """تعداد روزهای باقی‌مانده تا انقضا را برمی‌گرداند"""
         if not self.expireDate:
             return None
         now = timezone.now()
@@ -195,7 +208,6 @@ class Restaurant(BaseModel):
 
     @property
     def expiry_status(self):
-        """وضعیت انقضا را به صورت متن برمی‌گرداند"""
         if not self.expireDate:
             return "بدون تاریخ انقضا"
         if self.is_expired:
@@ -206,15 +218,6 @@ class Restaurant(BaseModel):
         return f"فعال ({days_left} روز باقی مانده)"
 
     def extend_expiry(self, days):
-        """
-        تمدید تاریخ انقضا
-
-        Args:
-            days (int): تعداد روز برای تمدید
-
-        Returns:
-            bool: True در صورت موفقیت، False در صورت خطا
-        """
         try:
             days = int(days)
             if days <= 0:
@@ -222,11 +225,9 @@ class Restaurant(BaseModel):
 
             now = timezone.now()
 
-            # اگر تاریخ انقضا وجود ندارد یا گذشته است، از زمان حال شروع کن
             if not self.expireDate or self.is_expired:
                 new_expire_date = now + timedelta(days=days)
             else:
-                # اگر هنوز منقضی نشده، از تاریخ انقضای فعلی اضافه کن
                 new_expire_date = self.expireDate + timedelta(days=days)
 
             self.expireDate = new_expire_date
@@ -239,15 +240,6 @@ class Restaurant(BaseModel):
             return False, f"خطا در تمدید: {str(e)}"
 
     def set_expiry_from_today(self, days):
-        """
-        تنظیم تاریخ انقضا از امروز به تعداد روز مشخص
-
-        Args:
-            days (int): تعداد روز از امروز
-
-        Returns:
-            bool: True در صورت موفقیت، False در صورت خطا
-        """
         try:
             days = int(days)
             if days <= 0:
@@ -263,7 +255,6 @@ class Restaurant(BaseModel):
             return False, f"خطا در تنظیم تاریخ انقضا: {str(e)}"
 
     def get_expiry_display(self, lang='fa'):
-        """نمایش فرمت شده تاریخ انقضا"""
         if not self.expireDate:
             return "بدون تاریخ انقضا" if lang == 'fa' else "No expiry date"
 
@@ -277,12 +268,10 @@ class Restaurant(BaseModel):
 
     @classmethod
     def get_expired_restaurants(cls):
-        """لیست تمام رستوران‌های منقضی شده را برمی‌گرداند"""
         return cls.objects.filter(expireDate__lt=timezone.now())
 
     @classmethod
     def get_active_restaurants(cls):
-        """لیست تمام رستوران‌های فعال (منقضی نشده) را برمی‌گرداند"""
         return cls.objects.filter(
             models.Q(expireDate__isnull=True) |
             models.Q(expireDate__gte=timezone.now())
@@ -290,7 +279,6 @@ class Restaurant(BaseModel):
 
     @classmethod
     def get_expiring_soon_restaurants(cls, days=7):
-        """لیست رستوران‌هایی که تا چند روز آینده منقضی می‌شوند"""
         threshold = timezone.now() + timedelta(days=days)
         return cls.objects.filter(
             expireDate__gte=timezone.now(),
@@ -337,9 +325,6 @@ class MenuCategory(models.Model):
 # ----------------------------
 # Food
 # ----------------------------
-# ----------------------------
-# Food
-# ----------------------------
 class Food(BaseModel):
     restaurants = models.ManyToManyField(
         'Restaurant',
@@ -365,8 +350,6 @@ class Food(BaseModel):
     class Meta:
         ordering = ['displayOrder']
 
-
-
     def save(self, *args, **kwargs):
         if self.price is not None and self.price_usd_cents is None:
             self.update_usd_price()
@@ -375,7 +358,6 @@ class Food(BaseModel):
             base_slug = slugify(self.title_en or self.title)
             slug = base_slug
             counter = 1
-            # ❌ اصلاح شده: حذف شرط restaurant چون فیلد جداگانه نیست
             while Food.objects.filter(slug=slug).exclude(id=self.id).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
@@ -383,20 +365,16 @@ class Food(BaseModel):
 
         super().save(*args, **kwargs)
 
-
     def is_selected_by_restaurant(self, restaurant):
-        """بررسی می‌کند که آیا این غذا توسط رستوران انتخاب شده است"""
         return self.restaurants.filter(id=restaurant.id).exists()
 
     def toggle_for_restaurant(self, restaurant):
-        """تغییر وضعیت انتخاب غذا برای رستوران"""
         if self.restaurants.filter(id=restaurant.id).exists():
             self.restaurants.remove(restaurant)
             return False
         else:
             self.restaurants.add(restaurant)
             return True
-
 
     def update_usd_price(self, exchange_rate=None):
         if self.price is not None:
@@ -426,6 +404,11 @@ class Food(BaseModel):
     def current_exchange_rate(self):
         return get_current_exchange_rate()
 
+    @property
+    def is_customizable(self):
+        """آیا این غذا قابل کاستومایز توسط رستوران‌ها است؟"""
+        return self.created_by == 'company'
+
     def get_price_display(self, lang='fa'):
         if lang == 'en':
             if self.price_usd_cents:
@@ -444,6 +427,155 @@ class Food(BaseModel):
     def __str__(self):
         return self.title or self.title_en or "Food"
 
+
+
+
+class FoodRestaurant(models.Model):
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='custom_foods',
+        verbose_name="رستوران"
+    )
+    food = models.ForeignKey(
+        Food,
+        on_delete=models.CASCADE,
+        related_name='custom_restaurants',
+        verbose_name="غذا"
+    )
+
+    # فیلدهای کاستومایز
+    custom_price = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="قیمت کاستوم (تومان)"
+    )
+    custom_image = models.ImageField(
+        upload_to=upload_to_food_restaurant_image,
+        null=True,
+        blank=True,
+        verbose_name="عکس کاستوم"
+    )
+
+    # فیلدهای مدیریتی
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+    display_order = models.IntegerField(default=0, verbose_name="ترتیب نمایش")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'restaurant_food_restaurant'
+        verbose_name = 'غذای کاستوم رستوران'
+        verbose_name_plural = 'غذاهای کاستوم رستوران'
+        ordering = ['display_order', 'created_at']
+        unique_together = ['restaurant', 'food']
+
+    def __str__(self):
+        return f"{self.restaurant.title} - {self.food.title}"
+
+    def save(self, *args, **kwargs):
+        """ولیدیشن: فقط غذاهای ایجاد شده توسط شرکت قابل کاستومایز هستند"""
+        if self.food.created_by != 'company':
+            raise ValueError("فقط غذاهای ایجاد شده توسط شرکت قابل کاستومایز هستند")
+        super().save(*args, **kwargs)
+
+    # property های اصلی
+    @property
+    def final_price(self):
+        """قیمت نهایی - اولویت با قیمت کاستوم است"""
+        return self.custom_price if self.custom_price is not None else self.food.price
+
+    @property
+    def final_image(self):
+        """عکس نهایی - اولویت با عکس کاستوم است"""
+        return self.custom_image if self.custom_image else self.food.image
+
+    def get_final_price_display(self, lang='fa'):
+        """نمایش قیمت نهایی"""
+        if lang == 'en':
+            if self.final_price:
+                exchange_rate = get_current_exchange_rate()
+                if exchange_rate:
+                    usd_amount = Decimal(self.final_price) / Decimal(exchange_rate)
+                    return f"${usd_amount:.2f}"
+            return "$0.00"
+        else:
+            from django.contrib.humanize.templatags.humanize import intcomma
+            return f"{intcomma(self.final_price or 0)} تومان"
+
+    def has_customizations(self):
+        """بررسی می‌کند که آیا این غذا کاستومایز شده است"""
+        return self.custom_price is not None or self.custom_image is not None
+
+    def reset_customizations(self):
+        """بازنشانی تمام کاستومایزها به مقادیر پیش‌فرض"""
+        self.custom_price = None
+        self.custom_image = None
+        self.save()
+
+    @classmethod
+    def get_customizable_foods_for_restaurant(cls, restaurant):
+        """لیست غذاهای قابل کاستومایز برای یک رستوران"""
+        return Food.objects.filter(
+            created_by='company',
+            isActive=True
+        ).exclude(
+            custom_restaurants__restaurant=restaurant
+        )
+
+    @classmethod
+    def create_custom_food(cls, restaurant, food, custom_price=None, custom_image=None):
+        """ایجاد غذای کاستوم برای رستوران"""
+        if food.created_by != 'company':
+            raise ValueError("فقط غذاهای ایجاد شده توسط شرکت قابل کاستومایز هستند")
+
+        return cls.objects.create(
+            restaurant=restaurant,
+            food=food,
+            custom_price=custom_price,
+            custom_image=custom_image
+        )
+
+    @classmethod
+    def get_final_food_data(cls, restaurant, food):
+        """
+        دریافت اطلاعات نهایی غذا با در نظر گرفتن شخصی‌سازی‌ها
+        """
+        try:
+            custom_food = cls.objects.get(restaurant=restaurant, food=food)
+            return {
+                'id': food.id,
+                'title': food.title,
+                'title_en': food.title_en,
+                'description': food.description,
+                'description_en': food.description_en,
+                'price': custom_food.final_price,
+                'image': custom_food.final_image,
+                'preparationTime': food.preparationTime,
+                'isActive': custom_food.is_active and food.isActive,
+                'menuCategory': food.menuCategory,
+                'slug': food.slug,
+                'displayOrder': custom_food.display_order,
+                'is_customized': custom_food.has_customizations(),
+                'custom_food_id': custom_food.id
+            }
+        except cls.DoesNotExist:
+            return {
+                'id': food.id,
+                'title': food.title,
+                'title_en': food.title_en,
+                'description': food.description,
+                'description_en': food.description_en,
+                'price': food.price,
+                'image': food.image,
+                'preparationTime': food.preparationTime,
+                'isActive': food.isActive,
+                'menuCategory': food.menuCategory,
+                'slug': food.slug,
+                'displayOrder': food.displayOrder,
+                'is_customized': False,
+                'custom_food_id': None
+            }
 
 # ----------------------------
 # Exchange Rate
@@ -481,9 +613,6 @@ class ExchangeRate(models.Model):
         return f"1 USD = {self.rate} Toman"
 
 
-# ----------------------------
-# Helper functions
-# ----------------------------
 def update_all_food_prices():
     try:
         current_rate = ExchangeRate.objects.filter(is_active=True).first()
@@ -502,3 +631,83 @@ def get_current_exchange_rate():
     except:
         pass
     return getattr(settings, 'EXCHANGE_RATE', Decimal('60000.00'))
+
+
+
+class MenuView(models.Model):
+    """
+    مدل برای ثبت بازدید یکتا از منوی هر رستوران
+    """
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='menu_views',
+        verbose_name="رستوران"
+    )
+    session_key = models.CharField(
+        max_length=40,
+        db_index=True,
+        verbose_name="کلید سشن"
+    )
+    ip_address = models.GenericIPAddressField(
+        verbose_name="آدرس IP",
+        null=True,
+        blank=True
+    )
+    user_agent = models.TextField(
+        verbose_name="User Agent",
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
+
+    class Meta:
+        verbose_name = 'بازدید منو'
+        verbose_name_plural = 'بازدیدهای منو'
+        unique_together = ['restaurant', 'session_key']
+        indexes = [
+            models.Index(fields=['restaurant', 'created_at']),
+            models.Index(fields=['session_key', 'restaurant']),
+            models.Index(fields=['ip_address', 'restaurant']),
+        ]
+
+    def __str__(self):
+        return f"{self.restaurant.title} - {self.session_key} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+    @classmethod
+    def is_viewed(cls, restaurant, session_key):
+        """بررسی می‌کند که آیا این سشن قبلاً از این منو بازدید کرده است"""
+        return cls.objects.filter(
+            restaurant=restaurant,
+            session_key=session_key
+        ).exists()
+
+    @classmethod
+    def record_view(cls, restaurant, session_key, ip_address=None, user_agent=None):
+        """ثبت بازدید جدید اگر قبلاً ثبت نشده باشد"""
+        if not cls.is_viewed(restaurant, session_key):
+            return cls.objects.create(
+                restaurant=restaurant,
+                session_key=session_key,
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
+        return None
+
+    @classmethod
+    def get_views_count(cls, restaurant):
+        """تعداد بازدیدهای یکتا برای یک رستوران"""
+        return cls.objects.filter(restaurant=restaurant).count()
+
+    @classmethod
+    def get_recent_views(cls, restaurant, hours=24):
+        """تعداد بازدیدهای اخیر (مثلاً در 24 ساعت گذشته)"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        since = timezone.now() - timedelta(hours=hours)
+        return cls.objects.filter(
+            restaurant=restaurant,
+            created_at__gte=since
+        ).count()

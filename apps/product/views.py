@@ -8,7 +8,7 @@ import json
 from .models import Product, ProductOrder, ProductOrderDetail
 from apps.plan.models import Plan
 from django.contrib.auth.decorators import login_required
-from apps.user.models import CustomUser
+from apps.user.model.user import CustomUser
 
 def get_or_create_cart(request):
     """دریافت یا ایجاد سبد خرید برای کاربر"""

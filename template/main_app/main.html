@@ -958,68 +958,7 @@
     </style>
 
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
-        <div class="flex flex-col lg:grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-
-            <!-- سمت چپ - محتوای متنی -->
-            <div class="order-2 lg:order-1 space-y-6 sm:space-y-8 text-center lg:text-right">
-                <!-- عنوان اصلی -->
-              <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight whitespace-nowrap">
-    هرگز طعم رو
-    <span class="gradient-text inline">از دست نده</span>
-</h1>
-   <div class="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
-                    <a href='/panel/' class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition text-sm sm:text-base flex-1 sm:flex-none">
-
-                       منو رستوران 10 دقیقه
-                    </a>
-                    <a href='accounts/login' class="border border-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition text-sm sm:text-base flex-1 sm:flex-none">
-                       ثبت نام
-                    </a>
-                </div>
-                <!-- توضیحات -->
-                <p class="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    با فودیلایو، بهترین رستوران‌های شهر رو کشف کن.
-                    از غذاهای ایرانی اصیل تا بین‌المللی، همه رو با چند کلیک ساده سفارش بده.
-                </p>
-
-                <!-- دکمه‌های اقدام - کنار هم -->
-
-            </div>
-
-            <!-- سمت راست - عکس بزرگ -->
-            <div class="order-1 lg:order-2 food-image w-full h-64 sm:h-80 lg:h-96">
-                <img
-                    src="{{media_url}}images/menu.jpg"
-                    alt="غذای خوشمزه"
-                    class="w-full h-full object-cover"
-                >
-            </div>
-
-        </div>
-
-        <!-- آمار و ارقام -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-12 sm:mt-20 pt-8 border-t border-gray-800">
-            <div class="text-center">
-                <div class="text-2xl sm:text-3xl font-black text-white">۵۰۰+</div>
-                <div class="text-gray-400 text-xs sm:text-sm">رستوران فعال</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl sm:text-3xl font-black text-white">۵۰k+</div>
-                <div class="text-gray-400 text-xs sm:text-sm">سفارش موفق</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl sm:text-3xl font-black text-white">۴.۹</div>
-                <div class="text-gray-400 text-xs sm:text-sm">امتیاز کاربران</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl sm:text-3xl font-black text-white">۹۸٪</div>
-                <div class="text-gray-400 text-xs sm:text-sm">رضایت مشتری</div>
-            </div>
-        </div>
-    </div>
-
-
+  {% render_partial 'main:section1' %}
 
 {% render_partial 'plan:plan_list' %}
 
@@ -1028,7 +967,7 @@
         <!-- عنوان سکشن -->
         <div class="text-center mb-16">
             <h2 class="text-3xl sm:text-5xl font-black text-white mb-6">
-                چرا <span class="gradient-text">فودیلایو</span>؟
+                چرا <span class="gradient-text">ستوران چی</span>؟
             </h2>
             <p class="text-xl text-gray-300 max-w-2xl mx-auto">
                 تجربه‌ای متفاوت از سفارش آنلاین غذا با ویژگی‌های منحصر به فرد
@@ -1061,6 +1000,10 @@
                 </div>
             </div>
         </div>
+
+
+
+
 
         <div class="flex flex-col lg:flex-row gap-12 items-center">
 
@@ -1242,6 +1185,7 @@
 </style>
 
 
+    {% render_partial 'main:latest_restaurants' %}
 
 
 

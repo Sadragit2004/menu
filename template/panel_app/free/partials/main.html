@@ -104,66 +104,130 @@
     </div>
 
     <!-- فیلترهای سفارشات -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-                <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-filter text-blue-500 ml-3 text-lg"></i>
-                    فیلتر سفارشات
-                </h2>
-                <p class="text-gray-600 text-sm mt-2">سفارشات خود را بر اساس نوع و وضعیت فیلتر کنید</p>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-4">
-                <!-- فیلتر نوع سفارش -->
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="filterOrdersByType('all')"
-                            class="type-filter-btn active px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-blue-500 text-white shadow-lg">
-                        <i class="fas fa-layer-group ml-2"></i>
-                        همه سفارشات
-                    </button>
-
-                    <button onclick="filterOrdersByType('menu')"
-                            class="type-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-green-500 text-white hover:shadow-lg">
-                        <i class="fas fa-utensils ml-2"></i>
-                        سفارشات منو
-                    </button>
-
-                    <button onclick="filterOrdersByType('plan')"
-                            class="type-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-purple-500 text-white hover:shadow-lg">
-                        <i class="fas fa-crown ml-2"></i>
-                        سفارشات پلن
-                    </button>
-
-                    <button onclick="filterOrdersByType('product')"
-                            class="type-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-orange-500 text-white hover:shadow-lg">
-                        <i class="fas fa-box ml-2"></i>
-                        سفارشات محصول
-                    </button>
-                </div>
-
-                <!-- فیلتر وضعیت -->
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="filterOrdersByStatus('all')"
-                            class="status-filter-btn active px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-gray-500 text-white shadow-lg">
-                        همه وضعیت‌ها
-                    </button>
-
-                    <button onclick="filterOrdersByStatus('unpaid')"
-                            class="status-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-red-500 text-white hover:shadow-lg">
-                        <i class="fas fa-clock ml-2"></i>
-                        پرداخت نشده
-                    </button>
-
-                    <button onclick="filterOrdersByStatus('paid')"
-                            class="status-filter-btn px-4 py-2 rounded-xl font-medium transition-all duration-300 bg-green-500 text-white hover:shadow-lg">
-                        <i class="fas fa-check-circle ml-2"></i>
-                        پرداخت شده
-                    </button>
-                </div>
-            </div>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
+    <div class="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+        <div class="text-center sm:text-right">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center justify-center sm:justify-start">
+                <i class="fas fa-filter text-blue-500 ml-2 sm:ml-3 text-base sm:text-lg"></i>
+                فیلتر سفارشات
+            </h2>
+            <p class="text-gray-600 text-xs sm:text-sm mt-1 sm:mt-2">سفارشات خود را بر اساس نوع و وضعیت فیلتر کنید</p>
         </div>
     </div>
+
+    <!-- فیلتر نوع سفارش -->
+    <div class="mt-4 sm:mt-6">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">نوع سفارش</h3>
+        <div class="grid grid-cols-2 sm:flex flex-wrap gap-2">
+            <button onclick="filterOrdersByType('all')"
+                    class="type-filter-btn active px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-blue-500 text-white shadow-md hover:shadow-lg flex items-center justify-center sm:justify-start">
+                <i class="fas fa-layer-group ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                <span class="truncate">همه</span>
+            </button>
+
+            <button onclick="filterOrdersByType('menu')"
+                    class="type-filter-btn px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-green-500 text-white hover:shadow-lg flex items-center justify-center sm:justify-start">
+                <i class="fas fa-utensils ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                <span class="truncate">منو</span>
+            </button>
+
+            <button onclick="filterOrdersByType('plan')"
+                    class="type-filter-btn px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-purple-500 text-white hover:shadow-lg flex items-center justify-center sm:justify-start">
+                <i class="fas fa-crown ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                <span class="truncate">پلن</span>
+            </button>
+
+            <button onclick="filterOrdersByType('product')"
+                    class="type-filter-btn px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-orange-500 text-white hover:shadow-lg flex items-center justify-center sm:justify-start">
+                <i class="fas fa-box ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                <span class="truncate">محصول</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- فیلتر وضعیت -->
+    <div class="mt-4">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">وضعیت پرداخت</h3>
+        <div class="grid grid-cols-3 sm:flex flex-wrap gap-2">
+            <button onclick="filterOrdersByStatus('all')"
+                    class="status-filter-btn active px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-gray-500 text-white shadow-md hover:shadow-lg flex items-center justify-center">
+                همه
+            </button>
+
+            <button onclick="filterOrdersByStatus('unpaid')"
+                    class="status-filter-btn px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-red-500 text-white hover:shadow-lg flex items-center justify-center sm:justify-start">
+                <i class="fas fa-clock ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                <span class="truncate">پرداخت نشده</span>
+            </button>
+
+            <button onclick="filterOrdersByStatus('paid')"
+                    class="status-filter-btn px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 bg-green-500 text-white hover:shadow-lg flex items-center justify-center sm:justify-start">
+                <i class="fas fa-check-circle ml-1 sm:ml-2 text-xs sm:text-sm"></i>
+                <span class="truncate">پرداخت شده</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* استایل‌های اضافی برای بهینه‌سازی بیشتر */
+@media (max-width: 640px) {
+    .type-filter-btn, .status-filter-btn {
+        min-height: 36px;
+    }
+
+    .type-filter-btn span, .status-filter-btn span {
+        font-size: 11px;
+    }
+}
+
+/* استایل‌های فعال و غیرفعال */
+.type-filter-btn.active,
+.status-filter-btn.active {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.type-filter-btn:not(.active):hover,
+.status-filter-btn:not(.active):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+</style>
+
+<script>
+function filterOrdersByType(type) {
+    // حذف کلاس active از همه دکمه‌های نوع
+    document.querySelectorAll('.type-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.remove('shadow-lg');
+    });
+
+    // اضافه کردن کلاس active به دکمه کلیک شده
+    event.target.classList.add('active');
+    event.target.classList.add('shadow-lg');
+
+    // کد فیلتر سفارشات بر اساس نوع
+    console.log('فیلتر بر اساس نوع:', type);
+    // TODO: پیاده‌سازی فیلتر واقعی
+}
+
+function filterOrdersByStatus(status) {
+    // حذف کلاس active از همه دکمه‌های وضعیت
+    document.querySelectorAll('.status-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.remove('shadow-lg');
+    });
+
+    // اضافه کردن کلاس active به دکمه کلیک شده
+    event.target.classList.add('active');
+    event.target.classList.add('shadow-lg');
+
+    // کد فیلتر سفارشات بر اساس وضعیت
+    console.log('فیلتر بر اساس وضعیت:', status);
+    // TODO: پیاده‌سازی فیلتر واقعی
+}
+</script>
 
     <!-- بخش تمام سفارشات -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">

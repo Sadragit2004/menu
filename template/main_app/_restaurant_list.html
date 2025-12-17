@@ -1,0 +1,67 @@
+{% for restaurant in restaurants %}
+<div class="restaurant-card">
+    <div class="relative">
+        {% if restaurant.is_expired %}
+            <div class="expired-badge">منقضی شده</div>
+        {% elif restaurant.days_until_expiry and restaurant.days_until_expiry <= 7 %}
+            <div class="expiring-soon-badge">انقضای نزدیک</div>
+        {% endif %}
+
+        {% if restaurant.coverImage %}
+            <img src="{{ restaurant.coverImage.url }}"
+                 alt="{{ restaurant.title }}"
+                 class="restaurant-image">
+        {% else %}
+            <div class="restaurant-image bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                <span class="text-gray-500 text-lg">بدون تصویر</span>
+            </div>
+        {% endif %}
+
+        {% if restaurant.logo %}
+            <img src="{{ restaurant.logo.url }}"
+                 alt="{{ restaurant.title }}"
+                 class="restaurant-logo">
+        {% endif %}
+    </div>
+
+    <div class="p-6 pt-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ restaurant.title }}</h3>
+
+        {% if restaurant.description %}
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                {{ restaurant.description|truncatechars:80 }}
+            </p>
+        {% endif %}
+
+        <div class="flex items-center justify-between mb-4">
+            <div class="text-sm text-gray-500">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    {{ restaurant.createdAt|date:"Y/m/d" }}
+                </span>
+            </div>
+
+            <div class="text-xs px-3 py-1 rounded-full
+                        {% if restaurant.is_expired %}bg-red-100 text-red-800
+                        {% elif restaurant.days_until_expiry and restaurant.days_until_expiry <= 7 %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-green-100 text-green-800{% endif %}">
+                {{ restaurant.expiry_status }}
+            </div>
+        </div>
+
+        <a href="/menu/{{ restaurant.slug }}/"
+           class="block w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300">
+            مشاهده منوی رستوران
+        </a>
+    </div>
+</div>
+{% empty %}
+<div class="col-span-full text-center py-16">
+    <div class="text-gray-500 text-xl mb-4">هیچ رستورانی یافت نشد</div>
+    <a href="{% url 'latest_restaurants' %}" class="text-blue-600 hover:underline">
+        بازگشت به رستوران‌های جدید
+    </a>
+</div>
+{% endfor %}

@@ -6,8 +6,6 @@
      <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-
    {% if restaurant.isSeo %}
         <title>منوی دیجیتال {{ restaurant.title }} | سفارش آنلاین غذا</title>
         <meta name="description" content="منوی دیجیتال رستوران {{ restaurant.title }} - {{ restaurant.text|striptags|truncatechars:150|default:'سفارش آنلاین غذا با بهترین کیفیت و سریع‌ترین زمان آماده‌سازی' }}">
@@ -109,7 +107,7 @@
       </script>
     {% endif %}
 
-    <link rel="stylesheet" href="{% static 'assets/css/restaurant.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/restaurant33.css' %}">
 
     <style>
         /* رفع مشکل dark mode برای هدر */
@@ -138,7 +136,7 @@
 
         /* رفع مشکل فاصله جستجو */
         .main-content {
-            padding-top: 140px !important;
+            padding-top: 185px !important; /* افزایش بیشتر فاصله از هدر */
         }
 
         /* استایل‌های مودال رزرو برای dark mode */
@@ -172,34 +170,608 @@
         }
 
         /* مطمئن شویم مودال رزرو پشت تقویم قرار می‌گیرد */
-#reservationModal {
-    z-index: 9990 !important;
-}
+        #reservationModal {
+            z-index: 9990 !important;
+        }
 
-.modal-backdrop {
-    z-index: 9980 !important;
-}
+        .modal-backdrop {
+            z-index: 9980 !important;
+        }
+
+        /* استایل‌های جدید برای کارت غذا */
+        .food-card {
+            height: auto !important;
+            min-height: 140px !important;
+            margin-bottom: 8px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .food-card-inner {
+            flex-direction: row;
+            height: 100%;
+            width: 100%;
+        }
+
+        .food-image-container {
+            width: 35% !important;
+            flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .food-image-container::after {
+            content: '🔍';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .food-image-container:hover::after {
+            opacity: 1;
+        }
+
+        .food-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px 0 0 8px !important;
+            transition: transform 0.3s ease;
+        }
+
+        .food-image-container:hover .food-image {
+            transform: scale(1.05);
+        }
+
+        .food-details {
+            width: 65% !important;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .food-content {
+            padding: 0 !important;
+            margin-bottom: 6px;
+        }
+
+        .food-title {
+            font-size: 0.9rem !important;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .food-description {
+            font-size: 0.75rem !important;
+            line-height: 1.4;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            display: -webkit-box;
+            margin-bottom: 6px;
+        }
+
+        .food-price {
+            font-size: 0.85rem !important;
+            white-space: nowrap;
+        }
+
+        .food-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .cooking-time {
+            font-size: 0.7rem !important;
+            padding: 4px 8px;
+        }
+
+        .sound-btn {
+            padding: 4px !important;
+            font-size: 0.7rem;
+        }
+
+        .order-btn {
+            font-size: 0.75rem !important;
+            padding: 6px 12px !important;
+            min-width: 65px !important;
+            white-space: nowrap;
+        }
+
+        /* تنظیمات گرید برای نمایش بهتر در موبایل */
+        .food-grid {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+            width: 100%;
+            max-width: 100%;
+            padding: 0 4px;
+        }
+
+        @media (min-width: 640px) {
+            .food-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                padding: 0 8px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .food-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 12px !important;
+                padding: 0 12px;
+            }
+        }
+
+        /* استایل‌های جدید برای دکمه‌ها */
+        .reservation-btn span {
+            white-space: nowrap;
+        }
+
+        .lang-btn {
+            white-space: nowrap;
+        }
+
+        /* استایل‌های جدید برای بخش توضیحات رستوران */
+        .description-container {
+            margin: 20px auto;
+            max-width: 100%;
+            padding: 0 8px;
+        }
+
+        /* مودال نمایش عکس بزرگ */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .image-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .image-modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 95%;
+            max-height: 90%;
+            width: auto;
+            height: auto;
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            margin: 0 8px;
+        }
+
+        .image-modal.active .image-modal-content {
+            transform: scale(1);
+        }
+
+        .dark-mode .image-modal-content {
+            background: #1e293b;
+        }
+
+        .image-modal-img {
+            width: 100%;
+            height: auto;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .image-modal-details {
+            padding: 16px;
+        }
+
+        .image-modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .dark-mode .image-modal-title {
+            color: #f8fafc;
+        }
+
+        .image-modal-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .dark-mode .image-modal-description {
+            color: #94a3b8;
+        }
+
+        .image-modal-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 12px;
+        }
+
+        .image-modal-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .dark-mode .image-modal-info {
+            border-top: 1px solid #334155;
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 10;
+            transition: background 0.3s ease;
+        }
+
+        .image-modal-close:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        /* بهبود ظاهر برای موبایل */
+        @media (max-width: 640px) {
+            .main-content {
+                padding-top: 175px !important; /* افزایش بیشتر در موبایل */
+            }
+
+            .food-card {
+                min-height: 130px !important;
+                margin-bottom: 6px;
+            }
+
+            .food-details {
+                padding: 8px 10px;
+            }
+
+            .food-title {
+                font-size: 0.85rem !important;
+            }
+
+            .food-description {
+                font-size: 0.7rem !important;
+                -webkit-line-clamp: 2;
+            }
+
+            .food-price {
+                font-size: 0.8rem !important;
+            }
+
+            .order-btn {
+                font-size: 0.7rem !important;
+                padding: 5px 10px !important;
+                min-width: 60px !important;
+            }
+
+            .cooking-time {
+                font-size: 0.65rem !important;
+                padding: 3px 6px;
+            }
+
+            .image-modal-content {
+                max-width: 98%;
+                margin: 0 4px;
+            }
+
+            .image-modal-details {
+                padding: 12px;
+            }
+
+            .image-modal-title {
+                font-size: 1.1rem;
+            }
+
+            .image-modal-description {
+                font-size: 0.85rem;
+            }
+
+            /* بهبود هدر برای موبایل کوچک */
+            header {
+                padding: 8px 0 !important;
+            }
+
+            .header-actions {
+                gap: 4px !important;
+            }
+
+            .reservation-btn {
+                padding: 6px 8px !important;
+                font-size: 0.7rem !important;
+            }
+
+            .lang-btn, .header-icon {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 0.7rem !important;
+            }
+
+            .restaurant-name {
+                font-size: 0.9rem !important;
+            }
+
+            .hamburger-icon {
+                padding: 6px !important;
+            }
+        }
+
+        /* اطمینان از چسبیدن عکس به جای خودش بدون فاصله */
+        .food-image-container img,
+        .food-image-container div {
+            border-radius: 8px 0 0 8px !important;
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        /* بهبود دسته‌بندی‌ها - کوچک کردن عکس‌ها و متن */
+        .slider-category-icon,
+        .category-bottom-icon {
+            width: 45px !important; /* کاهش سایز */
+            height: 45px !important; /* کاهش سایز */
+            border-radius: 10px !important;
+        }
+
+        .slider-category-icon img,
+        .category-bottom-icon img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+
+        @media (max-width: 640px) {
+            .slider-category-icon,
+            .category-bottom-icon {
+                width: 40px !important; /* سایز کوچک در موبایل */
+                height: 40px !important;
+            }
+        }
+
+        /* بهبود فاصله‌ها در دسته‌بندی‌ها */
+        .slider-category-item {
+            padding: 12px 14px !important;
+            gap: 12px !important;
+        }
+
+        .category-bottom-item {
+            padding: 8px 10px !important;
+            gap: 6px !important;
+            min-width: 70px !important;
+        }
+
+        .slider-category-name {
+            font-size: 0.85rem !important;
+            font-weight: 600;
+        }
+
+        .category-bottom-name {
+            font-size: 0.7rem !important;
+            font-weight: 600;
+            max-width: 70px !important;
+        }
+
+        /* بهبود هدر برای جلوگیری از بهم ریختگی */
+        .logo-container {
+            min-width: 0;
+            flex-shrink: 1;
+        }
+
+        .restaurant-info {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .restaurant-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
+        @media (max-width: 400px) {
+            .restaurant-name {
+                max-width: 100px;
+                font-size: 0.8rem !important;
+            }
+
+            .reservation-btn span {
+                font-size: 0.65rem !important;
+            }
+
+            .header-actions {
+                gap: 3px !important;
+            }
+        }
+
+        /* اطمینان از نمایش صحیح محتوا زیر هدر */
+        body {
+            overflow-x: hidden;
+        }
+
+        .container.mx-auto {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* استایل‌های جدید برای دسته‌بندی‌های زیر جستجو */
+        .categories-scroll-container {
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 8px 0;
+        }
+
+        .dark-mode .categories-scroll-container {
+            background-color: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        .categories-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 12px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .category-bottom-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 12px;
+            min-width: 70px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .category-bottom-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .dark-mode .category-bottom-item:hover {
+            background-color: #334155 !important;
+        }
+
+        .category-bottom-active {
+            background-color: #3b82f6 !important;
+            color: white !important;
+        }
+
+        .dark-mode .category-bottom-active {
+            background-color: #1e40af !important;
+        }
+
+        .category-bottom-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .category-bottom-name {
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+            max-width: 70px;
+            color: #64748b;
+        }
+
+        .dark-mode .category-bottom-name {
+            color: #94a3b8 !important;
+        }
+
+        .category-bottom-active .category-bottom-name {
+            color: white !important;
+        }
+
+        .dark-mode .category-bottom-name {
+            color: #cbd5e1 !important;
+        }
     </style>
 </head>
 <body>
     <!-- لایه محو -->
     <div class="overlay"></div>
 
-    <!-- نوار بالایی اصلی -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="hamburger-icon cursor-pointer text-gray-600">
-                        <i class="fas fa-bars text-lg"></i>
+    <!-- مودال نمایش عکس بزرگ -->
+    <div class="image-modal">
+        <div class="image-modal-content">
+            <div class="image-modal-close">
+                <i class="fas fa-times"></i>
+            </div>
+            <img src="" alt="" class="image-modal-img">
+            <div class="image-modal-details">
+                <h3 class="image-modal-title"></h3>
+                <p class="image-modal-description"></p>
+                <div class="image-modal-price"></div>
+                <div class="image-modal-info">
+                    <div class="cooking-time bg-gray-50 px-3 py-2 rounded-lg">
+                        <i class="fas fa-clock text-xs"></i>
+                        <span class="text-xs font-medium image-modal-time"></span>
                     </div>
-                    <div class="logo-container flex items-center gap-3">
+                    <button style='background-color:#ef4444;' class="order-btn image-modal-order-btn">
+                        <span class="order-text">سفارش</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نوار بالایی اصلی -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm" style="padding: 8px 0;">
+        <div class="container mx-auto px-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2" style="min-width: 0; flex: 1;">
+                    <div class="hamburger-icon cursor-pointer text-gray-600" style="padding: 6px;">
+                        <i class="fas fa-bars text-base"></i>
+                    </div>
+                    <div class="logo-container flex items-center gap-2" style="min-width: 0; flex: 1;">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs flex-shrink: 0;">
+                        {% if restaurant.logo %}
+                        <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title_en|default:restaurant.title }}"
+                             class="w-10 h-10 rounded-xl object-cover border border-gray-200">
+                        {% else %}
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                            ر
+                            {{ restaurant.title_en|default:restaurant.title|first }}
                         </div>
-                        <div class="restaurant-info">
-                            <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap">
-                                رستوران نمونه
+                        {% endif %}
+                        </div>
+                        <div class="restaurant-info" style="min-width: 0;">
+                            <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis" style="max-width: 120px;">
+                                {{restaurant.title}}
                             </div>
                             <div class="restaurant-subtitle text-xs text-gray-500 hidden sm:block">
                                 منوی دیجیتال
@@ -208,9 +780,9 @@
                     </div>
                 </div>
 
-                <div class="header-actions flex items-center gap-2">
+                <div class="header-actions flex items-center gap-2" style="flex-shrink: 0;">
                     <a href="javascript:void(0);"
-                       class="reservation-btn bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                       class="reservation-btn bg-gradient-to-r from-#ef4444-500 to-red-500 hover:from-#ef4444-600 hover:to-red-600 text-white px-2 py-1.5 rounded-xl font-medium flex items-center gap-1 transition-all duration-300 shadow-md hover:shadow-lg text-xs"
                        data-bs-toggle="modal"
                        data-bs-target="#reservationModal">
                         <i class="fas fa-chair text-xs"></i>
@@ -218,44 +790,79 @@
                         <span class="sm:hidden">رزرو</span>
                     </a>
 
-                    <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline w-9 h-9 rounded-lg flex items-center justify-center text-sm hover:bg-gray-200 transition-colors">
+                    <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline w-8 h-8 rounded-lg flex items-center justify-center text-xs hover:bg-gray-200 transition-colors">
                         <span class="lang-text font-medium">EN</span>
                     </a>
 
-                    <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600 w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
-                        <i class="fas fa-moon text-sm"></i>
+                    <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-moon text-xs"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="search-container bg-white py-3 border-t border-gray-100">
-            <div class="container mx-auto px-4">
-                <div class="search-box bg-gray-50 rounded-xl px-4 py-2 flex items-center gap-3 border border-gray-200">
-                    <i class="fas fa-search text-gray-400 text-sm"></i>
+        <div class="search-container bg-white py-2 border-t border-gray-100">
+            <div class="container mx-auto px-3">
+                <div class="search-box bg-gray-50 rounded-xl px-3 py-1.5 flex items-center gap-2 border border-gray-200">
+                    <i class="fas fa-search text-gray-400 text-xs"></i>
                     <input type="text" placeholder="جستجوی غذا..."
-                           class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-sm">
+                           class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-xs">
                 </div>
             </div>
         </div>
-    </header>
 
+        <!-- دسته‌بندی‌های زیر جستجو -->
+        <div class="categories-scroll-container">
+            <div class="container mx-auto px-3">
+                <div class="categories-scroll">
+                    <div style='color:background-color:#ef4444 !important;' class="category-bottom-item category-bottom-active" data-category="all">
+                        <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <span class="category-bottom-name">همه</span>
+                    </div>
+
+                    {% for menu_category in menu_categories %}
+                    <div class="category-bottom-item" data-category="{{ menu_category.id }}">
+                        {% if menu_category.displayImage %}
+                        <img src="{{ menu_category.displayImage.url }}" alt="{{ menu_category.category.title }}"
+                             class="category-bottom-icon object-cover shadow-md">
+                        {% else %}
+                        <div class="category-bottom-icon bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 shadow-md">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        {% endif %}
+                        <span class="category-bottom-name">{{ menu_category.category.title|truncatechars:10 }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+    </header>
+<br>
     <!-- محتوای اصلی -->
     <div class="main-content">
-        <div class="container mx-auto px-4 py-4">
+        <div class="container mx-auto">
             <div class="food-grid">
                 {% for food in foods %}
                 <div class="food-item" data-category="{{ food.menuCategory.id|default:'all' }}">
                     <div class="food-card">
                         <div class="food-card-inner">
-                            <div class="food-image-container">
-                                {% if food.image %}
-                                <img src="{{ food.image.url }}" alt="{{ food.title }}"
-                                     class="w-full h-full object-cover food-image">
+                            <div class="food-image-container"
+                                 data-food-title="{{ food.title }}"
+                                 data-food-description="{{ food.description|default:'توضیحات موجود نیست' }}"
+                                 data-food-price="{{ food.final_price|intcomma }}"
+                                 data-food-time="{{ food.preparationTime|default:'-' }}"
+                                 data-food-image="{% if food.final_image %}{{ food.final_image.url }}{% endif %}"
+                                 data-food-id="{{ food.id }}">
+                                {% if food.final_image %}
+                                    <img src="{{ food.final_image.url }}" alt="{{ food.title }}" class="food-image">
                                 {% else %}
-                                <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 food-image">
-                                    <i class="fas fa-utensils text-xl"></i>
-                                </div>
+                                    <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 food-image">
+                                        <i class="fas fa-utensils text-xl"></i>
+                                    </div>
                                 {% endif %}
                             </div>
                             <div class="food-details">
@@ -263,15 +870,15 @@
                                     <div class="flex justify-between items-start gap-2 mb-2">
                                         <span class="food-title flex-1">{{ food.title }}</span>
                                         <span class="food-price">
-                                            {{ food.price|intcomma }} تومان
+                                            {{ food.final_price|intcomma }} تومان
                                         </span>
                                     </div>
-                                    <p class="food-description mb-3">
+                                    <p class="food-description">
                                         {{ food.description|default:"توضیحات موجود نیست" }}
                                     </p>
                                 </div>
-                                <div class="flex justify-between items-center gap-2">
-                                    <div class="flex items-center gap-3">
+                                <div class="food-card-footer">
+                                    <div class="flex items-center gap-2">
                                         <div class="cooking-time bg-gray-50 px-2 py-1 rounded-lg">
                                             <i class="fas fa-clock text-xs"></i>
                                             <span class="text-xs font-medium">{{ food.preparationTime|default:"-" }} دقیقه</span>
@@ -285,8 +892,9 @@
                                     <button class="order-btn"
                                             data-food-id="{{ food.id }}"
                                             data-food-title="{{ food.title }}"
-                                            data-food-price="{{ food.price }}"
-                                            data-food-image="{% if food.image %}{{ food.image.url }}{% endif %}">
+                                            style='background-color:#ef4444;'
+                                            data-food-price="{{ food.final_price }}"
+                                            data-food-image="{% if food.final_image %}{{ food.final_image.url }}{% endif %}">
                                         <span class="order-text">سفارش</span>
                                     </button>
                                 </div>
@@ -305,6 +913,7 @@
         </div>
     </div>
 
+    <!-- بقیه کدها بدون تغییر باقی می‌مانند -->
     <!-- دکمه لیست انتخاب غذا -->
     <div class="selection-list-btn">
         <i class="fas fa-list"></i>
@@ -390,41 +999,15 @@
     </div>
 
     <!-- دکمه باز کردن منوی کشویی - فلش به سمت راست و در سمت چپ صفحه -->
-    <div class="categories-toggle">
+    <div style='background-color:#ef4444;' class="categories-toggle">
         <i class="fas fa-chevron-right"></i>
-    </div>
-
-    <!-- دسته‌بندی‌های پایین صفحه -->
-    <div class="categories-bottom">
-        <div class="categories-scroll scrollbar-hide">
-            <div class="category-bottom-item category-bottom-active" data-category="all">
-                <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <span class="category-bottom-name">همه</span>
-            </div>
-
-            {% for menu_category in menu_categories %}
-            <div class="category-bottom-item" data-category="{{ menu_category.id }}">
-                {% if menu_category.displayImage %}
-                <img src="{{ menu_category.displayImage.url }}" alt="{{ menu_category.category.title }}"
-                     class="category-bottom-icon object-cover shadow-md">
-                {% else %}
-                <div class="category-bottom-icon bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 shadow-md">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                {% endif %}
-                <span class="category-bottom-name">{{ menu_category.category.title|truncatechars:10 }}</span>
-            </div>
-            {% endfor %}
-        </div>
     </div>
 
     <!-- مودال رزرو میز -->
     <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                <div class="modal-header bg-gradient-to-r from-#ef4444-500 to-red-500 text-white">
                     <h5 class="modal-title font-bold" id="reservationModalLabel">
                         <i class="fas fa-calendar-check ml-2"></i>
                         رزرو میز در {{ restaurant.title }}
@@ -484,7 +1067,7 @@
 
                         <div class="flex justify-end">
                             <button type="button"
-                                    class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
+                                    class="bg-gradient-to-r from-#ef4444-500 to-red-500 hover:from-#ef4444-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
                                     onclick="checkAvailability()">
                                 <i class="fas fa-search"></i>
                                 بررسی دسترسی
@@ -633,10 +1216,380 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        // نمایش عکس بزرگ و توضیحات
+        document.addEventListener('DOMContentLoaded', function() {
+            const foodImageContainers = document.querySelectorAll('.food-image-container');
+            const imageModal = document.querySelector('.image-modal');
+            const imageModalImg = document.querySelector('.image-modal-img');
+            const imageModalTitle = document.querySelector('.image-modal-title');
+            const imageModalDescription = document.querySelector('.image-modal-description');
+            const imageModalPrice = document.querySelector('.image-modal-price');
+            const imageModalTime = document.querySelector('.image-modal-time');
+            const imageModalClose = document.querySelector('.image-modal-close');
+            const imageModalOrderBtn = document.querySelector('.image-modal-order-btn');
+
+            foodImageContainers.forEach(container => {
+                container.addEventListener('click', function() {
+                    const title = this.getAttribute('data-food-title');
+                    const description = this.getAttribute('data-food-description');
+                    const price = this.getAttribute('data-food-price');
+                    const time = this.getAttribute('data-food-time');
+                    const image = this.getAttribute('data-food-image');
+                    const foodId = this.getAttribute('data-food-id');
+
+                    // پر کردن اطلاعات در مودال
+                    imageModalTitle.textContent = title;
+                    imageModalDescription.textContent = description;
+                    imageModalPrice.textContent = price + ' تومان';
+                    imageModalTime.textContent = time + ' دقیقه';
+
+                    if (image) {
+                        imageModalImg.src = image;
+                        imageModalImg.alt = title;
+                        imageModalImg.style.display = 'block';
+                    } else {
+                        imageModalImg.style.display = 'none';
+                    }
+
+                    // تنظیم دکمه سفارش در مودال
+                    imageModalOrderBtn.setAttribute('data-food-id', foodId);
+                    imageModalOrderBtn.setAttribute('data-food-title', title);
+                    imageModalOrderBtn.setAttribute('data-food-price', price.replace(/,/g, ''));
+                    imageModalOrderBtn.setAttribute('data-food-image', image);
+
+                    // نمایش مودال
+                    imageModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            // بستن مودال
+            imageModalClose.addEventListener('click', function() {
+                imageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // بستن مودال با کلیک روی پس‌زمینه
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    imageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // بستن مودال با کلید ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && imageModal.classList.contains('active')) {
+                    imageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // فعال کردن دکمه سفارش در مودال
+            imageModalOrderBtn.addEventListener('click', function() {
+                const foodId = this.getAttribute('data-food-id');
+                const foodTitle = this.getAttribute('data-food-title');
+                const foodPrice = this.getAttribute('data-food-price');
+                const foodImage = this.getAttribute('data-food-image');
+
+                // فراخوانی تابع سفارش
+                addToSelectionList(foodId, foodTitle, foodPrice, foodImage);
+
+                // بستن مودال
+                imageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // تابع افزودن به لیست انتخاب (نمونه)
+        function addToSelectionList(foodId, foodTitle, foodPrice, foodImage) {
+            // اینجا کد افزودن غذا به لیست انتخاب را اضافه کنید
+            console.log('افزودن به لیست:', foodTitle, foodPrice);
+
+            // نمایش نوتیفیکیشن
+            showNotification(foodTitle + ' به لیست انتخاب اضافه شد');
+        }
+
+        // نمایش نوتیفیکیشن
+        function showNotification(message) {
+            // کد نمایش نوتیفیکیشن
+            alert(message); // اینجا می‌توانید با یک سیستم نوتیفیکیشن زیبا جایگزین کنید
+        }
+    </script>
+
+    <script>
+
+class OrderManager {
+    constructor(restaurantId) {
+        this.restaurantId = restaurantId;
+        this.selectedItems = [];
+        this.totalPrice = 0;
+        this.tableNumber = null;
+        this.customerNotes = '';
+
+        this.websocket = new OrderWebSocket(restaurantId);
+        this.initializeEventListeners();
+    }
+
+    initializeEventListeners() {
+        // دکمه نمایش به گارسون
+        document.querySelector('.selection-list-show').addEventListener('click', () => {
+            this.showOrderToWaiter();
+        });
+
+        // دکمه فراخوانی گارسون
+        document.querySelector('.selection-display-call').addEventListener('click', () => {
+            this.callWaiter();
+        });
+
+        // دکمه‌های سفارش
+        document.querySelectorAll('.order-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                const foodTitle = e.currentTarget.getAttribute('data-food-title');
+                const foodPrice = parseInt(e.currentTarget.getAttribute('data-food-price'));
+                const foodImage = e.currentTarget.getAttribute('data-food-image');
+
+                this.addToSelectionList(foodId, foodTitle, foodPrice, foodImage);
+            });
+        });
+    }
+
+    addToSelectionList(foodId, foodTitle, foodPrice, foodImage) {
+        const existingItem = this.selectedItems.find(item => item.id === foodId);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+            existingItem.totalPrice = existingItem.quantity * existingItem.price;
+        } else {
+            this.selectedItems.push({
+                id: foodId,
+                title: foodTitle,
+                price: foodPrice,
+                image: foodImage,
+                quantity: 1,
+                totalPrice: foodPrice
+            });
+        }
+
+        this.updateSelectionList();
+        this.showNotification(`${foodTitle} به لیست انتخاب اضافه شد`);
+    }
+
+    updateSelectionList() {
+        this.calculateTotal();
+        this.updateSelectionUI();
+    }
+
+    calculateTotal() {
+        this.totalPrice = this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
+    }
+
+    updateSelectionUI() {
+        const badge = document.querySelector('.selection-list-badge');
+        const emptyState = document.querySelector('.selection-list-empty');
+        const itemsContainer = document.querySelector('.selection-list-items');
+        const displayItemsContainer = document.querySelector('.selection-display-items');
+        const totalPriceElement = document.querySelector('.selection-display-total-price');
+
+        // آپدیت badge
+        badge.textContent = this.selectedItems.reduce((total, item) => total + item.quantity, 0);
+
+        // آپدیت لیست آیتم‌ها
+        if (this.selectedItems.length > 0) {
+            emptyState.style.display = 'none';
+
+            // آپدیت لیست انتخاب
+            itemsContainer.innerHTML = this.selectedItems.map(item => `
+                <div class="selection-list-item" data-food-id="${item.id}">
+                    <div class="flex items-center gap-3">
+                        ${item.image ?
+                            `<img src="${item.image}" alt="${item.title}" class="w-12 h-12 rounded-lg object-cover">` :
+                            `<div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-utensils text-gray-400"></i>
+                            </div>`
+                        }
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm text-gray-800 truncate">${item.title}</div>
+                            <div class="text-xs text-gray-500">${item.price.toLocaleString()} تومان</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="quantity-btn decrease bg-gray-100 w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-gray-200" data-food-id="${item.id}">-</button>
+                        <span class="quantity text-sm font-medium w-8 text-center">${item.quantity}</span>
+                        <button class="quantity-btn increase bg-gray-100 w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-gray-200" data-food-id="${item.id}">+</button>
+                        <button class="remove-btn text-red-500 hover:text-red-700 p-1" data-food-id="${item.id}">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // آپدیت صفحه نمایش
+            displayItemsContainer.innerHTML = this.selectedItems.map(item => `
+                <div class="selection-display-item">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <div class="flex items-center gap-3">
+                            ${item.image ?
+                                `<img src="${item.image}" alt="${item.title}" class="w-16 h-16 rounded-lg object-cover">` :
+                                `<div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-utensils text-gray-400 text-lg"></i>
+                                </div>`
+                            }
+                            <div>
+                                <div class="font-semibold text-gray-800">${item.title}</div>
+                                <div class="text-sm text-gray-600">${item.price.toLocaleString()} تومان</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-gray-800">${item.quantity} ×</div>
+                            <div class="text-sm text-gray-600">${item.totalPrice.toLocaleString()} تومان</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // آپدیت قیمت کل
+            totalPriceElement.textContent = this.totalPrice.toLocaleString() + ' تومان';
+
+            // اضافه کردن event listeners برای دکمه‌های کم و زیاد
+            this.addQuantityEventListeners();
+        } else {
+            emptyState.style.display = 'block';
+            itemsContainer.innerHTML = '';
+            displayItemsContainer.innerHTML = '';
+            totalPriceElement.textContent = '0 تومان';
+        }
+    }
+
+    addQuantityEventListeners() {
+        // دکمه افزایش
+        document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                this.updateQuantity(foodId, 1);
+            });
+        });
+
+        // دکمه کاهش
+        document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                this.updateQuantity(foodId, -1);
+            });
+        });
+
+        // دکمه حذف
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const foodId = e.currentTarget.getAttribute('data-food-id');
+                this.removeItem(foodId);
+            });
+        });
+    }
+
+    updateQuantity(foodId, change) {
+        const item = this.selectedItems.find(item => item.id === foodId);
+        if (item) {
+            item.quantity += change;
+
+            if (item.quantity <= 0) {
+                this.removeItem(foodId);
+            } else {
+                item.totalPrice = item.quantity * item.price;
+                this.updateSelectionList();
+            }
+        }
+    }
+
+    removeItem(foodId) {
+        this.selectedItems = this.selectedItems.filter(item => item.id !== foodId);
+        this.updateSelectionList();
+    }
+
+    showOrderToWaiter() {
+        if (this.selectedItems.length === 0) {
+            this.showNotification('لطفاً ابتدا غذا انتخاب کنید', 'error');
+            return;
+        }
+
+        // نمایش صفحه نمایش سفارش
+        document.querySelector('.selection-display').classList.add('active');
+    }
+
+    async callWaiter() {
+        if (this.selectedItems.length === 0) {
+            this.showNotification('لطفاً ابتدا غذا انتخاب کنید', 'error');
+            return;
+        }
+
+        try {
+            // ایجاد داده سفارش
+            const orderData = {
+                id: Date.now().toString(), // ID موقت
+                items: this.selectedItems,
+                total_price: this.totalPrice,
+                table_number: this.tableNumber || 'تعیین نشده',
+                customer_notes: this.customerNotes,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // ارسال از طریق WebSocket
+            const success = this.websocket.sendOrder(orderData);
+
+            if (success) {
+                this.showNotification('سفارش شما با موفقیت به گارسون‌ها ارسال شد', 'success');
+
+                // پاک کردن لیست پس از ارسال موفق
+                this.selectedItems = [];
+                this.updateSelectionList();
+
+                // بستن صفحه نمایش
+                document.querySelector('.selection-display').classList.remove('active');
+            }
+
+        } catch (error) {
+            console.error('Error sending order:', error);
+            this.showNotification('خطا در ارسال سفارش. لطفاً دوباره تلاش کنید.', 'error');
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        // استفاده از سیستم نوتیفیکیشن موجود یا ایجاد یک نوتیفیکیشن جدید
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 left-4 z-50 px-4 py-3 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-500 text-white' :
+            type === 'error' ? 'bg-red-500 text-white' :
+            'bg-blue-500 text-white'
+        }`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+}
+
+// مقداردهی اولیه وقتی صفحه لود شد
+document.addEventListener('DOMContentLoaded', function() {
+    const restaurantId = '{{ restaurant.id }}'; // از تمپلیت Django می‌آید
+
+    // ایجاد مدیر سفارش
+    window.orderManager = new OrderManager(restaurantId);
+
+    console.log('Order manager initialized for restaurant:', restaurantId);
+});
+</script>
+
+
     {% include "./resScript.html" %}
     {% include "./persianCall.html" %}
-
-
 
 </body>
 </html>
