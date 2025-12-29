@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Menu Print Design</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Noto+Naskh+Arabic:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <style>
+        /* ------------------------------------------------------------------
+           1. PRINT SETUP & GLOBAL VARIABLES
+           ------------------------------------------------------------------ */
+        :root {
+            /* Default: LUXURY (Matches Dark Reference Image) */
+            --bg-color: #0F1115; /* Deep black/charcoal */
+            --text-color: #E5CFA0; /* Gold */
+            --accent-color: #C5A059; /* Darker Gold */
+            --line-color: #C5A059;
+            --font-heading: 'Lalezar', cursive;
+            --font-body: 'Vazirmatn', sans-serif;
+            --page-width: 210mm;
+            --page-height: 297mm; /* Exact A4 */
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #333; /* Browser view background */
+            font-family: var(--font-body);
+        }
+
+        .sheet {
+            position: relative;
+            width: var(--page-width);
+            height: var(--page-height);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            margin: 0 auto;
+            page-break-after: always;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); /* For screen viewing */
+        }
+
+        @media print {
+            body { background: none; }
+            .sheet { box-shadow: none; margin: 0; }
+        }
+
+        /* ------------------------------------------------------------------
+           2. LAYOUT & GRID
+           ------------------------------------------------------------------ */
+        .decoration-layer {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Floral Corners (SVG Data URI) */
+        .corner-flower {
+            position: absolute;
+            width: 45mm;
+            height: 45mm;
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0.9;
+        }
+
+        /* Luxury Theme Flower */
+        .luxury-flower {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='%23C5A059' d='M0,0 v60 c10,0 20,-10 30,-30 c20,20 50,10 60,0 c-20,-20 -20,-50 -30,-60 h-60 z'/%3E%3Ccircle cx='15' cy='15' r='5' fill='%230F1115'/%3E%3Cpath fill='none' stroke='%23C5A059' stroke-width='2' d='M0,70 q80,10 100,-70'/%3E%3Cpath fill='none' stroke='%23C5A059' stroke-width='1' d='M10,80 q90,20 120,-80'/%3E%3C/svg%3E");
+        }
+
+        .top-right { top: 0; right: 0; transform: scaleX(-1); }
+        .top-left { top: 0; left: 0; }
+        .bottom-right { bottom: 0; right: 0; transform: scale(-1); }
+        .bottom-left { bottom: 0; left: 0; transform: scaleY(-1); }
+
+        .container {
+            padding: 15mm;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* ------------------------------------------------------------------
+           3. HEADER
+           ------------------------------------------------------------------ */
+        header {
+            text-align: center;
+            height: 45mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5mm;
+            position: relative;
+        }
+
+        /* Decorative header lines from reference */
+        header::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 2px;
+            background: var(--line-color);
+            margin-top: 10px;
+            position: relative;
+        }
+        header::before {
+            content: '❖';
+            color: var(--line-color);
+            position: absolute;
+            bottom: 5px;
+            background: var(--bg-color);
+            padding: 0 10px;
+            z-index: 2;
+        }
+
+        .header-subtitle {
+            font-size: 14pt;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-family: var(--font-body);
+            color: var(--accent-color);
+        }
+
+        .header-title {
+            font-family: var(--font-heading);
+            font-size: 42pt;
+            margin: 0;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        /* ------------------------------------------------------------------
+           4. MENU GRID CONTENT
+           ------------------------------------------------------------------ */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two Columns */
+            grid-template-rows: 1fr 1fr;    /* Two Rows */
+            gap: 12mm; /* Space between quadrants */
+            flex-grow: 1;
+            position: relative;
+        }
+
+        /* The Cross Lines Separator (Matches Reference Dotted Lines) */
+        .menu-grid::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 10px;
+            bottom: 10px;
+            width: 1px;
+            border-left: 1px dotted var(--line-color);
+            opacity: 0.6;
+        }
+
+        .menu-grid::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            right: 10px;
+            height: 1px;
+            border-top: 1px dotted var(--line-color);
+            opacity: 0.6;
+        }
+
+        .quadrant {
+            padding: 2px;
+        }
+
+        .category-title {
+            font-family: var(--font-heading); /* Matches reference Serif style */
+            font-size: 16pt;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            text-align: center;
+            border-bottom: 1px solid transparent;
+        }
+
+        .menu-item-wrapper {
+            margin-bottom: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center; /* Center image vertically */
+            font-size: 9.5pt;
+        }
+
+        /* Small Image per Requirement */
+        .item-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: 8px; /* Space between img and text (RTL) */
+            border: 1px solid var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .item-text-group {
+            flex-grow: 1;
+            display: flex;
+            align-items: baseline;
+            width: 100%;
+        }
+
+        .item-name {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* The Dotted Leader Line */
+        .dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted var(--line-color);
+            margin: 0 5px;
+            opacity: 0.6;
+            position: relative;
+            top: -4px;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .item-desc {
+            display: block;
+            font-size: 8pt;
+            opacity: 0.7;
+            margin-top: 2px;
+            margin-right: 38px; /* Indent under name */
+            line-height: 1.2;
+        }
+
+        /* ------------------------------------------------------------------
+           5. BACK PAGE
+           ------------------------------------------------------------------ */
+        .back-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            border: 2px double var(--line-color);
+            margin: 10mm;
+            height: calc(100% - 20mm);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .social-block {
+            margin-top: 20mm;
+            padding: 10mm;
+            border-top: 1px solid var(--line-color);
+            width: 80%;
+        }
+
+        /* ------------------------------------------------------------------
+           6. THEMES
+           ------------------------------------------------------------------ */
+
+        /* THEME: TRADITIONAL IRANIAN */
+        body.theme-traditional {
+            --bg-color: #f4f1ea;
+            --text-color: #1a237e; /* Dark Blue */
+            --accent-color: #00838f; /* Persian Turquoise */
+            --line-color: #b71c1c;   /* Persian Red */
+        }
+        body.theme-traditional .sheet {
+            background-image:
+                radial-gradient(var(--accent-color) 0.5px, transparent 0.5px),
+                radial-gradient(var(--accent-color) 0.5px, var(--bg-color) 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            opacity: 1;
+        }
+        body.theme-traditional .luxury-flower {
+            filter: hue-rotate(180deg); /* Change gold to blue/teal */
+        }
+        body.theme-traditional .header-title {
+            font-family: 'Noto Naskh Arabic', serif;
+        }
+
+        /* THEME: CAFE */
+        body.theme-cafe {
+            --bg-color: #ffffff;
+            --text-color: #3e2723;
+            --accent-color: #5d4037;
+            --line-color: #3e2723;
+            --font-heading: 'Vazirmatn', sans-serif;
+        }
+        body.theme-cafe .sheet {
+            background: #fff;
+            border-left: 15mm solid #efebe9; /* Binder strip visual */
+        }
+        body.theme-cafe .decoration-layer { display: none; }
+        body.theme-cafe .menu-grid::before, body.theme-cafe .menu-grid::after { display: none; }
+        body.theme-cafe header { border: none; text-align: right; align-items: flex-start; padding-right: 20mm; }
+        body.theme-cafe header::after, body.theme-cafe header::before { display: none; }
+        body.theme-cafe .dots { border-bottom: 1px solid #ddd; }
+        body.theme-cafe .item-img { border-radius: 4px; border: none; box-shadow: 1px 1px 3px rgba(0,0,0,0.2); }
+
+    </style>
+</head>
+
+<body class="theme-luxury">
+
+    <div class="sheet">
+        <div class="decoration-layer">
+            <div class="corner-flower luxury-flower top-left"></div>
+            <div class="corner-flower luxury-flower top-right"></div>
+            <div class="corner-flower luxury-flower bottom-left"></div>
+            <div class="corner-flower luxury-flower bottom-right"></div>
+        </div>
+
+        <div class="container">
+            <header>
+                <div class="header-subtitle">Restaurant Name</div>
+                <h1 class="header-title">منوی رستوران</h1>
+                <div class="header-subtitle" style="font-size: 10pt; margin-top: 5px;">Authentic Persian Cuisine</div>
+            </header>
+
+            <div class="menu-grid">
+
+                <div class="quadrant">
+                    <div class="category-title">پیش غذا (Appetizer)</div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">سوپ جو مخصوص</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۴۵,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">همراه با خامه، قارچ و جعفری تازه</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">کشک و بادمجان</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۸۵,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">بادمجان کبابی، گردو، نعنا داغ و کشک غلیظ</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">میرزا قاسمی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۸۰,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">طعم اصیل گیلانی با سیر تازه و تخم مرغ</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">سالاد فصل</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۳۵,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1615937691194-97dbd3f3dc29?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">زیتون پرورده</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۵۵,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quadrant">
+                    <div class="category-title">غذای اصلی (Main Course)</div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">چلو کباب کوبیده</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۱۹۰,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">دو سیخ گوشت گوسفندی با برنج ایرانی اعلاء</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">کباب برگ ممتاز</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۳۲۰,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">فیله گوساله مرینیت شده با زعفران و کره</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">جوجه کباب زعفرانی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۱۸۰,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">قرمه سبزی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۱۶۰,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">جا افتاده با گوشت تکه ای و لیمو عمانی</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">زرشک پلو با مرغ</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۱۵۰,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quadrant">
+                    <div class="category-title">دسر (Dessert)</div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1551024601-562963525602?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">شله زرد اصیل</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۴۰,۰۰۰</span>
+                            </div>
+                        </div>
+                        <span class="item-desc">تزئین شده با دارچین و خلال بادام</span>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">بستنی سنتی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۳۵,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">کیک شکلاتی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۵۰,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quadrant">
+                    <div class="category-title">نوشیدنی (Beverage)</div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">دوغ پارچی محلی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۴۵,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">شربت سکنجبین</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۳۰,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">قهوه ترک</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۴۰,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=60&q=80" class="item-img" alt="food">
+                            <div class="item-text-group">
+                                <span class="item-name">چای دمی</span>
+                                <span class="dots"></span>
+                                <span class="item-price">۲۰,۰۰۰</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet">
+        <div class="decoration-layer">
+             <div class="corner-flower luxury-flower top-left"></div>
+             <div class="corner-flower luxury-flower bottom-right"></div>
+        </div>
+        <div class="back-content">
+            <h1 style="font-family: var(--font-heading); font-size: 50pt; margin-bottom: 0;">رستوران ستاره</h1>
+            <p style="font-size: 16pt; margin-top: 10px; color: var(--accent-color);">Setareh Luxury Restaurant</p>
+
+            <div style="margin: 30mm 0; width: 60%; border-top: 1px solid var(--line-color); border-bottom: 1px solid var(--line-color); padding: 10mm 0;">
+                <h3 style="margin-top: 0; font-family: var(--font-heading);">ساعات کاری | Opening Hours</h3>
+                <p>شنبه تا چهارشنبه: ۱۱ صبح تا ۱۱ شب</p>
+                <p>پنجشنبه و جمعه: ۱۱ صبح تا ۱۲ شب</p>
+            </div>
+
+            <div class="social-block">
+                <p>تاسیس: ۱۳۸۰ | Est. 2001</p>
+                <p style="font-size: 14pt; direction: ltr; margin: 15px 0;">
+                    <span style="font-family: sans-serif; font-size: 18px;">📷</span> @SetarehRestaurant
+                </p>
+                <p>تهران، خیابان ولیعصر، بالاتر از پارک ساعی</p>
+                <p style="direction: ltr;">+98 21 8888 0000</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Console Helper to switch themes quickly
+        console.log("%c MENU READY ", "background: #C5A059; color: black; font-weight: bold; padding: 5px;");
+        console.log("Change themes by modifying the <body> class or type: toggleTheme('traditional') in the console.");
+
+        function toggleTheme(themeName) {
+            document.body.className = 'theme-' + themeName;
+        }
+    </script>
+</body>
+</html>
+
+
+

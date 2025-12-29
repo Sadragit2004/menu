@@ -113,7 +113,7 @@ class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
             'fields': (
                 'owner', 'get_title_display', 'title', 'title_en', 'slug', 'text',
                 'description', 'description_en', 'isSeo',
-                'isActive', 'displayOrder'
+                'isActive', 'displayOrder','design'
             )
         }),
         (_('Menu View Statistics'), {
@@ -749,3 +749,137 @@ class MenuViewAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return True
+
+from django.contrib import admin
+from django.utils.html import format_html
+from .models.menufreemodels.models import MenuPaperDesien
+
+@admin.register(MenuPaperDesien)
+class MenuPaperDesienAdmin(admin.ModelAdmin):
+    # نمایش فیلدها در لیست
+    list_display = ('display_image', 'title', 'is_active_display', 'createAt', 'actions_column')
+    list_display_links = ('title',)  # فقط عنوان قابل کلیک باشد
+    list_filter = ('isActive', 'createAt')  # فیلترهای سمت راست
+    search_fields = ('title',)  # جستجو در عنوان
+    list_per_page = 20  # تعداد آیتم در هر صفحه
+    ordering = ('-createAt',)  # مرتب‌سازی بر اساس تاریخ (جدیدترین اول)
+
+    # فیلدها در فرم ویرایش
+    fieldsets = (
+        ('اطلاعات اصلی', {
+            'fields': ('title', 'image', 'isActive')
+        }),
+        ('اطلاعات زمانی', {
+            'fields': ('createAt',),
+            'classes': ('collapse',)  # قابل جمع شدن
+        }),
+    )
+
+    # فیلدهای فقط خواندنی
+    readonly_fields = ('createAt',)
+
+    # نمایش تاریخ به صورت فارسی
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # در حالت ویرایش
+            return self.readonly_fields + ('createAt',)
+        return self.readonly_fields
+
+    # نمایش وضعیت فعال/غیرفعال در لیست
+    def is_active_display(self, obj):
+        if obj.isActive:
+            return format_html(
+                '<span style="color: green; font-weight: bold;">✓ فعال</span>'
+            )
+        return format_html(
+            '<span style="color: red; font-weight: bold;">✗ غیرفعال</span>'
+        )
+    is_active_display.short_description = 'وضعیت'
+
+    # نمایش تصویر کوچک در لیست - از فیلد image استفاده می‌کند
+    def display_image(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" />',
+                obj.image.url
+            )
+        return format_html(
+            '<div style="width: 50px; height: 50px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">'
+            '<span style="color: #999; font-size: 12px;">بدون تصویر</span>'
+            '</div>'
+        )
+    display_image.short_description = 'تصویر'
+
+    # ستون اقدامات سفارشی
+    def actions_column(self, obj):
+        return format_html(
+            '<div style="display: flex; gap: 5px;">'
+            '<a href="/admin/{}/{}/{}/change/" class="button" style="padding: 3px 8px; background: #417690; color: white; text-decoration: none; border-radius: 4px; font-size: 12px;">ویرایش</a>'
+            '<a href="/admin/{}/{}/{}/delete/" class="button" style="padding: 3px 8px; background: #ba2121; color: white; text-decoration: none; border-radius: 4px; font-size: 12px;">حذف</a>'
+            '</div>',
+            obj._meta.app_label,
+            obj._meta.model_name,
+            obj.id,
+            obj._meta.app_label,
+            obj._meta.model_name,
+            obj.id
+        )
+    actions_column.short_description = 'اقدامات'
+    actions_column.allow_tags = True
+
+    # سفارشی‌سازی ظاهر فرم
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['title'].widget.attrs.update({'style': 'width: 70%;'})
+        form.base_fields['isActive'].widget.attrs.update({'style': 'width: 20px; height: 20px;'})
+        # اضافه کردن preview برای تصویر در فرم
+        form.base_fields['image'].widget.template_name = 'admin/widgets/clearable_file_input.html'
+        return form
+
+    # نمایش پیش‌نمایش تصویر در فرم ویرایش
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width: 300px; max-height: 300px; border-radius: 8px; border: 1px solid #ddd;" />',
+                obj.image.url
+            )
+        return "تصویری موجود نیست"
+    image_preview.short_description = 'پیش‌نمایش تصویر'
+
+    # اگر می‌خواهید در فرم ویرایش، پیش‌نمایش تصویر را ببینید
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if obj and obj.image:
+            # اضافه کردن فیلد پیش‌نمایش
+            fields = list(fields)
+            if 'image_preview' not in fields:
+                fields.insert(fields.index('image') + 1, 'image_preview')
+        return fields
+
+    # افزودن اکشن‌های سفارشی
+    actions = ['make_active', 'make_inactive']
+
+    def make_active(self, request, queryset):
+        updated = queryset.update(isActive=True)
+        self.message_user(request, f'{updated} طرح فعال شدند.')
+    make_active.short_description = 'فعال کردن طرح‌های انتخاب شده'
+
+    def make_inactive(self, request, queryset):
+        updated = queryset.update(isActive=False)
+        self.message_user(request, f'{updated} طرح غیرفعال شدند.')
+    make_inactive.short_description = 'غیرفعال کردن طرح‌های انتخاب شده'
+
+    # نمایش بهتر تاریخ در لیست
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs
+
+    # متن راهنما در بالای صفحه
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['title'] = 'مدیریت طرح‌های منو کاغذی'
+        extra_context['description'] = 'در این بخش می‌توانید طرح‌های منو کاغذی را مدیریت کنید.'
+        return super().changelist_view(request, extra_context=extra_context)
+
+    # تغییرات مربوط به save برای مدیریت تصویر
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)

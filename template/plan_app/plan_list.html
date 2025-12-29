@@ -8,38 +8,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پلن‌های قیمت‌گذاری</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-                        'bounce-subtle': 'bounce-subtle 2s infinite',
-                    },
-                    keyframes: {
-                        'pulse-glow': {
-                            '0%, 100%': {
-                                'box-shadow': '0 0 5px rgba(99, 102, 241, 0.5)',
-                                'transform': 'scale(1)'
-                            },
-                            '50%': {
-                                'box-shadow': '0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.6)',
-                                'transform': 'scale(1.02)'
-                            }
-                        },
-                        'bounce-subtle': {
-                            '0%, 100%': {
-                                'transform': 'translateY(0)'
-                            },
-                            '50%': {
-                                'transform': 'translateY(-5px)'
-                            }
-                        }
-                    }
-                }
+    <style>
+        /* استایل مخصوص انیمیشن‌ها */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.6);
+                transform: scale(1.02);
             }
         }
-    </script>
+
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        /* کلاس‌های جدید */
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s infinite;
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .video-placeholder {
+            background: linear-gradient(90deg, #1f2937 0%, #374151 50%, #1f2937 100%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite linear;
+        }
+
+        .play-btn-hover {
+            transition: all 0.3s ease;
+        }
+
+        .play-btn-hover:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+    </style>
 </head>
 <body class="bg-gray-900">
     <div class="relative isolate bg-gray-900 px-6 py-24 sm:py-32 lg:px-8">
@@ -94,6 +118,82 @@
                     {% endif %}
                 </div>
 
+                <!-- Video Box UI - قسمت جدید -->
+                <div class="mt-6 animate-fadeIn">
+                    <div class="mb-2 text-center">
+                        <span class="text-xs font-medium text-gray-400 bg-gray-800/50 px-2 py-1 rounded-full">
+                            <svg class="w-3 h-3 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                            </svg>
+                            ویدیوی معرفی
+                        </span>
+                    </div>
+
+                    <!-- ویدیو پلیس‌هولدر (نمایش قبل از پخش) -->
+                    <div class="relative rounded-xl overflow-hidden border border-gray-700/50 bg-gray-800/30 group cursor-pointer"
+                         onclick="playVideo('video-{{ plan.slug }}')">
+                        <!-- تصویر تامبنیل یا پلیس‌هولدر -->
+                        <div class="video-placeholder h-40 w-full flex items-center justify-center">
+                            {% if plan.video_thumbnail %}
+                                <!-- اگر تامبنیل وجود دارد -->
+                                <img src="{{ plan.video_thumbnail }}" alt="ویدیوی {{ plan.name }}"
+                                     class="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity">
+                            {% else %}
+                                <!-- پلیس‌هولدر پیش‌فرض -->
+                                <div class="text-center">
+                                    <div class="w-14 h-14 mx-auto mb-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center play-btn-hover">
+                                        <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm text-gray-300 font-medium">{{ plan.name }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- عنوان ویدیو -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-semibold text-white">معرفی {{ plan.name }}</p>
+                                    <p class="text-xs text-gray-300 mt-0.5">مدت: 30 ثانیه</p>
+                                </div>
+                                <div class="bg-black/50 rounded-full p-2 backdrop-blur-sm">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- حالت هاور -->
+                        <div class="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div class="bg-black/70 rounded-full p-4 transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- اطلاعات اضافی ویدیو -->
+                    <div class="mt-2 flex items-center justify-between text-xs text-gray-400">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>آخرین بروزرسانی: 1402/12/15</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>1.2K بازدید</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Plan description -->
                 {% if plan.description %}
                 <p class="mt-6 text-base/7 text-gray-300 text-center">{{ plan.description }}</p>
@@ -117,7 +217,7 @@
                     {% endfor %}
                 </ul>
 
-                <!-- CTA button - بدون هیچ انیمیشن اضافه -->
+                <!-- CTA button -->
                 <a href="{% url 'plan:purchase_plan' plan.slug %}" aria-describedby="tier-{{ plan.slug }}"
                    class="mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold text-white
                           transition-colors duration-200
@@ -133,5 +233,50 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- JavaScript برای مدیریت ویدیو -->
+    <script>
+        // تابع پخش ویدیو (قابل توسعه)
+        function playVideo(videoId) {
+            console.log(`پخش ویدیو: ${videoId}`);
+            // در اینجا می‌توانید:
+            // 1. باز کردن مدال ویدیو
+            // 2. پخش ویدیو در صفحه
+            // 3. یا هدایت به صفحه ویدیو
+
+            // مثال ساده: باز کردن لینک ویدیو در تب جدید
+            const videoLinks = {
+                'video-basic': 'https://example.com/video-basic',
+                'video-pro': 'https://example.com/video-pro',
+                'video-enterprise': 'https://example.com/video-enterprise'
+            };
+
+            if (videoLinks[videoId]) {
+                window.open(videoLinks[videoId], '_blank');
+            }
+        }
+
+        // مدیریت هایلایت ویدیو در هاور
+        document.querySelectorAll('.group.cursor-pointer').forEach(box => {
+            box.addEventListener('mouseenter', function() {
+                this.style.borderColor = 'rgba(99, 102, 241, 0.5)';
+            });
+
+            box.addEventListener('mouseleave', function() {
+                this.style.borderColor = '';
+            });
+        });
+
+        // اضافه کردن انیمیشن برای پلی‌باتن
+        document.querySelectorAll('.play-btn-hover').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.15)';
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>

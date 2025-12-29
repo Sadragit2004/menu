@@ -7,7 +7,8 @@ from apps.user.model.user import CustomUser
 from django.utils.translation import gettext as _
 from django.conf import settings
 from ckeditor_uploader.fields import RichTextUploadingField
-
+from django.utils import timezone
+import utils
 
 # ----------------------------
 # Upload helpers
@@ -51,6 +52,7 @@ def upload_to_food_restaurant_image(instance, filename):
 # Base abstract model
 # ----------------------------
 class BaseModel(models.Model):
+
     title = models.CharField(max_length=255, null=True, blank=True, verbose_name="عنوان فارسی")
     title_en = models.CharField(max_length=255, null=True, blank=True, verbose_name="عنوان انگلیسی")
     slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
@@ -95,6 +97,7 @@ class BaseModel(models.Model):
 # Category
 # ----------------------------
 class Category(BaseModel):
+
     image = models.ImageField(upload_to=upload_to_category, null=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
@@ -116,6 +119,23 @@ class Category(BaseModel):
             subcategories.append(child)
             subcategories.extend(child.get_all_subcategories())
         return subcategories
+
+
+
+class MenuPaperDesien(models.Model):
+
+    title = models.CharField(verbose_name='عنوان طرخ',max_length=200)
+    imageFile = utils.FileUpload('images','paperMenu')
+    image = models.ImageField(upload_to=imageFile.upload_to,verbose_name='عکس',null=True,blank=True)
+    isActive = models.BooleanField(default=True,verbose_name='وضعیت فعال')
+    createAt = models.DateTimeField(default=timezone.now,verbose_name='تاریخ ثبت')
+
+
+    def __str__(self):
+        return f'{self.title}\t{self.createAt}'
+
+
+
 
 
 # ----------------------------
@@ -142,24 +162,6 @@ class Restaurant(BaseModel):
     taxRate = models.DecimalField(max_digits=5, decimal_places=2, default=9.0, null=True, blank=True)
     isSeo = models.BooleanField(default=False,verbose_name='ایا سئو شده',blank=True,null=True)
     expireDate = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ انقضا")
-    primary_color = models.CharField(max_length=7, default='#3B82F6', verbose_name="رنگ اصلی")
-    secondary_color = models.CharField(max_length=7, default='#10B981', verbose_name="رنگ ثانویه")
-    background_color = models.CharField(max_length=7, default='#F9FAFB', verbose_name="رنگ پس‌زمینه")
-    text_color = models.CharField(max_length=7, default='#1F2937', verbose_name="رنگ متن")
-
-    # Theme Settings
-    theme = models.CharField(
-        max_length=10,
-        choices=[('light', 'روشن'), ('dark', 'تیره'), ('auto', 'خودکار')],
-        default='auto',
-        verbose_name="تم"
-    )
-    menu_style = models.CharField(
-        max_length=10,
-        choices=[('grid', 'شبکه‌ای'), ('list', 'لیستی'), ('compact', 'فشرده')],
-        default='grid',
-        verbose_name="سبک منو"
-    )
 
     # Toggle Settings
     show_usd_price = models.BooleanField(default=False, verbose_name="نمایش قیمت دلار")
@@ -171,6 +173,7 @@ class Restaurant(BaseModel):
             self.openingTime = None
         if self.closingTime == "":
             self.closingTime = None
+
 
         if not self.slug and self.english_name:
             base_slug = slugify(self.english_name)
@@ -284,6 +287,75 @@ class Restaurant(BaseModel):
             expireDate__gte=timezone.now(),
             expireDate__lte=threshold
         )
+
+
+
+
+class RequestToCreatePaperMenu(models.Model):
+
+    # وضعیت‌های ممکن
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار'),
+        ('confirmed', 'تایید شده'),
+        ('delivered', 'تحویل شده'),
+        ('rejected', 'رد شده'),
+    ]
+
+    paper = models.ForeignKey(
+        'MenuPaperDesien',
+        verbose_name='طرح منو',
+        on_delete=models.CASCADE
+    )
+
+    restaurant = models.ForeignKey(
+        'Restaurant',
+        verbose_name='رستوران',
+        on_delete=models.CASCADE
+    )
+
+    text_content = models.TextField(
+        verbose_name='متن محتوا',
+        blank=True,
+        null=True
+    )
+
+    # فیلد وضعیت
+    status = models.CharField(
+        verbose_name='وضعیت درخواست',
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    # فیلد عکس بک‌گراند
+    background_image = models.ImageField(
+        verbose_name='عکس بک‌گراند',
+        upload_to='paper_menu_backgrounds/',
+        blank=True,
+        null=True,
+        help_text='تصویر زمینه منو را آپلود کنید'
+    )
+
+    # فیلدهای تاریخ برای ردیابی
+    created_at = models.DateTimeField(
+        verbose_name='تاریخ ایجاد',
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        verbose_name='تاریخ بروزرسانی',
+        auto_now=True
+    )
+
+    class Meta:
+        verbose_name = 'درخواست ایجاد منو کاغذی'
+        verbose_name_plural = 'درخواست‌های ایجاد منو کاغذی'
+
+    def __str__(self):
+        return f'درخواست منو {self.paper} برای {self.restaurant}'
+
+
+
 
 
 # ----------------------------

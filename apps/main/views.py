@@ -97,7 +97,7 @@ class AllRestaurantsView(ListView):
         # فیلتر بر اساس دسته‌بندی
         category_slug = self.request.GET.get('category')
         if category_slug:
-            from .models import Category, MenuCategory
+            from apps.menu.models.menufreemodels.models import Category, MenuCategory
             try:
                 category = Category.objects.get(slug=category_slug, isActive=True)
                 restaurant_ids = MenuCategory.objects.filter(
@@ -129,7 +129,7 @@ class AllRestaurantsView(ListView):
             Q(expireDate__lt=timezone.now()) & Q(expireDate__isnull=False)
         ).count()
 
-        from .models import Category
+        from apps.menu.models.menufreemodels.models import Category
         context['categories'] = Category.objects.filter(
             isActive=True,
             parent__isnull=True
@@ -168,7 +168,7 @@ def load_more_restaurants(request):
 
             # فیلتر دسته‌بندی
             if category:
-                from .models import Category, MenuCategory
+                from apps.menu.models.menufreemodels.models import Category, MenuCategory
                 try:
                     category_obj = Category.objects.get(slug=category, isActive=True)
                     restaurant_ids = MenuCategory.objects.filter(

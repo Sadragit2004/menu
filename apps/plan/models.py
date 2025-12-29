@@ -6,6 +6,7 @@ from apps.user.model.user import CustomUser
 from django.utils import timezone
 from apps.menu.models.menufreemodels.models import Restaurant
 
+
 class Plan(models.Model):
 
 

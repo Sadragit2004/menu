@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Menu Design Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lalezar&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Vazirmatn:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* -----------------------------------------------------------
+           GLOBAL RESET & PRINT CONFIGURATION
+        ----------------------------------------------------------- */
+        :root {
+            --a4-width: 210mm;
+            --a4-height: 296mm; /* Slight reduction to prevent bleed overflow */
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0; /* Screen background */
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        /* The Sheet Container */
+        .sheet {
+            width: var(--a4-width);
+            height: var(--a4-height);
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        /* Print Specifics */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            body { background: none; }
+            .sheet {
+                margin: 0;
+                box-shadow: none;
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+
+        /* Utility: Dot Leaders for Prices */
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 6mm; /* Adjusted spacing */
+            position: relative;
+        }
+
+        .item-name {
+            font-weight: 500;
+            padding-left: 10px; /* Space for dots RTL */
+            background: inherit; /* To cover dots if needed */
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Image instructed in #5 */
+        .item-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .dots {
+            flex-grow: 1;
+            border-bottom: 2px dotted rgba(255,255,255,0.3);
+            margin: 0 10px;
+            position: relative;
+            top: -5px;
+            opacity: 0.5;
+        }
+
+        .price {
+            font-weight: 700;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        /* -----------------------------------------------------------
+           STYLE 1: THE REPLICA (Wood & Coffee Theme)
+           Matches the provided reference image
+        ----------------------------------------------------------- */
+        .style-replica {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('2.jpg'); /* Dark Wood Texture */
+            background-size: cover;
+            color: #fff;
+            padding: 15mm;
+        }
+
+        /* Typography Override for Replica */
+        .style-replica h1 {
+            font-family: 'Playfair Display', serif; /* Using serif to match "Coffee" */
+            font-size: 80pt;
+            margin: 0;
+            line-height: 0.8;
+            color: #fff;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+            text-align: left; /* Image has title on left */
+            direction: ltr; /* Keeping title English as per visual, or Persian? Using English for visual match, subtitles in Persian */
+        }
+
+        .style-replica .script-overlay {
+            font-family: 'Great Vibes', cursive;
+            font-size: 60pt;
+            color: #dcbfa4; /* Latte color */
+            position: absolute;
+            top: 50px;
+            left: 80px;
+            z-index: 3;
+            transform: rotate(-10deg);
+        }
+
+        .style-replica .brand-sub {
+            font-size: 14pt;
+            color: #dcbfa4;
+            margin-bottom: 10mm;
+            display: block;
+            text-align: left;
+            direction: ltr;
+        }
+
+        /* Layout Grid */
+        .replica-layout {
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr; /* Left Col, Divider, Right Col */
+            gap: 10mm;
+            margin-top: 15mm;
+            height: 65%;
+        }
+
+        .replica-divider {
+            background: rgba(255,255,255,0.2);
+            height: 100%;
+        }
+
+        .replica-col h2 {
+            color: #dcbfa4;
+            font-family: 'Lalezar', cursive;
+            font-size: 22pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(220, 191, 164, 0.3);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        .style-replica .item-desc {
+            display: none; /* Reference image has no descriptions, hidden for accuracy */
+        }
+
+        /* Floating Beans Decor */
+        .bean {
+            position: absolute;
+            width: 30px;
+            height: auto;
+            opacity: 0.8;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));
+        }
+
+        /* Bottom Contact Box */
+        .contact-box {
+            border: 1px solid #fff;
+            padding: 15px;
+            width: 250px;
+            position: absolute;
+            bottom: 35%; /* Adjusted based on image */
+            right: 15mm;
+            text-align: center;
+        }
+
+        /* Main Cup Image */
+        .cup-img {
+            position: absolute;
+            bottom: 830px;
+            right: -14px;
+            width: 283px;
+            z-index: 10;
+          }
+
+        /* -----------------------------------------------------------
+           STYLE 2: TRADITIONAL IRANIAN (Teahouse / Sofreh Khane)
+        ----------------------------------------------------------- */
+        .style-traditional {
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#1a5c68 1px, transparent 1px);
+            background-size: 20px 20px;
+            border: 10mm solid #1a5c68; /* Turquoise Border */
+            color: #2c2c2c;
+            padding: 20mm;
+        }
+
+        .style-traditional::before {
+            content: "";
+            position: absolute;
+            top: 5mm; left: 5mm; right: 5mm; bottom: 5mm;
+            border: 2px solid #c5a059; /* Gold inner border */
+            pointer-events: none;
+        }
+
+        .style-traditional h1 {
+            text-align: center;
+            font-family: 'Lalezar', cursive;
+            color: #1a5c68;
+            font-size: 48pt;
+            margin-bottom: 5mm;
+            text-shadow: 2px 2px 0px #c5a059;
+        }
+
+        .style-traditional h2 {
+            font-family: 'Vazirmatn', sans-serif;
+            text-align: center;
+            background: #1a5c68;
+            color: #fff;
+            padding: 5px 20px;
+            border-radius: 20px;
+            margin: 10mm auto;
+            width: fit-content;
+            font-size: 18pt;
+        }
+
+        .style-traditional .menu-item {
+            margin-bottom: 8mm;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 2mm;
+        }
+
+        .style-traditional .dots { border: none; } /* No dots in this style */
+
+        .style-traditional .item-name { color: #1a5c68; font-weight: 900; font-size: 14pt; }
+        .style-traditional .price { color: #c5a059; font-size: 14pt; }
+
+        .style-traditional .item-desc {
+            display: block;
+            font-size: 10pt;
+            color: #666;
+            margin-top: 2px;
+            width: 100%;
+        }
+
+        .persian-pattern {
+            position: absolute;
+            width: 150px;
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* -----------------------------------------------------------
+           STYLE 3: LUXURY FINE DINING (Modern Tehran)
+        ----------------------------------------------------------- */
+        .style-luxury {
+            background: #fff;
+            color: #000;
+            padding: 30mm;
+            text-align: center;
+        }
+
+        .style-luxury h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 30pt;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 5mm;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5mm;
+            display: inline-block;
+        }
+
+        .style-luxury h2 {
+            font-family: 'Vazirmatn', sans-serif;
+            font-weight: 300;
+            font-size: 16pt;
+            color: #555;
+            margin-top: 15mm;
+            margin-bottom: 10mm;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .style-luxury .menu-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8mm;
+        }
+
+        .style-luxury .menu-item {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10mm;
+            border: none;
+        }
+
+        .style-luxury .item-thumb { display: none; } /* Minimalist - no thumbs */
+        .style-luxury .dots { display: none; }
+
+        .style-luxury .item-name {
+            font-size: 14pt;
+            font-weight: 700;
+            padding: 0;
+            margin-bottom: 2mm;
+        }
+
+        .style-luxury .item-desc {
+            font-size: 9pt;
+            color: #777;
+            max-width: 80%;
+            margin: 0 auto 2mm auto;
+            line-height: 1.4;
+        }
+
+        .style-luxury .price {
+            font-family: 'Playfair Display', serif;
+            font-size: 12pt;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+        }
+
+        .luxury-footer {
+            position: absolute;
+            bottom: 15mm;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 9pt;
+            letter-spacing: 2px;
+            color: #999;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sheet style-replica">
+
+        <img src="https://purepng.com/public/uploads/large/purepng.com-coffee-bean-clippartcoffee-beancoffeebeandrink-1701527142472d8p9h.png" class="bean" style="top: 20px; right: 50px; transform: rotate(45deg);">
+        <img src="https://purepng.com/public/uploads/large/purepng.com-coffee-bean-clippartcoffee-beancoffeebeandrink-1701527142472d8p9h.png" class="bean" style="top: 150px; right: 120px; width: 20px;">
+        <img src="https://purepng.com/public/uploads/large/purepng.com-coffee-bean-clippartcoffee-beancoffeebeandrink-1701527142472d8p9h.png" class="bean" style="top: 80px; left: 200px; transform: rotate(-30deg); width: 40px;">
+
+        <span class="brand-sub">Borcelle Cafe</span>
+        <h1>Coffee</h1>
+        <div class="script-overlay">Menu</div>
+
+        <div class="replica-layout">
+
+            <div class="replica-col">
+                <h2>قهوه گرم (Hot Coffee)</h2>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        اسپرسو دوبل
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۰۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کاپوچینو ایتالیایی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۲۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1585494156145-1c60a4fe952b?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        موکا شکلاتی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۴۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        لاته وانیلی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۵۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1621575883582-7494f275759a?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        آمریکانو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۳۰۰ ت</div>
+                </div>
+
+                <h2 style="margin-top: 15mm;">قهوه سرد (Ice Coffee)</h2>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1517701604599-bb29b5dd7359?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کلد برو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۰۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        آیس لاته
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۲۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        آیس موکا
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۴۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                         فراپوچینو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۵۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                         آفوگاتو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۳۰۰ ت</div>
+                </div>
+            </div>
+
+            <div class="replica-divider"></div>
+
+            <div class="replica-col" style="position: relative;">
+                <h2>میان وعده (Snacks)</h2>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کروسان کره ای
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۰۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کوکی شکلاتی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۲۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        براونی گردویی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۴۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کیک هویج
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۵۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        چیز کیک
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۳۰۰ ت</div>
+                </div>
+
+                <div class="contact-box">
+                    <h4 style="margin:0 0 5px 0; color: #dcbfa4;">Cafe Contact:</h4>
+                    <div style="font-size: 12px; direction: ltr;">
+                        +123-456-7890<br>
+                        @borcellecafe
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <img src="https://pngimg.com/uploads/cappuccino/cappuccino_PNG26.png" class="cup-img" alt="Latte">
+    </div>
+    <div class="sheet style-replica">
+
+
+
+
+        <div class="replica-layout">
+
+            <div class="replica-col">
+                <h2>قهوه گرم (Hot Coffee)</h2>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        اسپرسو دوبل
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۰۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کاپوچینو ایتالیایی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۲۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1585494156145-1c60a4fe952b?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        موکا شکلاتی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۴۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        لاته وانیلی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۵۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1621575883582-7494f275759a?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        آمریکانو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۳۰۰ ت</div>
+                </div>
+
+                <h2 style="margin-top: 15mm;">قهوه سرد (Ice Coffee)</h2>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1517701604599-bb29b5dd7359?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کلد برو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۰۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        آیس لاته
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۲۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        آیس موکا
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۴۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                         فراپوچینو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۵۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                         آفوگاتو
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۳۰۰ ت</div>
+                </div>
+            </div>
+
+            <div class="replica-divider"></div>
+
+            <div class="replica-col" style="position: relative;">
+                <h2>میان وعده (Snacks)</h2>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کروسان کره ای
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۰۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کوکی شکلاتی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۲۰ ت</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        براونی گردویی
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۴۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        کیک هویج
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۲۵۰ ت</div>
+                </div>
+                 <div class="menu-item">
+                    <div class="item-name">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=50&h=50&fit=crop" class="item-thumb" alt="">
+                        چیز کیک
+                    </div>
+                    <div class="dots"></div>
+                    <div class="price">۳۰۰ ت</div>
+                </div>
+
+                <div class="contact-box">
+                    <h4 style="margin:0 0 5px 0; color: #dcbfa4;">Cafe Contact:</h4>
+                    <div style="font-size: 12px; direction: ltr;">
+                        +123-456-7890<br>
+                        @borcellecafe
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

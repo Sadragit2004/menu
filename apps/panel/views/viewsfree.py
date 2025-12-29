@@ -1523,6 +1523,9 @@ def quick_add_menu_category(request, slug):
             'message': f'خطا در افزودن دسته‌بندی‌ها: {str(e)}'
         })
 
+
+
+
 @login_required
 def user_menus_view(request):
     user_restaurants = request.user.restaurants.all()
@@ -1533,6 +1536,8 @@ def user_menus_view(request):
     return render(request, 'panel_app/free/myMenu.html', {
         'menu_categories': menu_categories,
     })
+
+
 
 @login_required
 def generate_qr_code(request, restaurant_slug):
@@ -1965,3 +1970,174 @@ def restaurant_settings(request, restaurant_slug):
                 'success': False,
                 'message': f'خطا در ذخیره تنظیمات: {str(e)}'
             })
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.core.paginator import Paginator
+from apps.menu.models.menufreemodels.models import MenuPaperDesien, Restaurant, RequestToCreatePaperMenu
+from django.views.decorators.http import require_POST
+import json
+
+class MenuPaperDesienListView(ListView):
+    """
+    View برای نمایش لیست طرح‌های منو برای مشتریان
+    """
+    model = MenuPaperDesien
+    template_name = 'panel_app/free/menu_paper_desien_list.html'
+    context_object_name = 'designs'
+    paginate_by = 12
+
+    def get_queryset(self):
+        # فقط طرح‌های فعال را نشان می‌دهد
+        return MenuPaperDesien.objects.filter(isActive=True).order_by('-createAt')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # اضافه کردن رستوران‌های کاربر
+        if self.request.user.is_authenticated:
+            context['user_restaurants'] = Restaurant.objects.filter(
+                owner=self.request.user,
+                isActive=True
+            )
+        else:
+            context['user_restaurants'] = []
+
+        context['total_designs'] = self.get_queryset().count()
+        return context
+
+
+
+@login_required
+@require_POST
+def create_paper_menu_request(request):
+    """
+    View برای ثبت درخواست سفارش منو کاغذی
+    """
+    try:
+        # دریافت داده‌ها
+        design_id = request.POST.get('design_id')
+        restaurant_id = request.POST.get('restaurant_id')
+        text_content = request.POST.get('text_content', '')
+        background_type = request.POST.get('background_type', 'default')
+        background_value = request.POST.get('background_value', '')
+
+        # اعتبارسنجی
+        if not design_id or not restaurant_id:
+            return JsonResponse({
+                'success': False,
+                'message': 'لطفاً طرح و رستوران را انتخاب کنید.'
+            })
+
+        # دریافت مدل‌ها
+        design = get_object_or_404(MenuPaperDesien, id=design_id, isActive=True)
+        restaurant = get_object_or_404(Restaurant, id=restaurant_id, owner=request.user, isActive=True)
+
+        # ایجاد درخواست
+        request_obj = RequestToCreatePaperMenu.objects.create(
+            paper=design,
+            restaurant=restaurant,
+            text_content=text_content,
+            status='pending'
+        )
+
+        # مدیریت فایل بک‌گراند
+        if background_type == 'custom' and 'background_image' in request.FILES:
+            background_image = request.FILES['background_image']
+            # بررسی حجم فایل (حداکثر 5MB)
+            if background_image.size > 5 * 1024 * 1024:
+                request_obj.delete()
+                return JsonResponse({
+                    'success': False,
+                    'message': 'حجم فایل نباید بیشتر از 5 مگابایت باشد.'
+                })
+
+            request_obj.background_image = background_image
+            request_obj.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'درخواست شما با موفقیت ثبت شد.',
+            'request_id': request_obj.id
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'خطا در ثبت درخواست: {str(e)}'
+        })
+
+@login_required
+def paper_menu_requests_list(request):
+    """
+    View برای نمایش لیست درخواست‌های کاربر
+    """
+    requests = RequestToCreatePaperMenu.objects.filter(
+        restaurant__owner=request.user
+    ).order_by('-created_at')
+
+    paginator = Paginator(requests, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'requests': page_obj,
+        'status_choices': dict(RequestToCreatePaperMenu.STATUS_CHOICES)
+    }
+
+    return render(request, 'panel_app/free/paper_menu_requests.html', context)
+
+@login_required
+def paper_menu_request_detail(request, pk):
+    """
+    View برای نمایش جزئیات یک درخواست
+    """
+    request_obj = get_object_or_404(
+        RequestToCreatePaperMenu,
+        id=pk,
+        restaurant__owner=request.user
+    )
+
+    context = {
+        'request': request_obj,
+        'status_display': dict(RequestToCreatePaperMenu.STATUS_CHOICES).get(request_obj.status)
+    }
+
+    return render(request, 'panel_app/free/paper_menu_request_detail.html', context)
+
+
+from django.http import Http404
+@login_required
+@require_POST
+def cancel_paper_menu_request(request, pk):
+    """
+    View برای لغو درخواست توسط کاربر
+    """
+    try:
+        request_obj = get_object_or_404(
+            RequestToCreatePaperMenu,
+            id=pk,
+            restaurant__owner=request.user,
+            status='pending'  # فقط درخواست‌های در انتظار قابل لغو هستند
+        )
+
+        cancel_reason = request.POST.get('cancel_reason', '')
+
+        # می‌توانید یک فیلد cancel_reason به مدل اضافه کنید
+        # request_obj.cancel_reason = cancel_reason
+        # request_obj.status = 'cancelled'  # اگر می‌خواهید وضعیت جدید اضافه کنید
+
+        # یا فقط حذف کنید
+        request_obj.delete()
+
+        messages.success(request, 'درخواست با موفقیت لغو شد.')
+        return redirect('paper_menu_requests')
+
+    except Http404:
+        messages.error(request, 'درخواست یافت نشد یا قابل لغو نیست.')
+        return redirect('paper_menu_requests')
+    except Exception as e:
+        messages.error(request, f'خطا در لغو درخواست: {str(e)}')
+        return redirect('paper_menu_request_detail', pk=pk)

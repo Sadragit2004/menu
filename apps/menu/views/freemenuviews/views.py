@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.db.models import Q
+from django.views import View
 from ...models.menufreemodels.models import Restaurant, MenuCategory, Food, FoodRestaurant, get_current_exchange_rate
 
 # صفحه اصلی منوی دیجیتال
@@ -316,6 +317,4 @@ class MenuViewStats(View):
                 'success': False,
                 'message': 'رستوران پیدا نشد'
             }, status=404)
-
-
 

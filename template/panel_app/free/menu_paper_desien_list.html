@@ -1,0 +1,702 @@
+{% extends "db_template.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- هدر صفحه -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6 mb-8 border border-blue-100">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">طرح‌های منوی کاغذی</h1>
+                <p class="text-gray-600">طراحی‌های حرفه‌ای برای منو کاغذی رستوران شما</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3">
+                <!-- تعداد طرح‌های فعال -->
+                <div class="bg-white text-blue-700 px-4 py-2 rounded-lg border border-blue-200 shadow-sm">
+                    <span class="font-semibold">{{ total_designs }}</span> طرح فعال
+                </div>
+
+                <!-- دکمه لیست سفارشات -->
+                <a href="{% url 'panel:paper_menu_requests' %}"
+                   class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    لیست سفارشات من
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- گالری Pinterest-style -->
+    <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+        {% for design in designs %}
+        <div class="break-inside-avoid relative group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300"
+             onclick="openImageModal('{{ design.id }}', '{{ design.title }}', '{% if design.image %}{{ design.image.url }}{% endif %}', '{{ design.createAt|date:"Y/m/d" }}')">
+
+            <!-- تصویر اصلی -->
+            <div class="relative overflow-hidden">
+                {% if design.image %}
+                <img src="{{ design.image.url }}"
+                     alt="{{ design.title }}"
+                     class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105">
+                {% else %}
+                <div class="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                {% endif %}
+
+                <!-- نشانگر وضعیت مخفی -->
+                {% if design.isActive %}
+                <div class="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                        ✓ آماده سفارش
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <!-- حالت خالی -->
+        <div class="col-span-full text-center py-20">
+            <div class="max-w-md mx-auto">
+                <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3 class="text-2xl font-bold text-gray-700 mb-3">طرحی برای نمایش وجود ندارد</h3>
+                <p class="text-gray-500">در حال حاضر طرح فعالی برای نمایش موجود نیست.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- پاگینیشن ساده -->
+    {% if designs.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <div class="flex space-x-2 space-x-reverse">
+            {% if designs.has_previous %}
+            <a href="?page={{ designs.previous_page_number }}"
+               class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-700 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            {% endif %}
+
+            {% for num in designs.paginator.page_range %}
+                {% if designs.number == num %}
+                <span class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white font-semibold">
+                    {{ num }}
+                </span>
+                {% elif num > designs.number|add:'-3' and num < designs.number|add:'3' %}
+                <a href="?page={{ num }}"
+                   class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-700 transition-colors">
+                    {{ num }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if designs.has_next %}
+            <a href="?page={{ designs.next_page_number }}"
+               class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-700 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- مودال تصویر Pinterest-style -->
+<div id="imageModal" class="fixed inset-0 bg-black/95 z-50 hidden">
+    <div class="relative h-full w-full">
+        <!-- دکمه بستن -->
+        <button onclick="closeImageModal()"
+                class="absolute top-6 right-6 z-20 text-white hover:text-gray-300 transition-colors">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <!-- نوار ابزار پایین -->
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent z-10 p-6">
+            <div class="max-w-4xl mx-auto">
+                <!-- اطلاعات طرح -->
+                <div class="text-white mb-4">
+                    <h2 id="modalTitle" class="text-2xl font-bold mb-1"></h2>
+                    <div class="flex items-center text-white/80 text-sm">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span id="modalDate"></span>
+                        <span id="modalStatus" class="mr-4 px-2 py-1 bg-green-500 rounded-full text-xs font-medium">
+                            ✓ آماده سفارش
+                        </span>
+                    </div>
+                </div>
+
+                <!-- دکمه‌های اقدام -->
+                <div class="flex gap-3">
+                    <button onclick="closeImageModal()"
+                            class="px-6 py-3 bg-white text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        بستن
+                    </button>
+
+                    <button onclick="startOrderProcess()"
+                            class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        سفارش این طرح
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- تصویر در مودال -->
+        <div class="h-full flex items-center justify-center p-4">
+            <img id="modalImage" src="" alt="" class="max-w-full max-h-[80vh] object-contain rounded-lg">
+        </div>
+    </div>
+</div>
+
+<!-- مودال مرحله ۱: انتخاب رستوران -->
+<div id="restaurantSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-800">انتخاب رستوران</h3>
+                <button onclick="closeRestaurantSelectionModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-gray-600 text-sm mt-2">لطفاً رستورانی که می‌خواهید برای آن منو سفارش دهید را انتخاب کنید.</p>
+        </div>
+
+        <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for restaurant in user_restaurants %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group"
+                     onclick="selectRestaurant('{{ restaurant.id }}', '{{ restaurant.title }}')">
+                    <div class="flex items-center gap-4">
+                        {% if restaurant.logo %}
+                        <img src="{{ restaurant.logo.url }}"
+                             alt="{{ restaurant.title }}"
+                             class="w-16 h-16 rounded-lg object-cover border border-gray-200">
+                        {% else %}
+                        <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-800 group-hover:text-blue-600">{{ restaurant.title }}</h4>
+                            {% if restaurant.address %}
+                            <p class="text-gray-600 text-sm mt-1 truncate">{{ restaurant.address }}</p>
+                            {% endif %}
+                        </div>
+
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-2 text-center py-8">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <p class="text-gray-600">شما هنوز رستورانی ثبت نکرده‌اید.</p>
+                    <a href="{% url 'restaurant_create' %}" class="inline-block mt-3 text-blue-600 hover:text-blue-800 font-medium">
+                        + ایجاد رستوران جدید
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- مودال مرحله ۲: انتخاب بک‌گراند -->
+<div id="backgroundSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-800">انتخاب زمینه منو</h3>
+                <button onclick="closeBackgroundSelectionModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-gray-600 text-sm mt-2">یک زمینه برای منوی خود انتخاب کنید یا تصویر دلخواه آپلود نمایید.</p>
+        </div>
+
+        <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <!-- گزینه‌های پیش‌فرض شرکت -->
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-800 mb-4">زمینه‌های پیش‌فرض شرکت</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <!-- نمونه‌های زمینه پیش‌فرض -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-all group"
+                         onclick="selectDefaultBackground('bg1')">
+                        <div class="h-32 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+                        <div class="p-3 text-center">
+                            <span class="text-sm font-medium text-gray-700 group-hover:text-blue-600">آبی کلاسیک</span>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-all group"
+                         onclick="selectDefaultBackground('bg2')">
+                        <div class="h-32 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+                        <div class="p-3 text-center">
+                            <span class="text-sm font-medium text-gray-700 group-hover:text-blue-600">سبز طبیعی</span>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-all group"
+                         onclick="selectDefaultBackground('bg3')">
+                        <div class="h-32 bg-gradient-to-r from-purple-400 to-purple-600"></div>
+                        <div class="p-3 text-center">
+                            <span class="text-sm font-medium text-gray-700 group-hover:text-blue-600">بنفش شیک</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- آپلود تصویر سفارشی -->
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-4">آپلود تصویر زمینه دلخواه</h4>
+                <div id="customBackgroundUpload"
+                     class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                    <p class="text-gray-600 mb-2">تصویر زمینه خود را آپلود کنید</p>
+                    <p class="text-gray-500 text-sm">فرمت‌های مجاز: JPG, PNG, GIF (حداکثر 5MB)</p>
+                    <input type="file" id="backgroundImageUpload" accept="image/*" class="hidden" onchange="handleBackgroundImageUpload(event)">
+                    <button onclick="document.getElementById('backgroundImageUpload').click()"
+                            class="mt-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
+                        انتخاب فایل
+                    </button>
+                </div>
+                <div id="selectedBackgroundPreview" class="mt-4 hidden">
+                    <p class="text-sm text-gray-600 mb-2">تصویر انتخاب شده:</p>
+                    <img id="backgroundPreviewImage" src="" alt="" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-200 bg-gray-50">
+            <div class="flex justify-between">
+                <button onclick="goBackToRestaurantSelection()"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+                    ← بازگشت
+                </button>
+                <button onclick="proceedToDescriptionStep()"
+                        id="proceedToDescriptionBtn"
+                        class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    ادامه به مرحله بعد
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- مودال مرحله ۳: وارد کردن توضیحات -->
+<div id="descriptionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-800">توضیحات سفارش</h3>
+                <button onclick="closeDescriptionModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-gray-600 text-sm mt-2">لطفاً توضیحات و درخواست‌های خاص خود را وارد کنید.</p>
+        </div>
+
+        <div class="p-6">
+            <!-- خلاصه سفارش -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <h4 class="font-semibold text-gray-800 mb-3">خلاصه سفارش</h4>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">طرح:</span>
+                        <span id="orderSummaryDesign" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">رستوران:</span>
+                        <span id="orderSummaryRestaurant" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">زمینه:</span>
+                        <span id="orderSummaryBackground" class="font-medium">پیش‌فرض شرکت</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="orderDescriptionForm">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            توضیحات سفارش (اختیاری)
+                        </label>
+                        <textarea name="description" rows="4"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                  placeholder="درخواست‌های خاص، جزئیات تماس، نکات فنی و ..."></textarea>
+                        <p class="text-gray-500 text-xs mt-1">این توضیحات برای کارشناسان ما جهت ارائه خدمات بهتر استفاده می‌شود.</p>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" id="agreeTerms" required
+                               class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <label for="agreeTerms" class="text-sm text-gray-700">
+                            با
+                            <a href="#" class="text-blue-600 hover:text-blue-800">شرایط و قوانین</a>
+                            استفاده از خدمات موافقت می‌کنم و تأیید می‌کنم که تمام اطلاعات وارد شده صحیح می‌باشد.
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="p-6 border-t border-gray-200 bg-gray-50">
+            <div class="flex justify-between">
+                <button onclick="goBackToBackgroundSelection()"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+                    ← بازگشت
+                </button>
+                <button onclick="submitFinalOrder()"
+                        class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all">
+                    ثبت نهایی درخواست
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- مودال موفقیت -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+        <div class="p-8 text-center">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">درخواست شما ثبت شد!</h3>
+            <p class="text-gray-600 mb-6">
+                درخواست ایجاد منو کاغذی با موفقیت ثبت گردید.
+                کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت.
+            </p>
+
+            <div class="space-y-4">
+                <a href="{% url 'panel:paper_menu_requests' %}"
+                   class="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                    مشاهده درخواست‌های من
+                </a>
+
+                <button onclick="closeSuccessModal()"
+                        class="block w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+                    بازگشت به طرح‌ها
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .columns-1 { columns: 1; }
+    @media (min-width: 640px) { .sm\:columns-2 { columns: 2; } }
+    @media (min-width: 768px) { .md\:columns-3 { columns: 3; } }
+    @media (min-width: 1024px) { .lg\:columns-4 { columns: 4; } }
+    .break-inside-avoid { break-inside: avoid; }
+</style>
+
+<script>
+    // متغیرهای سراسری
+    let currentDesignData = {};
+    let currentOrderData = {
+        design_id: null,
+        design_title: null,
+        restaurant_id: null,
+        restaurant_title: null,
+        background_type: 'default',
+        background_value: 'bg1',
+        description: ''
+    };
+
+    // توابع مدیریت مودال تصویر
+    function openImageModal(designId, title, imageUrl, date) {
+        currentDesignData = {
+            id: designId,
+            title: title,
+            imageUrl: imageUrl,
+            date: date
+        };
+
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalDate').textContent = `تاریخ اضافه شدن: ${date}`;
+        if (imageUrl) {
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('modalImage').alt = title;
+        }
+
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function startOrderProcess() {
+        closeImageModal();
+        currentOrderData.design_id = currentDesignData.id;
+        currentOrderData.design_title = currentDesignData.title;
+        openRestaurantSelectionModal();
+    }
+
+    // توابع مدیریت مودال انتخاب رستوران
+    function openRestaurantSelectionModal() {
+        document.getElementById('restaurantSelectionModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRestaurantSelectionModal() {
+        document.getElementById('restaurantSelectionModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function selectRestaurant(restaurantId, restaurantTitle) {
+        currentOrderData.restaurant_id = restaurantId;
+        currentOrderData.restaurant_title = restaurantTitle;
+        closeRestaurantSelectionModal();
+        openBackgroundSelectionModal();
+    }
+
+    // توابع مدیریت مودال انتخاب بک‌گراند
+    function openBackgroundSelectionModal() {
+        document.getElementById('backgroundSelectionModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        updateProceedButtonState();
+    }
+
+    function closeBackgroundSelectionModal() {
+        document.getElementById('backgroundSelectionModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        resetBackgroundSelection();
+    }
+
+    function selectDefaultBackground(bgType) {
+        currentOrderData.background_type = 'default';
+        currentOrderData.background_value = bgType;
+        updateProceedButtonState();
+    }
+
+    function handleBackgroundImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // بررسی سایز فایل (حداکثر 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('حجم فایل نباید بیشتر از 5 مگابایت باشد.');
+            return;
+        }
+
+        // بررسی فرمت فایل
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            alert('فرمت فایل نامعتبر است. فقط JPG، PNG و GIF مجاز هستند.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentOrderData.background_type = 'custom';
+            currentOrderData.background_value = e.target.result;
+
+            // نمایش پیش‌نمایش
+            const previewDiv = document.getElementById('selectedBackgroundPreview');
+            const previewImg = document.getElementById('backgroundPreviewImage');
+            previewImg.src = e.target.result;
+            previewDiv.classList.remove('hidden');
+
+            updateProceedButtonState();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function updateProceedButtonState() {
+        const btn = document.getElementById('proceedToDescriptionBtn');
+        btn.disabled = !currentOrderData.background_value;
+    }
+
+    function resetBackgroundSelection() {
+        currentOrderData.background_type = 'default';
+        currentOrderData.background_value = 'bg1';
+        document.getElementById('selectedBackgroundPreview').classList.add('hidden');
+        document.getElementById('backgroundImageUpload').value = '';
+    }
+
+    function goBackToRestaurantSelection() {
+        closeBackgroundSelectionModal();
+        openRestaurantSelectionModal();
+    }
+
+    function proceedToDescriptionStep() {
+        if (!currentOrderData.background_value) {
+            alert('لطفاً یک زمینه انتخاب کنید.');
+            return;
+        }
+
+        closeBackgroundSelectionModal();
+        openDescriptionModal();
+    }
+
+    // توابع مدیریت مودال توضیحات
+    function openDescriptionModal() {
+        // پر کردن خلاصه سفارش
+        document.getElementById('orderSummaryDesign').textContent = currentOrderData.design_title;
+        document.getElementById('orderSummaryRestaurant').textContent = currentOrderData.restaurant_title;
+
+        const backgroundText = currentOrderData.background_type === 'default'
+            ? 'پیش‌فرض شرکت'
+            : 'تصویر سفارشی';
+        document.getElementById('orderSummaryBackground').textContent = backgroundText;
+
+        document.getElementById('descriptionModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDescriptionModal() {
+        document.getElementById('descriptionModal').classList.add('hidden');
+        document.getElementById('orderDescriptionForm').reset();
+        document.body.style.overflow = 'auto';
+    }
+
+    function goBackToBackgroundSelection() {
+        closeDescriptionModal();
+        openBackgroundSelectionModal();
+    }
+
+    // ارسال نهایی درخواست
+    function submitFinalOrder() {
+        const form = document.getElementById('orderDescriptionForm');
+        const description = form.description.value;
+        const agreeTerms = document.getElementById('agreeTerms').checked;
+
+        if (!agreeTerms) {
+            alert('لطفاً شرایط و قوانین را بپذیرید.');
+            return;
+        }
+
+        currentOrderData.description = description;
+
+        // ارسال درخواست به سرور
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // آماده کردن داده‌ها برای ارسال
+        const formData = new FormData();
+        formData.append('design_id', currentOrderData.design_id);
+        formData.append('restaurant_id', currentOrderData.restaurant_id);
+        formData.append('text_content', currentOrderData.description);
+        formData.append('background_type', currentOrderData.background_type);
+
+        if (currentOrderData.background_type === 'custom') {
+            // برای تصویر سفارشی، فایل را ارسال می‌کنیم
+            const fileInput = document.getElementById('backgroundImageUpload');
+            if (fileInput.files[0]) {
+                formData.append('background_image', fileInput.files[0]);
+            }
+        } else {
+            formData.append('background_value', currentOrderData.background_value);
+        }
+
+        fetch('{% url "panel:create_paper_menu_request" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeDescriptionModal();
+                showSuccessModal();
+            } else {
+                alert('خطا در ثبت درخواست: ' + (data.message || 'لطفاً دوباره تلاش کنید.'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در ارسال درخواست. لطفاً دوباره تلاش کنید.');
+        });
+    }
+
+    // نمایش مودال موفقیت
+    function showSuccessModal() {
+        document.getElementById('successModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('successModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        // ریست کردن داده‌ها
+        currentOrderData = {
+            design_id: null,
+            design_title: null,
+            restaurant_id: null,
+            restaurant_title: null,
+            background_type: 'default',
+            background_value: 'bg1',
+            description: ''
+        };
+        resetBackgroundSelection();
+    }
+
+    // مدیریت کلیک خارج از مودال‌ها
+    document.addEventListener('click', function(event) {
+        const modals = ['imageModal', 'restaurantSelectionModal', 'backgroundSelectionModal', 'descriptionModal', 'successModal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && !modal.classList.contains('hidden') && event.target === modal) {
+                if (modalId === 'imageModal') closeImageModal();
+                else if (modalId === 'restaurantSelectionModal') closeRestaurantSelectionModal();
+                else if (modalId === 'backgroundSelectionModal') closeBackgroundSelectionModal();
+                else if (modalId === 'descriptionModal') closeDescriptionModal();
+                else if (modalId === 'successModal') closeSuccessModal();
+            }
+        });
+    });
+
+    // بستن با کلید ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeImageModal();
+            closeRestaurantSelectionModal();
+            closeBackgroundSelectionModal();
+            closeDescriptionModal();
+            closeSuccessModal();
+        }
+    });
+</script>
+{% endblock content %}

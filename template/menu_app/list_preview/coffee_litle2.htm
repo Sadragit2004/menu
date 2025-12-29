@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Menu Design</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Noto+Naskh+Arabic:wght@400;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+
+    <style>
+        /* -----------------------------------------------------------
+           1. BASE PRINT SETTINGS (A4 PRECISSON)
+        ----------------------------------------------------------- */
+        :root {
+            --page-width: 210mm;
+            --page-height: 296mm; /* Slight reduction to prevent overflow */
+            --margin: 0;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #555; /* Browser bg only */
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        /* The Sheet - Represents one piece of paper */
+        .sheet {
+            display: block;
+            width: var(--page-width);
+            height: var(--page-height);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+            background-color: white;
+        }
+
+        /* -----------------------------------------------------------
+           2. LAYOUT GRID & STRUCTURE
+        ----------------------------------------------------------- */
+        .menu-container {
+            padding: 15mm;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10mm;
+            position: relative;
+        }
+
+        header h1 {
+            font-family: 'Lalezar', cursive;
+            font-size: 32pt;
+            margin: 0;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        header .subtitle {
+            font-size: 12pt;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        header .meta-info {
+            font-size: 9pt;
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Two Column Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns like reference */
+            column-gap: 15mm;
+            row-gap: 5mm;
+            flex-grow: 1;
+        }
+
+        .category-section {
+            break-inside: avoid;
+            margin-bottom: 8mm;
+        }
+
+        .cat-title {
+            text-align: center;
+            margin-bottom: 6mm;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cat-badge {
+            padding: 4px 15px;
+            font-family: 'Lalezar', cursive;
+            font-size: 14pt;
+            text-transform: uppercase;
+        }
+
+        /* Menu Item Styling */
+        .menu-item {
+            margin-bottom: 6mm;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .item-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background-color: #ccc;
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px dotted;
+            padding-bottom: 2px;
+            margin-bottom: 3px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 11pt;
+        }
+
+        .item-price {
+            font-weight: 700;
+            font-size: 11pt;
+            white-space: nowrap;
+        }
+
+        .item-desc {
+            font-size: 9pt;
+            line-height: 1.3;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 9pt;
+            padding-top: 5mm;
+            border-top: 1px solid;
+            margin-top: auto;
+        }
+
+        /* -----------------------------------------------------------
+           3. THEMES (Select one in HTML class)
+        ----------------------------------------------------------- */
+
+        /* === STYLE 1: TRADITIONAL IRANIAN (Matches Reference) === */
+        .theme-traditional .sheet {
+            background-color: #1a1b26; /* Dark Navy/Black */
+            color: #f0f0f0;
+            /* Subtle Pattern Overlay */
+            background-image: radial-gradient(#2a2b36 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .theme-traditional .item-header {
+            border-color: #444;
+        }
+
+        .theme-traditional .cat-badge {
+            background-color: #ffbd00; /* Mustard Yellow */
+            color: #1a1b26;
+            clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%); /* Label Shape */
+        }
+
+        .theme-traditional h1 {
+            color: #ffbd00;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+
+        .theme-traditional .item-price {
+            color: #ffbd00;
+        }
+
+        .theme-traditional footer {
+            border-color: #333;
+            color: #888;
+        }
+
+        /* === STYLE 2: LUXURY / FINE DINING === */
+        .theme-luxury .sheet {
+            background-color: #fffbf0; /* Cream */
+            color: #111;
+            border: 1px solid #d4af37;
+            padding: 5mm; /* Inner border spacing */
+        }
+
+        .theme-luxury .menu-container {
+            border: 1px solid #d4af37; /* Gold Border */
+        }
+
+        .theme-luxury h1 {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .theme-luxury .cat-badge {
+            background: transparent;
+            color: #d4af37;
+            border-bottom: 2px solid #d4af37;
+            font-family: 'Noto Naskh Arabic', serif;
+        }
+
+        .theme-luxury .item-header {
+            border-bottom: none;
+        }
+
+        .theme-luxury .item-name {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 12pt;
+        }
+
+        .theme-luxury .item-img {
+            border-radius: 50%; /* Circle images */
+            filter: sepia(0.3);
+        }
+
+        /* === STYLE 3: SMALL CAFE === */
+        .theme-cafe .sheet {
+            background-color: #e6dac8; /* Kraft Paper */
+            color: #3e2723;
+        }
+
+        .theme-cafe header h1 {
+            font-family: 'Lalezar', cursive;
+            transform: rotate(-2deg);
+        }
+
+        .theme-cafe .cat-badge {
+            background-color: #3e2723;
+            color: #fff;
+            border-radius: 15px;
+            transform: rotate(1deg);
+        }
+
+        .theme-cafe .item-header {
+            border-bottom: 1px dashed #3e2723;
+        }
+
+        .theme-cafe .item-img {
+            border: 2px solid #fff;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* -----------------------------------------------------------
+           4. PRINT UTILITIES
+        ----------------------------------------------------------- */
+        @media screen {
+            body {
+                background: #333;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .sheet {
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-traditional">
+
+    <div class="sheet">
+        <div class="menu-container">
+            <header>
+                <div class="subtitle">~ Authentic Persian Cuisine ~</div>
+                <h1>رستوران ستاره شهر</h1>
+                <div class="meta-info">
+                    <span>تاسیس ۱۳۸۰</span>
+                    <span>|</span>
+                    <span>@SetarehRestaurant <i style="font-style: normal;">📷</i></span>
+                </div>
+            </header>
+
+            <div class="content-grid">
+                <div>
+                    <section class="category-section">
+                        <div class="cat-title"><span class="cat-badge">پیشنهاد سرآشپز</span></div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Pizza">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">سینی مخصوص شاندیز</span>
+                                    <span class="item-price">۴۵۰,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">شیشلیک، جوجه کباب، کباب برگ، برنج ایرانی اعلاء</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Kebab">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">باقالی پلو با ماهیچه</span>
+                                    <span class="item-price">۳۸۰,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">ماهیچه گوسفندی تازه، باقالی پلو با روغن کرمانشاهی</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="category-section">
+                        <div class="cat-title"><span class="cat-badge">کباب‌های ایرانی</span></div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Koobideh">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">چلو کباب کوبیده زعفرانی</span>
+                                    <span class="item-price">۱۹۰,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">دو سیخ کباب گوشت گوسفندی، گوجه کبابی، ریحان</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1615937691194-97dbd3f3dc29?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Barg">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">کباب برگ ممتاز</span>
+                                    <span class="item-price">۳۲۰,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">راسته گوسفندی طعم‌دار شده با زعفران و پیاز</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Joojeh">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">جوجه کباب بدون استخوان</span>
+                                    <span class="item-price">۱۸۵,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">سینه مرغ مرینیت شده با آبلیمو و زعفران</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div>
+                    <section class="category-section">
+                        <div class="cat-title"><span class="cat-badge">خورشت‌های اصیل</span></div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Ghormeh">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">قرمه سبزی جاافتاده</span>
+                                    <span class="item-price">۱۶۰,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">با گوشت تکه‌ای و لیمو عمانی</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Fesenjan">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">خورشت فسنجان</span>
+                                    <span class="item-price">۱۹۵,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">با گردو آسیاب شده و رب انار ملس (با مرغ)</p>
+                            </div>
+                        </div>
+                    </section>
+
+                     <section class="category-section">
+                        <div class="cat-title"><span class="cat-badge">پیش غذا و سالاد</span></div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1606491956689-2ea28c674675?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Kashk">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">کشک و بادمجان</span>
+                                    <span class="item-price">۹۵,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">بادمجان کبابی، کشک غلیظ، نعنا داغ و گردو</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Salad">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">سالاد فصل</span>
+                                    <span class="item-price">۴۵,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">کاهو، گوجه، خیار، سس مخصوص</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <img src="https://images.unsplash.com/photo-1577906096429-f7bad7d7bf82?auto=format&fit=crop&w=100&q=80" class="item-img" alt="Soup">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">سوپ جو</span>
+                                    <span class="item-price">۴۰,۰۰۰ تومان</span>
+                                </div>
+                                <p class="item-desc">با خامه و قارچ</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <footer>
+                <p>آدرس: تهران، خیابان ولیعصر، نرسیده به میدان ونک | تلفن: ۸۸۸۸۰۰۰۰-۰۲۱</p>
+            </footer>
+        </div>
+    </div>
+
+    <div class="sheet">
+        <div class="menu-container">
+            <header>
+                 <h1>کافه و نوشیدنی‌ها</h1>
+            </header>
+
+            <div class="content-grid">
+                <div>
+                     <section class="category-section">
+                        <div class="cat-title"><span class="cat-badge">نوشیدنی‌های گرم</span></div>
+                        <div class="menu-item">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">چای دمی ایرانی</span>
+                                    <span class="item-price">۲۰,۰۰۰ تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu-item">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">دمنوش آرامش</span>
+                                    <span class="item-price">۳۵,۰۰۰ تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="menu-item">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">قهوه ترک</span>
+                                    <span class="item-price">۴۵,۰۰۰ تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div>
+                    <section class="category-section">
+                        <div class="cat-title"><span class="cat-badge">نوشیدنی‌های سرد</span></div>
+                        <div class="menu-item">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">دوغ محلی پارچی</span>
+                                    <span class="item-price">۵۰,۰۰۰ تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu-item">
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">شربت سکنجبین</span>
+                                    <span class="item-price">۳۵,۰۰۰ تومان</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 50mm; text-align: center; border: 2px solid rgba(255,255,255,0.2); padding: 20px;">
+                            <h3>رستوران ستاره شهر</h3>
+                            <p>بهترین لحظات را با ما تجربه کنید</p>
+                            <p style="font-size: 14pt; direction: ltr;">@SetarehRestaurant</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JS mainly to assist with switching themes if viewing in browser
+        // Not strictly necessary for the print output if class is hardcoded.
+
+        console.log("Menu Ready for Print. Press Ctrl+P");
+
+        // Optional: Ensure pages don't overflow vertically
+        const sheets = document.querySelectorAll('.sheet');
+        sheets.forEach(sheet => {
+            if (sheet.scrollHeight > sheet.clientHeight) {
+                console.warn("Warning: Content exceeds A4 page height. Adjust margins or font size.");
+            }
+        });
+    </script>
+</body>
+</html>

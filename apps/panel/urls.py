@@ -39,6 +39,7 @@ urlpatterns = [
     path('<slug:slug>/foods/<int:food_id>/assign-category/', viewsfree.assign_food_to_category, name='assign_food_to_category'),
 
 
+
     # =================
 
        path('<slug:restaurant_slug>/customized-foods/', viewsfree.get_customized_foods, name='get_customized_foods'),
@@ -47,6 +48,11 @@ urlpatterns = [
     path('<slug:restaurant_slug>/bulk-customize-foods/', viewsfree.bulk_customize_foods, name='bulk_customize_foods'),
     path('api/restaurant/food/<int:food_id>/details/', viewsfree.get_food_details, name='get_food_details'),
     path('<slug:restaurant_slug>/settings/', viewsfree.restaurant_settings, name='restaurant_settings'),
+    path('paper-menu-designs/', viewsfree.MenuPaperDesienListView.as_view(), name='paper_menu_designs'),
+    path('paper-menu-request/create/', viewsfree.create_paper_menu_request, name='create_paper_menu_request'),
+    path('paper-menu-requests/', viewsfree.paper_menu_requests_list, name='paper_menu_requests'),
+    path('paper-menu-requests/<int:pk>/', viewsfree.paper_menu_request_detail, name='paper_menu_request_detail'),
+    path('paper-menu-requests/<int:pk>/cancel/', viewsfree.cancel_paper_menu_request, name='cancel_paper_menu_request'),
 
 
 

@@ -38,9 +38,13 @@
                 <i class="fas fa-calendar"></i>
                 <span>تنظیمات میز رستوران</span>
             </a>
-            <a href="#" class="flex items-center space-x-3 space-x-reverse p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                <i class="fas fa-cog"></i>
-                <span>تنظیمات</span>
+            <a href="{% url 'panel:paper_menu_designs' %}" class="flex items-center space-x-3 space-x-reverse p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                <i class="fas fa-calendar"></i>
+                <span>تنظیم منو کاغذی</span>
             </a>
+            {% comment %} <a href="{% url 'menu:template_gallery' %}" class="flex items-center space-x-3 space-x-reverse p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                <i class="fas fa-palette"></i>
+                <span>گالری طرح‌های منو</span>
+            </a> {% endcomment %}
         </nav>
     </aside>
