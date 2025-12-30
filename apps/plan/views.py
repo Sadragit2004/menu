@@ -8,6 +8,7 @@ import json
 from django.contrib import messages
 from django.utils import timezone
 from .models import Plan, PlanOrder
+from datetime import timedelta
 from apps.product.models import Product
 
 
@@ -22,12 +23,49 @@ def plan_list(request):
 
 
 
+
 @login_required
 def purchase_plan(request, plan_slug):
     """انتخاب پلن و اضافه کردن به سبد خرید (بدون پرداخت)"""
     plan = get_object_or_404(Plan, slug=plan_slug, isActive=True)
 
-    # بررسی آیا کاربر همین پلن رو قبلاً انتخاب کرده و پرداخت نکرده
+    # ---------- اعتبارسنجی اولیه: کاربر باید حداقل یک رستوران داشته باشد ----------
+    user_restaurants = Restaurant.objects.filter(owner=request.user)
+
+    if not user_restaurants.exists():
+        messages.error(
+            request,
+            'برای خرید پلن باید حداقل یک رستوران ایجاد کرده باشید'
+        )
+        return redirect('panel:panel')  # یا صفحه لیست پلن‌ها
+
+    # ---------- اعتبارسنجی دوم: باید از ایجاد اولین رستوران 15 روز گذشته باشد ----------
+    oldest_restaurant = user_restaurants.order_by('createdAt').first()
+
+    # بررسی اینکه آیا رستوران تاریخ ایجاد دارد
+    if not oldest_restaurant.createdAt:
+        messages.error(
+            request,
+            'رستوران شما تاریخ ایجاد معتبر ندارد. لطفاً با پشتیبانی تماس بگیرید.'
+        )
+        return redirect('panel:panel')
+
+    # محاسبه مدت زمان از ایجاد رستوران
+    time_since_creation = timezone.now() - oldest_restaurant.createdAt
+
+    # بررسی آیا 15 روز (360 ساعت) گذشته است
+    if time_since_creation < timedelta(days=15):
+        days_left = 15 - time_since_creation.days
+        hours_left = 23 - time_since_creation.seconds // 3600
+
+        messages.error(
+            request,
+            f'برای خرید پلن باید از تاریخ ایجاد رستوران شما حداقل ۱۵ روز گذشته باشد. '
+            f'{days_left} روز و {hours_left} ساعت دیگر مجاز به خرید پلن هستید.'
+        )
+        return redirect('panel:panel')
+
+    # ---------- بررسی اینکه آیا همین پلن قبلاً انتخاب شده و پرداخت نشده ----------
     existing_unpaid_order = PlanOrder.objects.filter(
         user=request.user,
         plan=plan,
@@ -38,7 +76,7 @@ def purchase_plan(request, plan_slug):
         messages.info(request, 'این پلن قبلاً در سبد خرید شما وجود دارد')
         return redirect('plan:shop_cart')
 
-    # ایجاد سفارش با وضعیت پرداخت نشده
+    # ---------- ایجاد سفارش با وضعیت پرداخت نشده ----------
     plan_order = PlanOrder.objects.create(
         plan=plan,
         user=request.user,

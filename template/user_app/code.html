@@ -1,125 +1,239 @@
 {% extends "account_template.html" %}
 
 {% block content %}
-<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-black min-h-screen">
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" class="mx-auto h-10 w-auto" />
-    <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">کد تأیید را وارد کنید</h2>
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden relative">
+  <!-- Background elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <!-- Animated gradient circles -->
+    <div class="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-full blur-3xl animate-pulse delay-700"></div>
 
-    <div class="mt-4 text-center">
-      <p class="text-sm text-gray-400">کد به شماره <span class="text-white font-medium">{{ mobile }}</span> ارسال شد</p>
-    </div>
+    <!-- Grid pattern -->
+    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
   </div>
 
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <form method="POST" class="space-y-8">
-      {% csrf_token %}
-
-      <!-- کد تأیید -->
-      <div>
-        <label class="block text-sm/6 font-medium text-white text-right mb-4">کد ۵ رقمی</label>
-        <div class="flex justify-center gap-3" dir="ltr">
-          <input type="text" name="code1" maxlength="1" inputmode="numeric" class="w-14 h-14 rounded-lg bg-gray-900 border border-gray-700 text-white text-center text-xl font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" autocomplete="off" autofocus>
-          <input type="text" name="code2" maxlength="1" inputmode="numeric" class="w-14 h-14 rounded-lg bg-gray-900 border border-gray-700 text-white text-center text-xl font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" autocomplete="off">
-          <input type="text" name="code3" maxlength="1" inputmode="numeric" class="w-14 h-14 rounded-lg bg-gray-900 border border-gray-700 text-white text-center text-xl font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" autocomplete="off">
-          <input type="text" name="code4" maxlength="1" inputmode="numeric" class="w-14 h-14 rounded-lg bg-gray-900 border border-gray-700 text-white text-center text-xl font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" autocomplete="off">
-          <input type="text" name="code5" maxlength="1" inputmode="numeric" class="w-14 h-14 rounded-lg bg-gray-900 border border-gray-700 text-white text-center text-xl font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" autocomplete="off">
-        </div>
-
-        {% if form.non_field_errors %}
-          <div class="mt-4 text-center">
-            {% for error in form.non_field_errors %}
-              <p class="text-sm text-red-500">{{ error }}</p>
-            {% endfor %}
+  <div class="relative z-10 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md">
+      <!-- Logo and header -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center mb-6">
+          <div class="relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full blur-lg opacity-70 animate-pulse"></div>
+            <div class="relative bg-gradient-to-br from-gray-900 to-black p-4 rounded-full border border-gray-800 shadow-2xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M15.75 1.5a6.75 6.75 0 00-6.651 7.906c.067.39-.032.717-.221.906l-6.5 6.499a3 3 0 00-.878 2.121v2.818c0 .414.336.75.75.75H6a.75.75 0 00.75-.75v-1.5h1.5A.75.75 0 009 19.5V18h1.5a.75.75 0 00.53-.22l2.658-2.658c.19-.189.517-.288.906-.22A6.75 6.75 0 1015.75 1.5zm0 3a.75.75 0 000 1.5A2.25 2.25 0 0118 8.25a.75.75 0 001.5 0 3.75 3.75 0 00-3.75-3.75z" clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
-        {% endif %}
-      </div>
+        </div>
 
-      <!-- تایمر -->
-      <div class="text-center">
-        <div id="timer" class="text-indigo-400 text-sm font-medium">
-          زمان باقی‌مانده: <span id="time">{{ remaining_time|default:"02:00" }}</span>
+        <h1 class="text-3xl font-extrabold text-white mb-3">
+          کد تأیید را وارد کنید
+        </h1>
+
+        <div class="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4 mb-6">
+          <p class="text-gray-400 text-sm mb-2">
+            کد ۵ رقمی به شماره زیر ارسال شد
+          </p>
+          <div class="flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400 ml-2" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-lg font-bold text-white bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              {{ mobile }}
+            </span>
+          </div>
         </div>
       </div>
 
-      <!-- دکمه تأیید -->
-      <div>
-        <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-3 text-sm/6 font-semibold text-white hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors">
-          تأیید و ورود
-        </button>
+      <!-- Verification card -->
+      <div class="relative">
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-blue-500/10 rounded-2xl blur-xl"></div>
+        <div class="relative bg-gray-900/70 backdrop-blur-sm border border-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+          <div class="p-8">
+            <form method="POST" class="space-y-8">
+              {% csrf_token %}
+
+              <!-- Code input -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 text-right mb-6">
+                  کد تأیید ۵ رقمی
+                  <span class="text-xs text-gray-500 mr-2">(اعداد را به ترتیب وارد کنید)</span>
+                </label>
+
+                <div class="flex justify-center gap-3 md:gap-4" dir="ltr">
+                  {% for i in "12345"|make_list %}
+                  <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/30 to-purple-600/30 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+                    <input
+                      type="text"
+                      name="code{{ i }}"
+                      maxlength="1"
+                      inputmode="numeric"
+                      pattern="\d*"
+                      class="relative w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gray-900/80 border-2 border-gray-700 text-white text-center text-2xl font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all duration-300 group-hover:border-gray-600"
+                      autocomplete="off"
+                      {% if forloop.first %}autofocus{% endif %}
+                      data-index="{{ forloop.counter0 }}"
+                    />
+                    <div class="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-gray-600">
+                      {{ forloop.counter }}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Error messages -->
+                {% if form.non_field_errors %}
+                  <div class="mt-6 p-4 bg-red-900/30 border border-red-800/50 rounded-xl">
+                    <div class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400 ml-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                      </svg>
+                      <div class="text-right flex-1">
+                        {% for error in form.non_field_errors %}
+                          <p class="text-sm text-red-400">{{ error }}</p>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Timer -->
+              <div class="text-center py-4">
+                <div id="timer" class="inline-flex items-center px-4 py-2 rounded-full bg-gray-900/50 border border-gray-800">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400 ml-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-sm font-medium text-gray-300">
+                    زمان باقی‌مانده:
+                    <span id="time" class="font-bold text-indigo-400">{{ remaining_time|default:"02:00" }}</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Submit button -->
+              <div>
+                <button
+                  type="submit"
+                  id="submit-btn"
+                  class="group relative w-full flex justify-center items-center py-4 px-4 border border-transparent text-lg font-bold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                >
+                  <span class="ml-2">تأیید و ورود به حساب</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+
+                  <!-- Button hover effect -->
+                  <span class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-white/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                </button>
+              </div>
+            </form>
+
+            <!-- Actions -->
+            <div class="mt-10 pt-6 border-t border-gray-800">
+              <!-- Resend code -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <form method="POST" id="resend-form" class="w-full sm:w-auto">
+                  {% csrf_token %}
+                  <input type="hidden" name="resend" value="true">
+                  <button
+                    type="submit"
+                    id="resend-btn"
+                    {% if not can_resend %}disabled{% endif %}
+                    class="group w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm font-medium {% if can_resend %}text-indigo-400 hover:text-indigo-300 hover:bg-gray-800/50 cursor-pointer{% else %}text-gray-500 cursor-not-allowed{% endif %} transition-all duration-300"
+                  >
+                    {% if can_resend %}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z" clip-rule="evenodd" />
+                      </svg>
+                      ارسال مجدد کد
+                    {% else %}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
+                      </svg>
+                      ارسال مجدد کد (<span id="countdown">{{ remaining_seconds|default:120 }}</span> ثانیه)
+                    {% endif %}
+                  </button>
+                </form>
+
+                <!-- Change mobile -->
+                <a
+                  href="{% url 'account:send_mobile' %}"
+                  class="group w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm font-medium text-gray-400 hover:text-gray-300 hover:bg-gray-800/50 transition-all duration-300"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 group-hover:rotate-90 transition-transform duration-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z" />
+                  </svg>
+                  تغییر شماره موبایل
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </form>
 
-    <!-- ارسال مجدد کد -->
-    <div class="mt-8 text-center">
-      <form method="POST" id="resend-form" class="inline">
-        {% csrf_token %}
-        <input type="hidden" name="resend" value="true">
-        <button type="submit" id="resend-btn" {% if not can_resend %}disabled{% endif %} class="{% if can_resend %}text-indigo-400 hover:text-indigo-300 cursor-pointer{% else %}text-gray-500 cursor-not-allowed{% endif %} text-sm font-medium transition-colors">
-          {% if can_resend %}
-            ارسال مجدد کد
-          {% else %}
-            ارسال مجدد کد (<span id="countdown">{{ remaining_seconds|default:120 }}</span>)
-          {% endif %}
-        </button>
-      </form>
-
-      <span class="text-gray-500 mx-2">•</span>
-
-      <a href="{% url 'account:send_mobile' %}" class="text-gray-400 hover:text-gray-300 text-sm font-medium transition-colors">
-        تغییر شماره موبایل
-      </a>
+      <!-- Messages -->
+      {% if messages %}
+        <div class="mt-8">
+          {% for message in messages %}
+            <div class="p-4 rounded-xl border {% if message.tags == 'error' %}bg-red-900/30 border-red-800/50{% else %}bg-green-900/30 border-green-800/50{% endif %}">
+              <div class="flex items-center">
+                {% if message.tags == 'error' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400 ml-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+                  </svg>
+                {% else %}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 ml-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                  </svg>
+                {% endif %}
+                <span class="text-right flex-1 {% if message.tags == 'error' %}text-red-400{% else %}text-green-400{% endif %}">
+                  {{ message }}
+                </span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
-
-    {% if messages %}
-      <div class="mt-6 text-center">
-        {% for message in messages %}
-          <p class="text-sm {% if message.tags == 'error' %}text-red-500{% else %}text-green-500{% endif %}">
-            {{ message }}
-          </p>
-        {% endfor %}
-      </div>
-    {% endif %}
   </div>
 </div>
 
+<!-- Enhanced JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const inputs = document.querySelectorAll('input[type="text"]');
+  const inputs = document.querySelectorAll('input[type="text"][name^="code"]');
   const timerElement = document.getElementById('time');
   const countdownElement = document.getElementById('countdown');
   const resendBtn = document.getElementById('resend-btn');
+  const submitBtn = document.getElementById('submit-btn');
   const timerDisplay = document.getElementById('timer');
 
-  // زمان باقی‌مانده از سرور
+  // Variables from Django template
   let timeLeft = {{ remaining_seconds|default:120 }};
   const canResend = {{ can_resend|yesno:"true,false" }};
 
-  // اگر زمان تمام شده، نیازی به تایمر نیست
-  if (canResend) {
-    resendBtn.disabled = false;
-    resendBtn.classList.remove('text-gray-500', 'cursor-not-allowed');
-    resendBtn.classList.add('text-indigo-400', 'hover:text-indigo-300', 'cursor-pointer');
-    if (countdownElement) {
-      countdownElement.textContent = "0";
-    }
-    if (timerElement) {
-      timerElement.textContent = "00:00";
-      timerElement.classList.add('text-red-500');
-    }
-    if (timerDisplay) {
-      timerDisplay.classList.add('text-red-500');
-      timerDisplay.classList.remove('text-indigo-400');
-    }
-  } else if (timeLeft > 0) {
-    // تایمر فقط زمانی اجرا شود که زمان باقی‌مانده وجود دارد
+  // Sound effect for input (optional)
+  const clickSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+
+  // Handle timer
+  if (!canResend && timeLeft > 0) {
     function updateTimer() {
       const minutes = Math.floor(timeLeft / 60);
       const seconds = timeLeft % 60;
 
       if (timerElement) {
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Change color when time is running out
+        if (timeLeft <= 30) {
+          timerElement.classList.remove('text-indigo-400');
+          timerElement.classList.add('text-red-400', 'animate-pulse');
+        }
       }
+
       if (countdownElement) {
         countdownElement.textContent = timeLeft;
       }
@@ -128,65 +242,118 @@ document.addEventListener('DOMContentLoaded', function() {
         timeLeft--;
         setTimeout(updateTimer, 1000);
       } else {
-        if (timerElement) {
-          timerElement.textContent = "00:00";
-          timerElement.classList.add('text-red-500');
-        }
-        if (timerDisplay) {
-          timerDisplay.classList.add('text-red-500');
-          timerDisplay.classList.remove('text-indigo-400');
-        }
-        if (resendBtn) {
-          resendBtn.disabled = false;
-          resendBtn.classList.remove('text-gray-500', 'cursor-not-allowed');
-          resendBtn.classList.add('text-indigo-400', 'hover:text-indigo-300', 'cursor-pointer');
-          if (countdownElement) {
-            countdownElement.textContent = "0";
-          }
-          // به روز رسانی متن دکمه
-          const buttonText = resendBtn.innerHTML;
-          resendBtn.innerHTML = buttonText.replace(/ارسال مجدد کد \(\d+\)/, 'ارسال مجدد کد');
-        }
+        handleTimerExpired();
       }
     }
 
-    // شروع تایمر
+    function handleTimerExpired() {
+      if (timerElement) {
+        timerElement.textContent = "00:00";
+        timerElement.classList.add('text-red-500');
+      }
+
+      if (timerDisplay) {
+        timerDisplay.classList.add('text-red-500');
+        timerDisplay.classList.remove('text-indigo-400');
+      }
+
+      if (resendBtn) {
+        resendBtn.disabled = false;
+        resendBtn.classList.remove('text-gray-500', 'cursor-not-allowed');
+        resendBtn.classList.add('text-indigo-400', 'hover:text-indigo-300', 'cursor-pointer');
+
+        // Update button text
+        resendBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z" clip-rule="evenodd" />
+          </svg>
+          ارسال مجدد کد
+        `;
+      }
+    }
+
+    // Start timer
     updateTimer();
+  } else if (canResend) {
+    handleTimerExpired();
   }
 
-  // مدیریت ورود کد - از چپ به راست
+  // Smart input handling
   inputs.forEach((input, index) => {
-    // فقط اعداد قبول کن
+    // Focus effect
+    input.addEventListener('focus', function() {
+      this.select();
+      this.parentElement.classList.add('ring-2', 'ring-indigo-500/50');
+    });
+
+    input.addEventListener('blur', function() {
+      this.parentElement.classList.remove('ring-2', 'ring-indigo-500/50');
+    });
+
+    // Input validation and navigation
     input.addEventListener('input', function(e) {
+      // Allow only numbers
       this.value = this.value.replace(/[^0-9]/g, '');
 
-      // اگر عدد وارد شد به فیلد بعدی (راست) برو
-      if (this.value.length === 1 && index < inputs.length - 1) {
-        inputs[index + 1].focus();
-        inputs[index + 1].select();
+      if (this.value.length === 1) {
+        // Play sound effect (optional)
+        // clickSound.play().catch(() => {});
+
+        // Move to next input
+        if (index < inputs.length - 1) {
+          inputs[index + 1].focus();
+          inputs[index + 1].select();
+        } else {
+          // Last input filled - auto submit after delay
+          setTimeout(() => {
+            if (isFormComplete()) {
+              submitBtn.classList.add('ring-2', 'ring-green-500');
+              setTimeout(() => {
+                submitBtn.click();
+              }, 500);
+            }
+          }, 300);
+        }
       }
     });
 
-    // پشتیبانی از backspace - به فیلد قبلی (چپ) برو
+    // Keyboard navigation
     input.addEventListener('keydown', function(e) {
-      if (e.key === 'Backspace' && this.value === '' && index > 0) {
-        inputs[index - 1].focus();
-        inputs[index - 1].select();
+      switch(e.key) {
+        case 'Backspace':
+          if (this.value === '' && index > 0) {
+            e.preventDefault();
+            inputs[index - 1].focus();
+            inputs[index - 1].select();
+          }
+          break;
+
+        case 'ArrowLeft':
+          if (index > 0) {
+            e.preventDefault();
+            inputs[index - 1].focus();
+            inputs[index - 1].select();
+          }
+          break;
+
+        case 'ArrowRight':
+          if (index < inputs.length - 1) {
+            e.preventDefault();
+            inputs[index + 1].focus();
+            inputs[index + 1].select();
+          }
+          break;
+
+        case 'Enter':
+          if (isFormComplete()) {
+            e.preventDefault();
+            submitBtn.click();
+          }
+          break;
       }
     });
 
-    // پشتیبانی از arrow keys
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'ArrowLeft' && index > 0) {
-        inputs[index - 1].focus();
-        inputs[index - 1].select();
-      } else if (e.key === 'ArrowRight' && index < inputs.length - 1) {
-        inputs[index + 1].focus();
-        inputs[index + 1].select();
-      }
-    });
-
-    // پشتیبانی از paste
+    // Paste handling
     input.addEventListener('paste', function(e) {
       e.preventDefault();
       const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
@@ -197,45 +364,107 @@ document.addEventListener('DOMContentLoaded', function() {
             input.value = pastedData[i] || '';
           }
         });
-        inputs[4].focus();
-        inputs[4].select();
+
+        // Trigger input event on last input
+        setTimeout(() => {
+          inputs[4].dispatchEvent(new Event('input'));
+        }, 100);
       }
     });
 
-    // انتخاب متن هنگام فوکوس
-    input.addEventListener('focus', function() {
+    // Click to select all
+    input.addEventListener('click', function() {
       this.select();
     });
   });
-});
 
-// وقتی فرم ارسال مجدد ارسال شد، تایمر رو ریست کن
-document.getElementById('resend-form').addEventListener('submit', function(event) {
-  // اگر دکمه غیرفعال است، از ارسال فرم جلوگیری کن
-  if (document.getElementById('resend-btn').disabled) {
-    event.preventDefault();
+  // Check if all inputs are filled
+  function isFormComplete() {
+    return Array.from(inputs).every(input => input.value.length === 1);
+  }
+
+  // Real-time form validation
+  inputs.forEach(input => {
+    input.addEventListener('input', function() {
+      const allFilled = isFormComplete();
+      if (allFilled) {
+        submitBtn.classList.add('from-green-600', 'to-emerald-600');
+        submitBtn.classList.remove('from-indigo-600', 'to-purple-600');
+      } else {
+        submitBtn.classList.remove('from-green-600', 'to-emerald-600');
+        submitBtn.classList.add('from-indigo-600', 'to-purple-600');
+      }
+    });
+  });
+
+  // Resend form handling
+  const resendForm = document.getElementById('resend-form');
+  if (resendForm) {
+    resendForm.addEventListener('submit', function(e) {
+      if (resendBtn.disabled) {
+        e.preventDefault();
+      } else {
+        // Show loading state
+        resendBtn.disabled = true;
+        resendBtn.innerHTML = `
+          <svg class="animate-spin h-4 w-4 ml-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          در حال ارسال...
+        `;
+      }
+    });
+  }
+
+  // Auto-focus first input on page load
+  if (inputs.length > 0) {
+    inputs[0].focus();
   }
 });
 </script>
 
 <style>
-#resend-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-#resend-btn:not(:disabled):hover {
-  color: #a5b4fc;
+::-webkit-scrollbar-track {
+  background: #0f172a;
 }
 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
+::-webkit-scrollbar-thumb {
+  background: #4f46e5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}
+
+/* Remove number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(139, 92, 246, 0.3);
+  color: white;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 </style>
 {% endblock content %}

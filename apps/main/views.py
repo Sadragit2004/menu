@@ -214,3 +214,11 @@ def load_more_restaurants(request):
             }, status=500)
 
     return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+
+
+
+
+def faq(request):
+
+    return render(request,'main_app/partials/faq.html')

@@ -1,52 +1,171 @@
- <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="logo" style="margin-bottom: 20px;">مِنو<span>بساز</span></div>
-                    <p style="color: var(--text-muted); max-width: 300px;">
-                        راهکار جامع دیجیتال برای رستوران‌ها، کافه‌ها و فودکورت‌ها.
-                        ما به شما کمک می‌کنیم تا تجربه‌ای لذت‌بخش برای مشتریانتان بسازید.
-                    </p>
-                </div>
-
-                <div class="footer-col">
-                    <h4>دسترسی سریع</h4>
-                    <ul>
-                        <li><a href="#">صفحه اصلی</a></li>
-                        <li><a href="#">درباره ما</a></li>
-                        <li><a href="#">لیست رستوران‌ها</a></li>
-                        <li><a href="#">تعرفه‌ها</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>خدمات</h4>
-                    <ul>
-                        <li><a href="#">منوی دیجیتال</a></li>
-                        <li><a href="#">رزرواسیون</a></li>
-                        <li><a href="#">چاپ منو</a></li>
-                        <li><a href="#">خرید استند</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>پشتیبانی</h4>
-                    <ul>
-                        <li><a href="#">سوالات متداول</a></li>
-                        <li><a href="#">تماس با ما</a></li>
-                        <li><a href="#">قوانین و مقررات</a></li>
-                        <li><a href="#">حریم خصوصی</a></li>
-                    </ul>
-                </div>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 20px;">مِنو<span>بساز</span></div>
+                <p style="color: var(--text-muted); max-width: 300px;">
+                    راهکار جامع دیجیتال برای رستوران‌ها، کافه‌ها و فودکورت‌ها.
+                    ما به شما کمک می‌کنیم تا تجربه‌ای لذت‌بخش برای مشتریانتان بسازید.
+                </p>
             </div>
 
-            <div class="footer-bottom">
-                <div>تمامی حقوق برای دیجی‌مِنو محفوظ است © ۱۴۰۲</div>
-                <div style="display: flex; gap: 15px;">
-                    <a href="#">اینستاگرام</a>
-                    <a href="#">توییتر</a>
-                    <a href="#">لینکدین</a>
+            <div class="footer-col">
+                <h4>دسترسی سریع</h4>
+                <ul>
+                    <li><a href="#">صفحه اصلی</a></li>
+                    <li><a href="#">درباره ما</a></li>
+                    <li><a href="#">لیست رستوران‌ها</a></li>
+                    <li><a href="#">تعرفه‌ها</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>خدمات</h4>
+                <ul>
+                    <li><a href="/panel">منوی دیجیتال</a></li>
+                    <li><a href="/panel/paper-menu-designs/">چاپ منو</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>پشتیبانی</h4>
+                <ul>
+                    <li><a href="/faq">سوالات متداول</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>تماس با ما</h4>
+                <div class="contact-info">
+                    <div class="address" style="margin-bottom: 15px;">
+                        <strong>آدرس:</strong><br>
+                       تبریز - چهاراه منصور مجتمع تجاری اطلس طبقه منفی شرکت رنک صفر
+                    </div>
+                    <div class="phone-numbers">
+                        <strong>شماره‌های تماس:</strong><br>
+                        <div style="margin-top: 8px;">
+                            <a href="tel:+982112345678" style="display: block; margin-bottom: 5px;">0930-908-7909</a>
+                            <a href="tel:+989121234567" style="display: block; margin-bottom: 5px;">0914-659-7108</a>
+                            <a href="tel:+989301234567" style="display: block;">۰۹۳۰-۱۲۳۴۵۶۷</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </footer>
+
+        <div class="footer-bottom">
+            <div>تمامی حقوق برای مِنو‌بساز محفوظ است © ۱۴۰۲</div>
+            <div style="display: flex; gap: 15px;">
+                <a href="#">اینستاگرام</a>
+                <a href="#">توییتر</a>
+                <a href="#">لینکدین</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        padding: 50px 0 30px;
+        font-family: 'Vazirmatn', sans-serif;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .footer-col h4 {
+        color: #f8fafc;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .footer-col ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-col ul li {
+        margin-bottom: 12px;
+    }
+
+    .footer-col ul li a {
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .footer-col ul li a:hover {
+        color: #60a5fa;
+    }
+
+    .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #f8fafc;
+    }
+
+    .logo span {
+        color: #60a5fa;
+    }
+
+    .contact-info {
+        color: #cbd5e1;
+        line-height: 1.8;
+    }
+
+    .contact-info a {
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .contact-info a:hover {
+        color: #60a5fa;
+    }
+
+    .footer-bottom {
+        border-top: 1px solid #475569;
+        padding-top: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 0.9rem;
+        color: #94a3b8;
+    }
+
+    .footer-bottom a {
+        color: #94a3b8;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .footer-bottom a:hover {
+        color: #60a5fa;
+    }
+
+    @media (max-width: 768px) {
+        .footer-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .footer-bottom {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

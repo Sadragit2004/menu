@@ -7,11 +7,12 @@
                     <path d="M16 13H10" stroke="white" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16 17H13" stroke="white" stroke-width="2" stroke-linecap="round"/>
                 </svg>
-                مِنو<span>بساز</span>
+                <span>مِنو</span><span>بساز</span>
             </a>
 
             <nav class="nav-desktop">
                 <a href="/" class="nav-link">خانه</a>
+                <a href="/faq" class="nav-link">راهنمای سایت</a>
                 <a href="#features" class="nav-link">ویژگی‌ها</a>
                 <a href="#restaurants" class="nav-link">رستوران‌ها</a>
                 <a href="#pricing" class="nav-link">تعرفه‌ها</a>
@@ -21,12 +22,21 @@
             <div class="nav-actions">
                 <a href="#" class="btn btn-primary" style="display: none; height: 40px; font-size: 0.9rem; @media(min-width:768px){display:inline-flex;}">ورود / ثبت نام</a>
 
-                <a href='/panel' class="icon-btn" aria-label="حساب کاربری">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </a>
+             <a href='/panel' class="icon-btn relative" aria-label="حساب کاربری">
+    {% if request.user.is_authenticated %}
+        <!-- نشانگر سبز لاگین -->
+        <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full border-2 border-white shadow-lg ring-2 ring-green-500/50 animate-pulse"></span>
+
+        <!-- هاله سبز درخشان دور آیکون -->
+        <div class="absolute inset-0 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-full blur-sm opacity-70"></div>
+    {% endif %}
+
+    <!-- آیکون اصلی (همیشه یکسان) -->
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+</a>
 
                 <div class="mobile-toggle" onclick="toggleMenu()">
                     <span></span>
@@ -39,6 +49,7 @@
 
     <div class="mobile-menu" id="mobileMenu">
         <a href="#home" class="mobile-nav-link" onclick="toggleMenu()">خانه</a>
+        <a href="/faq" class="mobile-nav-link" onclick="toggleMenu()">راهنمای سایت</a>
         <a href="#features" class="mobile-nav-link" onclick="toggleMenu()">ویژگی‌ها</a>
         <a href="#restaurants" class="mobile-nav-link" onclick="toggleMenu()">رستوران‌ها</a>
         <a href="#pricing" class="mobile-nav-link" onclick="toggleMenu()">تعرفه‌ها</a>
