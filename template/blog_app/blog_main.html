@@ -1,250 +1,402 @@
-<section class="blog-section">
-    <div class="blog-container">
-        <div class="blog-header">
-            <h2 class="blog-title">آخرین <span class="gradient-text">مقالات</span></h2>
-            <p class="blog-subtitle">جدیدترین مطالب و آموزش‌های حوزه رستوران‌داری و مدیریت منو</p>
+{% load static %}
+{% load humanize %}
+
+<section class="section bg-light" id="blog">
+    <div class="container">
+        <div class="section-title" style="text-align: right; margin-bottom: 2rem;">
+            <h2>آخرین مقالات</h2>
+            {% if blogs.count > 0 %}
+            <p class="section-subtitle">جدیدترین مطالب و آموزش‌های حوزه رستوران‌داری</p>
+            {% endif %}
         </div>
 
-        <div class="blog-scroll-container">
-            <div class="blog-posts">
-                {% for blog in blogs %}
-                <!-- پست {{ forloop.counter }} -->
-                <article class="blog-card">
-                    {% if blog.image_name %}
-                    <img src="{{ blog.image_name.url }}" alt="{{ blog.subject }}" class="blog-image">
-                    {% else %}
-                    <div class="blog-image-placeholder">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 16L8 12L12 16L16 12L20 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M4 20H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <rect x="4" y="4" width="16" height="12" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                       <a href="{% url 'blog:detail' slug=blog.slug %}"><span style='color:#ffff;'>{{ blog.subject }}</span></a>
+        {% if blogs.count > 0 %}
+        <div class="blog-grid">
+            {% for blog in blogs %}
+            <article class="blog-card">
+                <!-- تصویر مقاله -->
+                {% if blog.image %}
+                <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="blog-thumb">
+                {% elif blog.thumbnail %}
+                <img src="{{ blog.thumbnail.url }}" alt="{{ blog.title }}" class="blog-thumb">
+                {% else %}
+                <div class="blog-thumb" style="background: {% cycle '#e2e8f0' '#cbd5e1' '#94a3b8' '#c4b5fd' '#a5b4fc' '#bae6fd' %}">
+                    {% if blog.title %}
+                    <div class="blog-thumb-text">
+                        {{ blog.title|slice:":1" }}
                     </div>
                     {% endif %}
-                    <div class="blog-content">
-                        <span class="blog-category">{{ blog.grop_blog.group_name }}</span>
-                       <a href="{% url 'blog:detail' slug=blog.slug %}"> <span class="blog-post-title">{{ blog.subject }}</span></a>
-                        <p class="blog-excerpt">{{ blog.description|truncatewords:20 }}</p>
-                        <div class="blog-meta">
-                            <span class="blog-date">{{ blog.time_since_posted }}</span>
-
-                        </div>
-                    </div>
-                </article>
-                {% empty %}
-                <div class="no-blogs">
-                    <p>هنوز مقاله‌ای منتشر نشده است.</p>
                 </div>
-                {% endfor %}
-            </div>
+                {% endif %}
+
+                <div class="blog-content">
+                    <!-- تاریخ انتشار -->
+                    <div class="blog-date">
+                        {% if blog.published_date %}
+                            {{ blog.published_date|date:"j F Y" }}
+                        {% elif blog.created_at %}
+                            {{ blog.created_at|date:"j F Y" }}
+                        {% else %}
+                            تاریخ نامشخص
+                        {% endif %}
+                    </div>
+
+                    <!-- عنوان مقاله -->
+                    <h3 class="blog-title">
+                        <a href="{% url 'blog:detail' slug=blog.slug %}">
+                            {{ blog.title }}
+                        </a>
+                    </h3>
+
+                    <!-- خلاصه مقاله -->
+                    {% if blog.summary %}
+                    <p class="blog-excerpt">{{ blog.summary|truncatewords:20 }}</p>
+                    {% elif blog.content %}
+                    <p class="blog-excerpt">{{ blog.content|striptags|truncatewords:20 }}</p>
+                    {% endif %}
+
+                    <!-- اطلاعات اضافی -->
+                    <div class="blog-meta">
+                        <!-- دسته‌بندی -->
+                        {% if blog.category %}
+                        <span class="blog-category">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            {{ blog.category.name }}
+                        </span>
+                        {% endif %}
+
+                        <!-- زمان مطالعه -->
+                        {% if blog.read_time %}
+                        <span class="blog-read-time">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            {{ blog.read_time }} دقیقه
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- دکمه ادامه مطلب -->
+                    <a href="{% url 'blog:detail' slug=blog.slug %}" class="blog-read-more">
+                        مطالعه مقاله
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
         </div>
+
+        <!-- دکمه مشاهده همه مقالات -->
+        <div class="text-center mt-8">
+            <a href="{% url 'blog:list' %}" class="btn btn-primary">
+                مشاهده همه مقالات
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+
+        {% else %}
+        <!-- حالت خالی -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+            </div>
+            <h3 class="empty-state-title">مقاله‌ای یافت نشد</h3>
+            <p class="empty-state-description">هنوز هیچ مقاله‌ای منتشر نشده است.</p>
+            {% if user.is_staff %}
+            <a href="{% url 'admin:blog_blog_add' %}" class="btn btn-primary">
+                ایجاد مقاله جدید
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </section>
 
 <style>
-.blog-section {
+/* استایل‌های اصلی */
+.section {
     padding: 4rem 1rem;
-
 }
 
-.blog-container {
+.bg-light {
+    background-color: #f8fafc;
+}
+
+.container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
-.blog-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.blog-title {
+.section-title h2 {
     font-size: 2.5rem;
     font-weight: bold;
-    color: white;
-    margin-bottom: 1rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
 }
 
-.gradient-text {
-    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.section-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
 }
 
-.blog-subtitle {
-    font-size: 1.2rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.blog-scroll-container {
-    overflow-x: auto;
-    padding: 1rem 0;
-}
-
-.blog-posts {
-    display: flex;
+/* گرید مقالات */
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 2rem;
-    padding: 1rem;
-    min-width: min-content;
+    margin-top: 2rem;
 }
 
+/* کارت مقاله */
 .blog-card {
-    min-width: 350px;
     background: white;
-    border-radius: 20px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    flex-shrink: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .blog-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.blog-image {
+.blog-thumb {
     width: 100%;
     height: 200px;
     object-fit: cover;
 }
 
-.blog-image-placeholder {
-    width: 100%;
-    height: 200px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.blog-thumb[style*="background"] {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #475569;
 }
 
-.blog-image-placeholder svg {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 1rem;
-    opacity: 0.8;
-}
-
-.blog-image-placeholder span {
-    font-size: 1rem;
+.blog-thumb-text {
+    font-size: 3rem;
     font-weight: bold;
-    text-align: center;
-    padding: 0 1rem;
+    color: #475569;
+    opacity: 0.5;
 }
 
 .blog-content {
     padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-.blog-category {
-    display: inline-block;
-    background: linear-gradient(45deg, #ff6b6b, #feca57);
-    color: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+.blog-date {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.blog-post-title {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 1rem;
+.blog-date::before {
+    content: "📅";
+    font-size: 0.875rem;
+}
+
+.blog-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
     line-height: 1.4;
 }
 
+.blog-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.blog-title a:hover {
+    color: #3b82f6;
+}
+
 .blog-excerpt {
-    color: #666;
+    color: #64748b;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    flex-grow: 1;
     font-size: 0.95rem;
 }
 
 .blog-meta {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
-.blog-date {
-    color: #999;
-    font-size: 0.9rem;
+.blog-category,
+.blog-read-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    background: #f1f5f9;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
 }
 
 .blog-read-more {
-    color: #667eea;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #3b82f6;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
     text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-top: auto;
 }
 
 .blog-read-more:hover {
-    color: #764ba2;
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.no-blogs {
+/* حالت خالی */
+.empty-state {
     text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
+
+/* دکمه‌ها */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: #3b82f6;
     color: white;
-    font-size: 1.2rem;
-    padding: 2rem;
 }
 
-/* اسکرول بار سفارشی */
-.blog-scroll-container::-webkit-scrollbar {
-    height: 8px;
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.blog-scroll-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+.text-center {
+    text-align: center;
 }
 
-.blog-scroll-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #ff6b6b, #feca57);
-    border-radius: 10px;
+.mt-8 {
+    margin-top: 2rem;
 }
 
 /* ریسپانسیو */
 @media (max-width: 768px) {
-    .blog-title {
-        font-size: 2rem;
-    }
-
-    .blog-subtitle {
-        font-size: 1rem;
-    }
-
-    .blog-card {
-        min-width: 300px;
-    }
-
-    .blog-posts {
-        gap: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .blog-section {
+    .section {
         padding: 2rem 1rem;
     }
 
+    .section-title h2 {
+        font-size: 2rem;
+    }
+
+    .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
     .blog-card {
-        min-width: 280px;
-    }
-
-    .blog-content {
-        padding: 1rem;
-    }
-
-    .blog-post-title {
-        font-size: 1.1rem;
+        max-width: 100%;
     }
 }
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .blog-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* انیمیشن‌ها */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.blog-card {
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.blog-card:nth-child(1) { animation-delay: 0.1s; }
+.blog-card:nth-child(2) { animation-delay: 0.2s; }
+.blog-card:nth-child(3) { animation-delay: 0.3s; }
+.blog-card:nth-child(4) { animation-delay: 0.4s; }
+.blog-card:nth-child(5) { animation-delay: 0.5s; }
+.blog-card:nth-child(6) { animation-delay: 0.6s; }
 </style>

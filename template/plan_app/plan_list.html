@@ -1,282 +1,69 @@
-{% load humanize %}
 {% load static %}
+{% load humanize %}
 
-<!DOCTYPE html>
-<html dir="rtl" lang="fa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پلن‌های قیمت‌گذاری</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* استایل مخصوص انیمیشن‌ها */
-        @keyframes pulse-glow {
-            0%, 100% {
-                box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.6);
-                transform: scale(1.02);
-            }
-        }
-
-        @keyframes bounce-subtle {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200px 0; }
-            100% { background-position: 200px 0; }
-        }
-
-        /* کلاس‌های جدید */
-        .animate-pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        .animate-bounce-subtle {
-            animation: bounce-subtle 2s infinite;
-        }
-
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .video-placeholder {
-            background: linear-gradient(90deg, #1f2937 0%, #374151 50%, #1f2937 100%);
-            background-size: 200px 100%;
-            animation: shimmer 1.5s infinite linear;
-        }
-
-        .play-btn-hover {
-            transition: all 0.3s ease;
-        }
-
-        .play-btn-hover:hover {
-            transform: scale(1.1);
-            filter: brightness(1.2);
-        }
-    </style>
-</head>
-<body class="bg-gray-900">
-    <div class="relative isolate bg-gray-900 px-6 py-24 sm:py-32 lg:px-8">
-        <!-- Background decoration -->
-        <div aria-hidden="true" class="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl">
-            <div style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
-                 class="mx-auto aspect-1155/678 w-288.75 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20"></div>
+<section class="section" id="pricing">
+    <div class="container">
+        <div class="section-title">
+            <h2>پلن‌های قیمت‌گذاری</h2>
+            <p>انتخاب بهترین طرح متناسب با نیاز رستوران شما.</p>
         </div>
 
-        <!-- Header section -->
-        <div class="mx-auto max-w-4xl text-center">
-            <h2 class="text-base/7 font-semibold text-indigo-400">تعرفه‌ها</h2>
-        </div>
-
-        <!-- Plans grid - 3 plans per row -->
-        <div class="mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="pricing-grid">
             {% for plan in plans %}
-            <div class="relative rounded-3xl p-8 ring-1 ring-white/10 transition-all duration-300
-                        {% if plan.isFavorit %}
-                        bg-gradient-to-br from-gray-800 to-indigo-900/30 animate-pulse-glow
-                        {% else %}
-                        bg-white/2.5 hover:bg-white/5
-                        {% endif %}">
-
-                <!-- Favorite badge with animation -->
-                {% if plan.isFavorit %}
-                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce-subtle">
-                    <span class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        پلن محبوب
-                    </span>
-                </div>
-
-                <!-- Shiny corner effect for favorite plan -->
-                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-indigo-400 rounded-tl-lg"></div>
-                <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-indigo-400 rounded-tr-lg"></div>
-                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-indigo-400 rounded-bl-lg"></div>
-                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-indigo-400 rounded-br-lg"></div>
+            <div class="price-card {% if plan.is_recommended %}featured{% endif %}">
+                {% if plan.is_recommended %}
+                <div class="featured-tag">{{ plan.recommended_tag|default:"پیشنهادی" }}</div>
                 {% endif %}
 
-                <h3 id="tier-{{ plan.slug }}" class="text-base/7 font-semibold text-indigo-400 text-center">{{ plan.name }}</h3>
+                <div class="price-name">{{ plan.name }}</div>
 
-                <!-- Price section -->
-                <div class="mt-4 flex items-baseline justify-center gap-x-2">
-                    {% if plan.price %}
-                    <span class="text-5xl font-semibold tracking-tight text-white">{{ plan.price|intcomma }}</span>
-                    <span class="text-base text-gray-400">تومان</span>
+                <div class="price-val">
+                    {% if plan.price == 0 %}
+                        رایگان
+                    {% elif plan.price %}
+                        {{ plan.price|intcomma }}
                     {% else %}
-                    <span class="text-3xl font-semibold tracking-tight text-white">رایگان</span>
+                        تماس
                     {% endif %}
                 </div>
 
-                <!-- Video Box UI - قسمت جدید -->
-                <div class="mt-6 animate-fadeIn">
-                    <div class="mb-2 text-center">
-                        <span class="text-xs font-medium text-gray-400 bg-gray-800/50 px-2 py-1 rounded-full">
-                            <svg class="w-3 h-3 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-                            </svg>
-                            ویدیوی معرفی
-                        </span>
-                    </div>
+                <span class="price-unit">
+                    {% if plan.price == 0 %}
+                        برای همیشه
+                    {% elif plan.price %}
+                        تومان / {{ plan.duration }}
+                    {% else %}
+                        {{ plan.description|default:"برای رستوران‌های زنجیره‌ای" }}
+                    {% endif %}
+                </span>
 
-                    <!-- ویدیو پلیس‌هولدر (نمایش قبل از پخش) -->
-                    <div class="relative rounded-xl overflow-hidden border border-gray-700/50 bg-gray-800/30 group cursor-pointer"
-                         onclick="playVideo('video-{{ plan.slug }}')">
-                        <!-- تصویر تامبنیل یا پلیس‌هولدر -->
-                        <div class="video-placeholder h-40 w-full flex items-center justify-center">
-                            {% if plan.video_thumbnail %}
-                                <!-- اگر تامبنیل وجود دارد -->
-                                <img src="{{ plan.video_thumbnail }}" alt="ویدیوی {{ plan.name }}"
-                                     class="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity">
-                            {% else %}
-                                <!-- پلیس‌هولدر پیش‌فرض -->
-                                <div class="text-center">
-                                    <div class="w-14 h-14 mx-auto mb-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center play-btn-hover">
-                                        <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <p class="text-sm text-gray-300 font-medium">{{ plan.name }}</p>
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- عنوان ویدیو -->
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-semibold text-white">معرفی {{ plan.name }}</p>
-                                    <p class="text-xs text-gray-300 mt-0.5">مدت: 30 ثانیه</p>
-                                </div>
-                                <div class="bg-black/50 rounded-full p-2 backdrop-blur-sm">
-                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- حالت هاور -->
-                        <div class="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                            <div class="bg-black/70 rounded-full p-4 transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- اطلاعات اضافی ویدیو -->
-                    <div class="mt-2 flex items-center justify-between text-xs text-gray-400">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>آخرین بروزرسانی: 1402/12/15</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>1.2K بازدید</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Plan description -->
-                {% if plan.description %}
-                <p class="mt-6 text-base/7 text-gray-300 text-center">{{ plan.description }}</p>
-                {% endif %}
-
-                <!-- Features list -->
-                <ul role="list" class="mt-8 space-y-3 text-sm/6 text-gray-300">
+                <ul class="price-features">
                     {% for feature in plan.features.all %}
-                    <li class="flex gap-x-3 {% if not feature.isAvailable %}opacity-50{% endif %}">
-                        {% if feature.isAvailable %}
-                        <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="h-6 w-5 flex-none text-indigo-400">
-                            <path d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" fill-rule="evenodd" />
-                        </svg>
+                    <li {% if not feature.is_available %}style="color: var(--text-light); text-decoration: line-through;"{% endif %}>
+                        {% if feature.is_available %}
+                            {{ feature.title }}
                         {% else %}
-                        <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="h-6 w-5 flex-none text-gray-500">
-                            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                        </svg>
+                            {{ feature.title }}
                         {% endif %}
-                        {{ feature.title }}
                     </li>
                     {% endfor %}
                 </ul>
 
-                <!-- CTA button -->
-                <a href="{% url 'plan:purchase_plan' plan.slug %}" aria-describedby="tier-{{ plan.slug }}"
-                   class="mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold text-white
-                          transition-colors duration-200
-                          {% if plan.isFavorit %}
-                          bg-indigo-500 hover:bg-indigo-400
-                          {% else %}
-                          bg-white/10 hover:bg-white/20
-                          {% endif %}
-                          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/75">
-                    {% if plan.price %}خرید پلن{% else %}شروع رایگان{% endif %}
-                </a>
+                {% if plan.price == 0 %}
+                    <a href="{% url 'plan:start_free_plan' plan.slug %}" class="btn btn-secondary" style="width: 100%;">شروع کنید</a>
+                {% elif plan.price %}
+                    <a href="{% url 'plan:purchase_plan' plan.slug %}" class="btn {% if plan.is_recommended %}btn-primary{% else %}btn-secondary{% endif %}" style="width: 100%;">
+                        {% if plan.is_recommended %}خرید اشتراک{% else %}انتخاب پلن{% endif %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'contact:sales' %}" class="btn btn-secondary" style="width: 100%;">تماس با فروش</a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="no-plans-message">
+                <p>در حال حاضر پلنی برای نمایش وجود ندارد.</p>
             </div>
             {% endfor %}
         </div>
     </div>
-
-    <!-- JavaScript برای مدیریت ویدیو -->
-    <script>
-        // تابع پخش ویدیو (قابل توسعه)
-        function playVideo(videoId) {
-            console.log(`پخش ویدیو: ${videoId}`);
-            // در اینجا می‌توانید:
-            // 1. باز کردن مدال ویدیو
-            // 2. پخش ویدیو در صفحه
-            // 3. یا هدایت به صفحه ویدیو
-
-            // مثال ساده: باز کردن لینک ویدیو در تب جدید
-            const videoLinks = {
-                'video-basic': 'https://example.com/video-basic',
-                'video-pro': 'https://example.com/video-pro',
-                'video-enterprise': 'https://example.com/video-enterprise'
-            };
-
-            if (videoLinks[videoId]) {
-                window.open(videoLinks[videoId], '_blank');
-            }
-        }
-
-        // مدیریت هایلایت ویدیو در هاور
-        document.querySelectorAll('.group.cursor-pointer').forEach(box => {
-            box.addEventListener('mouseenter', function() {
-                this.style.borderColor = 'rgba(99, 102, 241, 0.5)';
-            });
-
-            box.addEventListener('mouseleave', function() {
-                this.style.borderColor = '';
-            });
-        });
-
-        // اضافه کردن انیمیشن برای پلی‌باتن
-        document.querySelectorAll('.play-btn-hover').forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.15)';
-            });
-
-            btn.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1)';
-            });
-        });
-    </script>
-</body>
-</html>
+</section>

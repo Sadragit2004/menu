@@ -1,265 +1,56 @@
-{% load static %}
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-
-<style>
-    /* استایل اصلی */
-    .restaurants-slider {
-        background-color: rgb(17 24 39) !important; /* رنگ مورد نظر شما */
-        padding: 24px 0;
-    }
-
-    .slider-container {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 0 20px 30px;
-    }
-
-    /* عنوان */
-    .section-header {
-        text-align: center;
-        margin-bottom: 24px;
-    }
-
-    .section-title {
-        color: white;
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 8px;
-    }
-
-    .section-subtitle {
-        color: #9ca3af;
-        font-size: 14px;
-    }
-
-    /* Swiper */
-    .swiper {
-        padding: 10px;
-    }
-
-    .swiper-slide {
-        width: auto !important;
-        height: 50px;
-    }
-
-    /* باکس رستوران - کل باکس لینکه */
-    .restaurant-box {
-        display: block;
-        background-color: rgb(31 41 55) !important; /* کمی تیره‌تر از بک‌گراند */
-        border: 1px solid rgb(55 65 81);
-        border-radius: 10px;
-        padding: 12px 20px;
-        height: 100%;
-        min-width: 170px;
-        text-decoration: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-align: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .restaurant-box:hover {
-        background-color: rgb(37 99 235) !important; /* آبی زیبا */
-        border-color: rgb(37 99 235);
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
-    }
-
-    .restaurant-name {
-        color: white;
-        font-size: 15px;
-        font-weight: 500;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 150px;
-    }
-
-    /* دکمه‌های ناوبری */
-    .swiper-button-next, .swiper-button-prev {
-        background-color: rgb(31 41 55) !important;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1px solid rgb(55 65 81);
-        color: white;
-        transition: all 0.3s ease;
-    }
-
-    .swiper-button-next:after, .swiper-button-prev:after {
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-    .swiper-button-next:hover, .swiper-button-prev:hover {
-        background-color: rgb(37 99 235) !important;
-        border-color: rgb(37 99 235);
-    }
-
-    /* صفحه‌بندی */
-    .swiper-pagination-bullet {
-        background-color: rgb(55 65 81) !important;
-        width: 8px;
-        height: 8px;
-        opacity: 1;
-    }
-
-    .swiper-pagination-bullet-active {
-        background-color: rgb(37 99 235) !important;
-    }
-
-    /* دکمه مشاهده همه */
-    .view-all-container {
-        text-align: center;
-        margin-top: 24px;
-    }
-
-    .view-all-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background-color: rgb(31 41 55) !important;
-        color: #d1d5db;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        border: 1px solid rgb(55 65 81);
-        transition: all 0.3s ease;
-    }
-
-    .view-all-btn:hover {
-        background-color: rgb(37 99 235) !important;
-        color: white;
-        border-color: rgb(37 99 235);
-    }
-
-    /* رسپانسیو */
-    @media (max-width: 768px) {
-        .restaurants-slider {
-            padding: 20px 0;
-        }
-
-        .slider-container {
-            padding: 0 15px 25px;
-        }
-
-        .section-title {
-            font-size: 18px;
-        }
-
-        .swiper-slide {
-            height: 45px;
-        }
-
-        .restaurant-box {
-            min-width: 140px;
-            padding: 10px 16px;
-        }
-
-        .restaurant-name {
-            font-size: 14px;
-            max-width: 120px;
-        }
-
-        .swiper-button-next, .swiper-button-prev {
-            display: none;
-        }
-    }
-
-    @media (max-width: 640px) {
-        .restaurant-box {
-            min-width: 120px;
-            padding: 8px 12px;
-        }
-
-        .restaurant-name {
-            font-size: 13px;
-        }
-    }
-</style>
-
-<div class="restaurants-slider">
-    <div class="slider-container">
-        <!-- عنوان بخش -->
-        <div class="section-header">
-            <h2 class="section-title">جدیدترین رستوران‌ها</h2>
-            <p class="section-subtitle">لیست ۲۰ رستوران جدید اضافه شده</p>
+<section class="section bg-light" id="restaurants">
+    <div class="container">
+        <div class="section-title">
+            <h2>رستوران‌های برتر</h2>
+            <p>مجموعه‌ای از بهترین رستوران‌هایی که به دیجی‌مِنو پیوسته‌اند.</p>
         </div>
 
-        <!-- Swiper Slider -->
-        <div class="swiper">
-            <div class="swiper-wrapper">
+        <div class="restaurants-container">
+            <div class="restaurants-scroll">
+
                 {% for restaurant in restaurants %}
-                <div class="swiper-slide">
-                    <!-- کل باکس لینک است -->
-                    <a href="/menu/{{ restaurant.slug }}/" class="restaurant-box">
-                        <span class="restaurant-name">{{ restaurant.title }}</span>
-                    </a>
+                <div class="res-card">
+
+                    <!-- تصویر رستوران -->
+                    <div class="res-img"
+                         style="
+                         {% if restaurant.cover %}
+                             background-image: url('{{ restaurant.cover.url }}');
+                             background-size: cover;
+                             background-position: center;
+                         {% else %}
+                             background: linear-gradient(135deg, #1e293b, #334155);
+                         {% endif %}
+                         ">
+                        {% if restaurant.category %}
+                        <span class="res-badge">{{ restaurant.category.title }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- اطلاعات -->
+                    <div class="res-info">
+                        <h3 class="res-name">{{ restaurant.title }}</h3>
+
+                        <div class="res-meta">
+                            {% if restaurant.rating %}
+                                <span class="rating">★ {{ restaurant.rating }}</span>
+                            {% endif %}
+                            {% if restaurant.city %}
+                                <span>• {{ restaurant.city }}</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="/menu/{{ restaurant.slug }}/"
+                           class="btn btn-secondary"
+                           style="width:100%; padding:8px; display:inline-block; text-align:center;">
+                            مشاهده منو
+                        </a>
+                    </div>
+
                 </div>
                 {% endfor %}
+
             </div>
-
-            <!-- دکمه‌های ناوبری -->
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-
-            <!-- صفحه‌بندی -->
-            <div class="swiper-pagination"></div>
-        </div>
-
-        <!-- دکمه مشاهده همه -->
-        <div class="view-all-container">
-            <a href="{% url 'main:all_restaurants' %}" class="view-all-btn">
-                مشاهده همه رستوران‌ها
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-            </a>
         </div>
     </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const swiper = new Swiper('.swiper', {
-        slidesPerView: 'auto',
-        spaceBetween: 12,
-        loop: true,
-        centeredSlides: false,
-        autoplay: {
-            delay: 4000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-        },
-        speed: 600,
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-            dynamicBullets: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            640: {
-                spaceBetween: 12,
-            },
-            768: {
-                spaceBetween: 15,
-            },
-            1024: {
-                spaceBetween: 18,
-            },
-            1280: {
-                spaceBetween: 20,
-            }
-        }
-    });
-});
-</script>
+</section>

@@ -1,205 +1,50 @@
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #000; /* پس‌زمینه کل صفحه مشکی */
-        color: #fff; /* رنگ متن‌ها سفید */
-    }
-
-    dialog {
-        border: none;
-        padding: 0;
-    }
-
-    dialog::backdrop {
-        background-color: rgba(255, 255, 255, 0.2); /* برای حالت تیره کمی روشن‌تر */
-    }
-
-    /* استایل پایه برای تم تیره */
-    header, nav, .mobile-menu, .search-bar {
-        background-color: #000 !important;
-        color: #fff !important;
-    }
-
-    a {
-        color: #fff;
-        transition: color 0.3s ease;
-    }
-
-    a:hover {
-        color: #60a5fa; /* آبی روشن هنگام هاور */
-    }
-
-    svg {
-        stroke: #fff;
-    }
-
-    input {
-        background-color: #111 !important;
-        color: #fff !important;
-        border: 1px solid #333 !important;
-    }
-
-    input::placeholder {
-        color: #aaa !important;
-    }
-
-    .menu-box {
-        background-color: #000 !important;
-        border: 1px solid #222 !important;
-    }
-
-    .menu-item:hover {
-        background-color: #111 !important;
-    }
-
-    .btn-blue {
-        background-color: #2563eb;
-        color: #fff;
-    }
-
-    .btn-blue:hover {
-        background-color: #1d4ed8;
-    }
-</style>
-
-<script>
-    function closeMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        if (menu && typeof menu.close === 'function') {
-            menu.close();
-        }
-    }
-
-    function toggleUserMenu() {
-        const userMenu = document.getElementById('user-menu');
-        userMenu.classList.toggle('hidden');
-    }
-
-    document.addEventListener('click', function(event) {
-        const userMenu = document.getElementById('user-menu');
-        const userButton = document.getElementById('user-button');
-        if (userButton && userMenu && !userButton.contains(event.target) && !userMenu.contains(event.target)) {
-            userMenu.classList.add('hidden');
-        }
-    });
-</script>
-
-<header class="shadow-sm sticky top-0 z-50 bg-black text-white">
-    <nav class="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
-        <div class="flex items-center gap-x-4">
-            <!-- دکمه همبرگری -->
-            <div class="flex lg:hidden">
-                <button onclick="document.getElementById('mobile-menu').showModal()"
-                    class="p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-6">
-                        <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- لوگو -->
-            <a href="#" class="flex items-center gap-2">
-                <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=white&shade=600"
-                    alt="لوگو" class="h-8 w-auto" />
+<header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="20" height="16" rx="4" fill="#2563EB"/>
+                    <path d="M16 9H7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16 13H10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16 17H13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                مِنو<span>بساز</span>
             </a>
 
-            <!-- لینک‌های دسکتاپ -->
-            <div class="hidden lg:flex lg:gap-x-8 mr-8">
-                <a href="/" class="text-sm font-semibold hover:text-blue-400">صفحه اصلی</a>
-                <a href="#" class="text-sm font-semibold hover:text-blue-400">درباره ما</a>
-                <a href="#" class="text-sm font-semibold hover:text-blue-400">تماس باما</a>
-                <a href="#" class="text-sm font-semibold hover:text-blue-400">اینده نگری</a>
-            </div>
-        </div>
+            <nav class="nav-desktop">
+                <a href="/" class="nav-link">خانه</a>
+                <a href="#features" class="nav-link">ویژگی‌ها</a>
+                <a href="#restaurants" class="nav-link">رستوران‌ها</a>
+                <a href="#pricing" class="nav-link">تعرفه‌ها</a>
+                <a href="#contact" class="nav-link">تماس با ما</a>
+            </nav>
 
-        <!-- بخش سمت چپ -->
-        <div class="flex items-center space-x-4 rtl:space-x-reverse">
-            {% if user.is_authenticated %}
-            <div class="relative">
-                <button id="user-button" onclick="toggleUserMenu()" class="flex items-center text-sm font-semibold hover:text-blue-400 transition">
-                    <svg style="margin-left:8px; width:24px;" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            <div class="nav-actions">
+                <a href="#" class="btn btn-primary" style="display: none; height: 40px; font-size: 0.9rem; @media(min-width:768px){display:inline-flex;}">ورود / ثبت نام</a>
+
+                <a href='/panel' class="icon-btn" aria-label="حساب کاربری">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    حساب کاربری
-                </button>
+                </a>
 
-                <div id="user-menu" class="hidden absolute left-0 mt-2 w-48 rounded-lg shadow-lg menu-box py-1 z-50">
-                    <a href="{% url 'panel:panel' %}" class="block px-4 py-2 text-sm menu-item">پنل کاربری</a>
-                    <a href="{% url 'account:logout' %}"
-                        class="block px-4 py-2 text-sm text-red-400 hover:bg-red-900/30 transition">خروج</a>
+                <div class="mobile-toggle" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
-            {% else %}
-            <a href="{% url 'account:send_mobile' %}" class="flex items-center text-sm font-semibold hover:text-blue-400">
-                <svg style="margin-left:8px; width:24px;" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
-                ورود / ثبت‌نام
-            </a>
-            {% endif %}
-
-            <a href="/restaurant" class="btn-blue text-sm font-semibold px-4 py-2 rounded-full shadow-md transition">
-                دمو منو
-            </a>
         </div>
-    </nav>
+    </header>
 
-    <!-- نوار جستجو -->
-    <div class="py-3 px-4 border-t border-gray-800 search-bar">
-        <div class="max-w-3xl mx-auto relative">
-            <input type="text" placeholder="جستجو برای رستوران‌ها، غذاها یا مناطق..."
-                class="w-full rounded-full px-4 py-2 pl-10 text-sm shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500" />
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" />
-            </svg>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home" class="mobile-nav-link" onclick="toggleMenu()">خانه</a>
+        <a href="#features" class="mobile-nav-link" onclick="toggleMenu()">ویژگی‌ها</a>
+        <a href="#restaurants" class="mobile-nav-link" onclick="toggleMenu()">رستوران‌ها</a>
+        <a href="#pricing" class="mobile-nav-link" onclick="toggleMenu()">تعرفه‌ها</a>
+        <a href="#blog" class="mobile-nav-link" onclick="toggleMenu()">وبلاگ</a>
+        <a href="#contact" class="mobile-nav-link" onclick="toggleMenu()">تماس با ما</a>
+        <div style="padding: 20px;">
+            <a href="{% url 'account:send_mobile' %}" class="btn btn-primary" style="width: 100%;">ورود / ثبت نام</a>
         </div>
     </div>
-
-    <!-- منوی موبایل -->
-    <dialog id="mobile-menu" class="fixed inset-0 w-full h-full bg-transparent p-0">
-        <div tabindex="0" class="fixed inset-0 focus:outline-none">
-            <div class="absolute inset-0 bg-white/10" onclick="closeMobileMenu()"></div>
-
-            <div class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-black p-6 sm:max-w-sm shadow-xl text-white">
-                <div class="flex items-center justify-between">
-                    <a href="#" class="-m-1.5 p-1.5">
-                        <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=white&shade=600"
-                            class="h-8 w-auto" />
-                    </a>
-                    <button onclick="closeMobileMenu()" class="p-2 text-white hover:text-blue-400">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="mt-6 space-y-2">
-                    <a href="#" class="block px-3 py-2 font-semibold hover:text-blue-400">صفحه اصلی</a>
-                    <a href="#" class="block px-3 py-2 font-semibold hover:text-blue-400">درباره ما</a>
-                    <a href="#" class="block px-3 py-2 font-semibold hover:text-blue-400">تماس باما</a>
-                    <a href="#" class="block px-3 py-2 font-semibold hover:text-blue-400"> اینده نگری</a>
-                </div>
-
-                <div class="pt-4 border-t border-gray-800 mt-4">
-                    {% if user.is_authenticated %}
-                    <a href=" " onclick="closeMobileMenu()"
-                        class="block px-3 py-2 font-semibold hover:text-blue-400">پنل کاربری</a>
-                    <a href="{% url 'account:logout' %}" onclick="closeMobileMenu()"
-                        class="block px-3 py-2 text-red-400 hover:text-red-300">خروج</a>
-                    {% else %}
-                    <a href="{% url 'account:send_mobile' %}" onclick="closeMobileMenu()"
-                        class="block px-3 py-2 font-semibold hover:text-blue-400">ورود / ثبت‌نام</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </dialog>
-</header>

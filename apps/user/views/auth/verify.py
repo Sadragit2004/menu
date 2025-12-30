@@ -24,7 +24,7 @@ def verify_code(request):
     # بررسی درخواست ارسال مجدد
     if request.method == "POST" and "resend" in request.POST:
         try:
-            new_code = AuthService.send_activation_code(security)
+            new_code = AuthService.send_activation_code(security,mobile)
             messages.success(request, "کد جدید ارسال شد.")
             # ریدایرکت برای جلوگیری از تکرار ارسال مجدد با رفرش
             return redirect("account:verify_code")
