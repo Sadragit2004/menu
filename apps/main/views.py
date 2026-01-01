@@ -222,3 +222,16 @@ def load_more_restaurants(request):
 def faq(request):
 
     return render(request,'main_app/partials/faq.html')
+
+
+
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import ListView, DetailView
+from .models import Course
+
+
+
+def active_courses(request):
+    """لیست دوره‌های فعال"""
+    courses = Course.objects.filter(is_active=True).order_by('-created_at')
+    return render(request, 'courses_َapp/course_list.html', {'courses': courses})

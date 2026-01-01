@@ -113,7 +113,7 @@ class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
             'fields': (
                 'owner', 'get_title_display', 'title', 'title_en', 'slug', 'text',
                 'description', 'description_en', 'isSeo',
-                'isActive', 'displayOrder','design'
+                'isActive', 'displayOrder',
             )
         }),
         (_('Menu View Statistics'), {

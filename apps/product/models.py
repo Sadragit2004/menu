@@ -124,7 +124,7 @@ class ProductOrder(models.Model):
         self.tax_amount = int(self.total_price * 0.09)  # 9% مالیات به تومان
 
         # قیمت نهایی با احتساب مالیات (به تومان)
-        self.final_price = self.total_price + self.tax_amount
+        self.final_price = self.total_price + self.tax_amount + self.plan.price
 
     def save(self, *args, **kwargs):
         # محاسبه خودکار قیمت‌ها

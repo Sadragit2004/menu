@@ -1,620 +1,1032 @@
 {% extends 'main_template.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
-<div class="blog-list-page">
-    <!-- هدر صفحه -->
-    <section class="blog-list-header">
-        <div class="container">
-            <div class="header-content">
-                <h1 class="page-title">مقالات و آموزش‌ها</h1>
-                <p class="page-subtitle">جدیدترین مطالب در حوزه رستوران‌داری، مدیریت منو و دیجیتال مارکتینگ</p>
+<div class="modern-blog-list">
+    <!-- هدر شیشهای با افکت پارالکس -->
+    <header class="glass-header">
+        <div class="parallax-bg"></div>
+        <div class="header-content">
+            <div class="animated-title">
+                <h1 class="title-text">
+                    <span class="gradient-text">مقالات و آموزش‌ها</span>
+                </h1>
+                <div class="title-subtext">
+                    <div class="typing-text">به دنیای دانش و تجربه خوش آمدید...</div>
+                </div>
+            </div>
 
-                <!-- جستجو و فیلتر -->
-                <div class="blog-filters">
-                    <div class="search-box">
-                        <input type="text" placeholder="جستجو در مقالات..." class="search-input">
-                        <button class="search-btn">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z"
-                                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- جستجوی پیشرفته -->
+            <div class="search-container">
+                <form method="get" class="search-form">
+                    <div class="search-wrapper">
+                        <input
+                            type="text"
+                            name="q"
+                            placeholder="دنبال چه مطلبی می‌گردید؟"
+                            value="{{ request.GET.q }}"
+                            class="search-input"
+                            autocomplete="off"
+                        >
+                        <button type="submit" class="search-btn">
+                            <svg class="search-icon" viewBox="0 0 24 24">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </button>
                     </div>
+                    <div class="search-tags">
+                        <span class="tag">#رستوران‌داری</span>
+                        <span class="tag">#مدیریت</span>
+                        <span class="tag">#دیجیتال‌مارکتینگ</span>
+                        <span class="tag">#منو</span>
+                        <span class="tag">#خدمات</span>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-                    <div class="filter-buttons">
-                        <a href="?sort=1" class="filter-btn {% if sort == '1' %}active{% endif %}">جدیدترین</a>
-                        <a href="?sort=2" class="filter-btn {% if sort == '2' %}active{% endif %}">پربازدیدترین</a>
+        <!-- موج انیمیشن -->
+        <div class="wave-divider">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="currentColor"/>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="currentColor"/>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="currentColor"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- فیلترهای شناور -->
+    <div class="floating-filters">
+        <div class="filters-container">
+            <div class="filter-tabs">
+                <a href="?sort=1" class="filter-tab {% if sort == '1' %}active{% endif %}">
+                    <span class="tab-icon">🆕</span>
+                    <span class="tab-text">جدیدترین</span>
+                </a>
+                <a href="?sort=2" class="filter-tab {% if sort == '2' %}active{% endif %}">
+                    <span class="tab-icon">🔥</span>
+                    <span class="tab-text">پربازدید</span>
+                </a>
+                <div class="filter-dropdown">
+                    <button class="dropdown-btn">
+                        <span class="dropdown-icon">📂</span>
+                        <span class="dropdown-text">دسته‌بندی‌ها</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        {% for category in categories %}
+                        <a href="?category={{ category.slug }}" class="dropdown-item">
+                            <span class="item-dot" style="background: {{ category.color }}"></span>
+                            {{ category.group_name }}
+                            <span class="item-count">{{ category.group_of_blog.count }}</span>
+                        </a>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- محتوای اصلی -->
-    <section class="blog-list-content">
-        <div class="container">
-            <div class="blog-layout">
-                <!-- سایدبار دسته‌بندی‌ها -->
-                <aside class="blog-sidebar">
-                    <div class="sidebar-widget">
-                        <h3 class="widget-title">دسته‌بندی‌ها</h3>
-                        <ul class="category-list">
-                            {% for category in categories %}
-                            <li class="category-item">
-                                <a href="#" class="category-link">
-                                    <span class="category-name">{{ category.group_name }}</span>
-                                    <span class="category-count">({{ category.group_of_blog.count }})</span>
-                                </a>
-                            </li>
-                            {% empty %}
-                            <li class="category-item">دسته‌بندی‌ای یافت نشد</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <!-- مقالات پربازدید -->
-                    <div class="sidebar-widget">
-                        <h3 class="widget-title">مقالات پربازدید</h3>
-                        <div class="popular-posts">
-                            {% for popular_blog in popular_blog|slice:":3" %}
-                            <article class="popular-post">
-                                {% if popular_blog.image_name %}
-                                <img src="{{ popular_blog.image_name.url }}" alt="{{ popular_blog.subject }}" class="popular-post-image">
-                                {% else %}
-                                <div class="popular-post-placeholder">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 16L8 12L12 16L16 12L20 16" stroke="currentColor" stroke-width="1.5"/>
-                                    </svg>
-                                </div>
-                                {% endif %}
-                                <div class="popular-post-content">
-                                    <h4 class="popular-post-title">
-                                        <a href="{{ popular_blog.get_absolute_url }}">{{ popular_blog.subject|truncatewords:5 }}</a>
-                                    </h4>
-                                    <span class="popular-post-views">{{ popular_blog.view }} بازدید</span>
-                                </div>
-                            </article>
-                            {% empty %}
-                            <p class="no-data">مقاله‌ای یافت نشد</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- لیست مقالات -->
-                <main class="blog-main">
-                    <div class="blog-grid">
-                        {% for blog in page_obj %}
-                        <article class="blog-post-card">
-                            <div class="post-image-container">
-                                {% if blog.image_name %}
-                                <img src="{{ blog.image_name.url }}" alt="{{ blog.subject }}" class="post-image">
-                                {% else %}
-                                <div class="post-image-placeholder">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 16L8 12L12 16L16 12L20 16" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M4 20H20" stroke="currentColor" stroke-width="2"/>
-                                        <rect x="4" y="4" width="16" height="12" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </div>
-                                {% endif %}
-                                <div class="post-category">{{ blog.grop_blog.group_name }}</div>
-                            </div>
-
-                            <div class="post-content">
-                                <div class="post-meta">
-                                    <span class="post-date">{{ blog.get_jalali_register_date }}</span>
-                                    <span class="post-read-time">{{ blog.time_read }}</span>
-                                </div>
-
-                                <h2 class="post-title">
-                                    <a href=" ">{{ blog.subject }}</a>
-                                </h2>
-
-                                <p class="post-excerpt">{{ blog.description|truncatewords:25 }}</p>
-
-                                <div class="post-footer">
-                                    <div class="post-stats">
-                                        <span class="post-views">
-                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                                            </svg>
-                                            {{ blog.view }}
-                                        </span>
-                                    </div>
-                                    <a href=" " class="read-more-btn">
-                                        مطالعه مقاله
-                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
-                        {% empty %}
-                        <div class="no-posts">
-                            <div class="no-posts-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
-                                    <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
-                                    <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2"/>
-                                    <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2"/>
-                                    <polyline points="10,9 9,9 8,9" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                            </div>
-                            <h3>مقاله‌ای یافت نشد</h3>
-                            <p>هنوز هیچ مقاله‌ای در این بخش منتشر نشده است.</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <!-- Pagination -->
-                    {% if page_obj.has_other_pages %}
-                    <div class="pagination">
-                        {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-btn">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            قبلی
-                        </a>
-                        {% endif %}
-
-                        <div class="pagination-numbers">
-                            {% for i in page_obj.paginator.page_range %}
-                                {% if page_obj.number == i %}
-                                <span class="pagination-number active">{{ i }}</span>
-                                {% else %}
-                                <a href="?page={{ i }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-number">{{ i }}</a>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-
-                        {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-btn">
-                            بعدی
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </a>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </main>
+            <div class="filter-stats">
+                <span class="stat-item">
+                    <span class="stat-number">{{ blogs.count }}</span>
+                    <span class="stat-label">مقاله</span>
+                </span>
+                <span class="stat-divider">|</span>
+                <span class="stat-item">
+                    <span class="stat-number">{{ categories.count }}</span>
+                    <span class="stat-label">دسته‌بندی</span>
+                </span>
             </div>
         </div>
-    </section>
+    </div>
+
+    <!-- محتوای اصلی -->
+    <main class="blog-main-container">
+        <div class="container">
+            <!-- حالت کارت‌ها -->
+            <div class="blog-grid-layout">
+                {% for blog in page_obj %}
+                <article class="modern-blog-card" data-category="{{ blog.grop_blog.slug }}">
+                    <!-- هدر کارت -->
+                    <div class="card-header">
+                        <div class="category-badge">
+                            <span class="badge-icon">{{ blog.grop_blog.group_name|slice:":1" }}</span>
+                            <span class="badge-text">{{ blog.grop_blog.group_name }}</span>
+                        </div>
+                        <div class="time-badge">
+                            <svg viewBox="0 0 24 24" class="clock-icon">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <span>{{ blog.time_read }} دقیقه</span>
+                        </div>
+                    </div>
+
+                    <!-- تصویر کارت -->
+                    <div class="card-image">
+                        {% if blog.image_name %}
+                        <img src="{{ blog.image_name.url }}" alt="{{ blog.subject }}" loading="lazy">
+                        {% else %}
+                        <div class="image-placeholder">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div class="image-overlay"></div>
+                    </div>
+
+                    <!-- محتوای کارت -->
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <div class="author-info">
+                                <svg viewBox="0 0 24 24" class="author-icon">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                <span class="author-names">
+                                    {% for author in blog.Auther_blog.all|slice:":2" %}
+                                    {{ author.Author_name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <div class="date-info">
+                                <svg viewBox="0 0 24 24" class="date-icon">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                                <time>{{ blog.get_jalali_register_date }}</time>
+                            </div>
+                        </div>
+
+                        <h2 class="card-title">
+                            <a href="{{ blog.get_absolute_url }}">{{ blog.subject }}</a>
+                        </h2>
+
+                        <p class="card-excerpt">
+                            {{ blog.description|truncatewords:20 }}
+                        </p>
+
+                        <div class="card-footer">
+                            <div class="views-counter">
+                                <svg viewBox="0 0 24 24" class="eye-icon">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <span>{{ blog.view|intcomma }}</span>
+                            </div>
+
+                            <a href="{{ blog.get_absolute_url }}" class="read-more-btn">
+                                <span>مطالعه</span>
+                                <svg viewBox="0 0 24 24" class="arrow-icon">
+                                    <path d="M5 12h14m-7-7l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- افکت هاله نور -->
+                    <div class="card-glow"></div>
+                </article>
+                {% empty %}
+                <!-- حالت خالی -->
+                <div class="empty-state">
+                    <div class="empty-state-illustration">
+                        <svg viewBox="0 0 200 200" class="empty-svg">
+                            <circle cx="100" cy="100" r="90" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+                            <path d="M70,80 Q100,40 130,80" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                            <circle cx="85" cy="70" r="5" fill="#94a3b8"/>
+                            <circle cx="115" cy="70" r="5" fill="#94a3b8"/>
+                            <path d="M80,110 Q100,130 120,110" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">مقاله‌ای یافت نشد</h3>
+                    <p class="empty-description">هنوز محتوایی در این بخش منتشر نشده است.</p>
+                    {% if user.is_staff %}
+                    <a href="{% url 'admin:blog_blog_add' %}" class="empty-action">
+                        ایجاد اولین مقاله
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination مدرن -->
+            {% if page_obj.has_other_pages %}
+            <div class="modern-pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}"
+                   class="pagination-btn prev-btn">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                    <span>قبلی</span>
+                </a>
+                {% endif %}
+
+                <div class="pagination-numbers">
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <span class="page-number active">{{ i }}</span>
+                        {% elif i > page_obj.number|add:-3 and i < page_obj.number|add:3 %}
+                        <a href="?page={{ i }}{% if sort %}&sort={{ sort }}{% endif %}"
+                           class="page-number">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}"
+                   class="pagination-btn next-btn">
+                    <span>بعدی</span>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- سایدبار متحرک -->
+    <aside class="floating-sidebar">
+        <!-- دسته‌بندی‌ها -->
+        <div class="sidebar-widget categories-widget">
+            <h3 class="widget-title">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 6h18M3 12h18M3 18h18"/>
+                </svg>
+                دسته‌بندی‌ها
+            </h3>
+            <div class="categories-list">
+                {% for category in categories %}
+                <a href="?category={{ category.slug }}" class="category-item">
+                    <div class="category-color" style="background: var(--category-{{ forloop.counter }})"></div>
+                    <span class="category-name">{{ category.group_name }}</span>
+                    <span class="category-count">{{ category.group_of_blog.count }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- مقالات داغ -->
+        <div class="sidebar-widget trending-widget">
+            <h3 class="widget-title">
+                <svg viewBox="0 0 24 24">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                داغ‌ترین‌ها
+            </h3>
+            <div class="trending-list">
+                {% for blog in blogs|slice:":5" %}
+                <div class="trending-item">
+                    <div class="trending-rank">{{ forloop.counter }}</div>
+                    <div class="trending-content">
+                        <a href="{{ blog.get_absolute_url }}" class="trending-title">{{ blog.subject|truncatewords:4 }}</a>
+                        <div class="trending-meta">
+                            <span>{{ blog.get_jalali_register_date }}</span>
+                            •
+                            <span>{{ blog.view }} بازدید</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="sidebar-widget cta-widget">
+            <div class="cta-content">
+                <h4>نویسنده شوید!</h4>
+                <p>تجربیات خود را با جامعه ما به اشتراک بگذارید</p>
+                <button class="cta-btn">شروع کنید</button>
+            </div>
+        </div>
+    </aside>
 </div>
 
+<!-- CSS -->
 <style>
-.blog-list-page {
-    min-height: 100vh;
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    --accent: #ec4899;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --gray: #64748b;
+    --gray-light: #e2e8f0;
+
+    --category-1: #3b82f6;
+    --category-2: #10b981;
+    --category-3: #f59e0b;
+    --category-4: #ef4444;
+    --category-5: #8b5cf6;
+    --category-6: #ec4899;
+
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Vazirmatn', sans-serif;
+    overflow-x: hidden;
+}
+
+.modern-blog-list {
+    position: relative;
+    min-height: 100vh;
+}
+
+/* هدر شیشهای */
+.glass-header {
+    position: relative;
+    height: 80vh;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.parallax-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(236, 72, 153, 0.3) 0%, transparent 50%);
+    animation: float 20s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, 20px) scale(1.05); }
+    66% { transform: translate(-20px, -10px) scale(0.95); }
+}
+
+.header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.animated-title {
+    margin-bottom: 3rem;
+}
+
+.title-text {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    animation: slideUp 1s ease-out;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #fff, #e0e0e0, #fff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.title-subtext {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 2rem;
+}
+
+.typing-text {
+    display: inline-block;
+    overflow: hidden;
+    border-right: 2px solid white;
+    white-space: nowrap;
+    animation: typing 3.5s steps(30, end), blink 1s infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+/* جستجوی پیشرفته */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1.2rem 3rem 1.2rem 1.5rem;
+    border: none;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background: #f8fafc;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.search-icon {
+    width: 24px;
+    height: 24px;
+    stroke: var(--primary);
+}
+
+.search-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tag {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* موج انیمیشن */
+.wave-divider {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: white;
+    transform: rotate(180deg);
+}
+
+.wave-divider svg {
+    width: 100%;
+    height: 120px;
+    display: block;
+}
+
+/* فیلترهای شناور */
+.floating-filters {
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+    margin: -60px auto 40px;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+
+.filters-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 50px;
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.filter-tab:hover,
+.filter-tab.active {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+.filter-dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 50px;
+    border: none;
+    color: var(--dark);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.dropdown-btn:hover {
+    background: var(--gray-light);
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 15px;
+    padding: 1rem 0;
+    margin-top: 0.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.filter-dropdown:hover .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    color: var(--dark);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #f8fafc;
+    color: var(--primary);
+}
+
+.item-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.item-count {
+    margin-right: auto;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.filter-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gray);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-number {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-divider {
+    opacity: 0.3;
+}
+
+/* محتوای اصلی */
+.blog-main-container {
+    position: relative;
+    padding: 2rem 0 6rem;
+    background: white;
+    border-radius: 40px 40px 0 0;
+    margin-top: -40px;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
-}
-
-/* هدر */
-.blog-list-header {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 3rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.header-content {
-    text-align: center;
-    color: white;
-}
-
-.page-title {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    background: linear-gradient(45deg, #fff, #e0e0e0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.page-subtitle {
-    font-size: 1.2rem;
-    color: #e0e0e0;
-    margin-bottom: 2rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* فیلترها */
-.blog-filters {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.search-box {
-    display: flex;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50px;
-    padding: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.search-input {
-    background: transparent;
-    border: none;
-    padding: 0.5rem 1rem;
-    color: white;
-    width: 300px;
-    outline: none;
-}
-
-.search-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.search-btn {
-    background: linear-gradient(45deg, #ff6b6b, #feca57);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-.filter-btn {
-    padding: 0.7rem 1.5rem;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 25px;
-    color: white;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-    background: white;
-    color: #667eea;
-    border-color: white;
-}
-
-/* محتوای اصلی */
-.blog-list-content {
-    padding: 3rem 0;
-}
-
-.blog-layout {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 3rem;
-}
-
-/* سایدبار */
-.blog-sidebar {
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
-}
-
-.sidebar-widget {
-    background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.widget-title {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-/* دسته‌بندی‌ها */
-.category-list {
-    list-style: none;
-    padding: 0;
-}
-
-.category-item {
-    margin-bottom: 0.5rem;
-}
-
-.category-link {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.8rem;
-    color: #666;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.category-link:hover {
-    background: #f8f9fa;
-    color: #667eea;
-}
-
-.category-name {
-    font-weight: 500;
-}
-
-.category-count {
-    color: #999;
-    font-size: 0.9rem;
-}
-
-/* مقالات پربازدید */
-.popular-posts {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.popular-post {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.popular-post-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-.popular-post-placeholder {
-    width: 60px;
-    height: 60px;
-    background: #f0f0f0;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #999;
-}
-
-.popular-post-content {
-    flex: 1;
-}
-
-.popular-post-title {
-    margin: 0 0 0.3rem 0;
-    font-size: 0.9rem;
-}
-
-.popular-post-title a {
-    color: #333;
-    text-decoration: none;
-}
-
-.popular-post-title a:hover {
-    color: #667eea;
-}
-
-.popular-post-views {
-    font-size: 0.8rem;
-    color: #999;
+    padding: 0 20px;
 }
 
 /* گرید مقالات */
-.blog-main {
-    min-height: 500px;
-}
-
-.blog-grid {
+.blog-grid-layout {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 2rem;
-    margin-bottom: 3rem;
+    margin-bottom: 4rem;
 }
 
-.blog-post-card {
+/* کارت مدرن */
+.modern-blog-card {
+    position: relative;
     background: white;
-    border-radius: 15px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--gray-light);
 }
 
-.blog-post-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+.modern-blog-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-light);
 }
 
-.post-image-container {
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    box-shadow: inset 0 0 50px rgba(99, 102, 241, 0.1);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.modern-blog-card:hover .card-glow {
+    opacity: 1;
+}
+
+.card-header {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+
+.category-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.badge-icon {
+    width: 24px;
+    height: 24px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.time-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.clock-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+}
+
+.card-image {
     position: relative;
     height: 200px;
     overflow: hidden;
 }
 
-.post-image {
+.card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.6s ease;
 }
 
-.blog-post-card:hover .post-image {
-    transform: scale(1.05);
+.modern-blog-card:hover .card-image img {
+    transform: scale(1.1);
 }
 
-.post-image-placeholder {
+.image-placeholder {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
 }
 
-.post-category {
+.image-placeholder svg {
+    width: 64px;
+    height: 64px;
+    fill: white;
+    opacity: 0.5;
+}
+
+.image-overlay {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
-    background: linear-gradient(45deg, #ff6b6b, #feca57);
-    color: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: bold;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
 }
 
-.post-content {
+.card-content {
     padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+    background: white;
 }
 
-.post-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: #999;
-}
-
-.post-title {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
-    line-height: 1.4;
-}
-
-.post-title a {
-    color: #333;
-    text-decoration: none;
-}
-
-.post-title a:hover {
-    color: #667eea;
-}
-
-.post-excerpt {
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.post-footer {
+.card-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--gray);
 }
 
-.post-stats {
+.author-info,
+.date-info {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #999;
+}
+
+.author-icon,
+.date-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+}
+
+.author-names {
+    font-weight: 500;
+    color: var(--dark);
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.card-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.card-title a:hover {
+    color: var(--primary);
+}
+
+.card-excerpt {
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-light);
+}
+
+.views-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray);
     font-size: 0.9rem;
 }
 
-.post-views {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.post-views svg {
-    width: 16px;
-    height: 16px;
+.eye-icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
 }
 
 .read-more-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #667eea;
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
     text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .read-more-btn:hover {
-    color: #764ba2;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
 }
 
-.read-more-btn svg {
+.arrow-icon {
     width: 16px;
     height: 16px;
+    fill: none;
+    stroke: currentColor;
 }
 
 /* حالت خالی */
-.no-posts {
+.empty-state {
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
-    color: white;
 }
 
-.no-posts-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1rem;
-    color: rgba(255, 255, 255, 0.7);
+.empty-state-illustration {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 2rem;
+    animation: float 6s ease-in-out infinite;
 }
 
-.no-posts h3 {
-    font-size: 1.5rem;
+.empty-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.empty-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
     margin-bottom: 1rem;
 }
 
-.no-data {
-    text-align: center;
-    color: #999;
-    padding: 1rem;
+.empty-description {
+    color: var(--gray);
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Pagination */
-.pagination {
+.empty-action {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.empty-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Pagination مدرن */
+.modern-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    margin-top: 3rem;
+    padding: 2rem 0;
 }
 
 .pagination-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.7rem 1.5rem;
+    padding: 0.8rem 1.5rem;
     background: white;
-    color: #667eea;
+    color: var(--dark);
     text-decoration: none;
-    border-radius: 25px;
-    font-weight: bold;
+    border-radius: 50px;
+    font-weight: 500;
     transition: all 0.3s ease;
+    border: 2px solid var(--gray-light);
 }
 
 .pagination-btn:hover {
-    background: #667eea;
-    color: white;
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
 }
 
 .pagination-btn svg {
     width: 16px;
     height: 16px;
+    stroke: currentColor;
 }
 
 .pagination-numbers {
@@ -622,80 +1034,382 @@
     gap: 0.5rem;
 }
 
-.pagination-number {
-    padding: 0.7rem 1rem;
-    background: white;
-    color: #667eea;
+.page-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
+    color: var(--dark);
+    font-weight: 500;
     transition: all 0.3s ease;
 }
 
-.pagination-number:hover,
-.pagination-number.active {
-    background: #667eea;
+.page-number:hover:not(.active) {
+    background: var(--gray-light);
+}
+
+.page-number.active {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    transform: scale(1.1);
+}
+
+/* سایدبار متحرک */
+.floating-sidebar {
+    position: fixed;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 100;
+}
+
+.sidebar-widget {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--gray-light);
+}
+
+.widget-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+}
+
+.widget-title svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--dark);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.category-item:hover {
+    background: #f8fafc;
+    transform: translateX(5px);
+}
+
+.category-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.category-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.category-count {
+    background: #f1f5f9;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.trending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.trending-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.trending-rank {
+    width: 32px;
+    height: 32px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.trending-item:nth-child(1) .trending-rank {
+    background: linear-gradient(45deg, #ffd700, #ffa500);
     color: white;
 }
 
+.trending-item:nth-child(2) .trending-rank {
+    background: linear-gradient(45deg, #c0c0c0, #a9a9a9);
+    color: white;
+}
+
+.trending-item:nth-child(3) .trending-rank {
+    background: linear-gradient(45deg, #cd7f32, #a0522d);
+    color: white;
+}
+
+.trending-content {
+    flex: 1;
+}
+
+.trending-title {
+    display: block;
+    font-weight: 500;
+    color: var(--dark);
+    text-decoration: none;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.trending-title:hover {
+    color: var(--primary);
+}
+
+.trending-meta {
+    font-size: 0.8rem;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cta-widget {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    text-align: center;
+}
+
+.cta-content h4 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.cta-content p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+}
+
+.cta-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: white;
+    color: var(--primary);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
 /* ریسپانسیو */
-@media (max-width: 1024px) {
-    .blog-layout {
-        grid-template-columns: 250px 1fr;
-        gap: 2rem;
+@media (max-width: 1400px) {
+    .floating-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 1200px) {
+    .title-text {
+        font-size: 3rem;
     }
 
-    .blog-grid {
+    .blog-grid-layout {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 }
 
 @media (max-width: 768px) {
-    .blog-layout {
-        grid-template-columns: 1fr;
+    .glass-header {
+        height: 70vh;
     }
 
-    .blog-sidebar {
+    .title-text {
+        font-size: 2.5rem;
+    }
+
+    .floating-filters {
         position: static;
+        margin: -30px 20px 30px;
     }
 
-    .blog-filters {
+    .filters-container {
         flex-direction: column;
+        gap: 1rem;
         align-items: stretch;
     }
 
-    .search-input {
-        width: 100%;
+    .filter-tabs {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
-    .page-title {
-        font-size: 2rem;
-    }
-
-    .blog-grid {
+    .blog-grid-layout {
         grid-template-columns: 1fr;
+    }
+
+    .modern-pagination {
+        flex-wrap: wrap;
     }
 }
 
 @media (max-width: 480px) {
-    .container {
-        padding: 0 0.5rem;
+    .title-text {
+        font-size: 2rem;
     }
 
-    .blog-list-header {
-        padding: 2rem 0;
+    .search-input {
+        font-size: 1rem;
+        padding: 1rem 3rem 1rem 1rem;
     }
 
-    .page-title {
-        font-size: 1.8rem;
+    .filter-tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
     }
 
-    .post-content {
+    .card-content {
         padding: 1rem;
-    }
-
-    .pagination {
-        flex-wrap: wrap;
     }
 }
 </style>
+
+<!-- JavaScript -->
+<script>
+// انیمیشن اسکرول
+document.addEventListener('DOMContentLoaded', function() {
+    // پارالکس
+    const parallaxBg = document.querySelector('.parallax-bg');
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        parallaxBg.style.transform = `translate3d(0, ${rate}px, 0)`;
+    });
+
+    // انیمیشن کارت‌ها
+    const cards = document.querySelectorAll('.modern-blog-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationDelay = `${entry.target.dataset.delay || 0}ms`;
+                entry.target.classList.add('animated');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    cards.forEach((card, index) => {
+        card.dataset.delay = index * 100;
+        observer.observe(card);
+    });
+
+    // فیلتر دسته‌بندی
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            if (this.classList.contains('active')) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // جستجوی زنده
+    const searchInput = document.querySelector('.search-input');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            this.form.submit();
+        }, 500);
+    });
+
+    // افکت هاله روی کارت‌ها
+    cards.forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const glow = this.querySelector('.card-glow');
+            const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+
+            glow.style.background = `radial-gradient(circle at ${x}px ${y}px,
+                rgba(99, 102, 241, 0.2) 0%,
+                rgba(99, 102, 241, 0.1) 40%,
+                transparent 70%)`;
+        });
+    });
+});
+
+// پیش‌نمایش تصاویر
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('.card-image img');
+
+    images.forEach(img => {
+        // افزودن افکت لودینگ
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.3s ease';
+
+        img.addEventListener('load', function() {
+            this.style.opacity = '1';
+        });
+
+        // اگر تصویری از قبل لود شده
+        if (img.complete) {
+            img.style.opacity = '1';
+        }
+    });
+});
+
+// پخش صدا (اختیاری)
+const playHoverSound = () => {
+    // این قسمت می‌تواند برای پخش صدای hover اضافه شود
+    console.log('Hover sound effect');
+};
+
+// اضافه کردن صدا به دکمه‌ها
+document.querySelectorAll('.read-more-btn, .filter-tab').forEach(btn => {
+    btn.addEventListener('mouseenter', playHoverSound);
+});
+</script>
+
+{% endblock %}

@@ -1,376 +1,2649 @@
 {% extends 'main_template.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
-<main class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900 antialiased">
-  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
-      <article class="mx-auto w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
-          <header class="mb-4 lg:mb-6 not-format">
-              <!-- بخش بهبود یافته اطلاعات نویسنده -->
-              <div class="author-section mb-8">
-                  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-800">
-                      {% if blog.Auther_blog.all %}
-                          <!-- آواتار نویسنده -->
-                          <div class="flex-shrink-0">
-                              <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-                                  {{ blog.Auther_blog.first.Author_name|first }}
-                              </div>
-                          </div>
+<!-- هدر شیشهای پارالکس -->
+<header class="glass-parallax-header">
+    <div class="parallax-layers">
+        <div class="layer layer-1"></div>
+        <div class="layer layer-2"></div>
+        <div class="layer layer-3"></div>
+    </div>
 
-                          <!-- اطلاعات نویسنده -->
-                          <div class="flex-1">
-                              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                  <div>
-                                      <a href="#" rel="author" class="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 transition-colors">
-                                          {{ blog.Auther_blog.first.Author_name }}
-                                      </a>
-                                      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">نویسنده مقاله</p>
-                                  </div>
+    <!-- ناوبری مقاله -->
+    <nav class="article-nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="{% url 'blog:blogs' %}" class="back-btn">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 12H5m7 7l-7-7 7-7"/>
+                    </svg>
+                    بازگشت به مقالات
+                </a>
 
-                                  <!-- اطلاعات تاریخ و زمان مطالعه -->
-                                  <div class="flex flex-col sm:items-end text-sm text-gray-500 dark:text-gray-400">
-                                      <div class="flex items-center gap-1">
-                                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                          </svg>
-                                          <time pubdate datetime="{{ blog.register_data|date:'Y-m-d' }}" title="{{ blog.get_jalali_register_date }}">
-                                              {{ blog.get_jalali_register_date }}
-                                          </time>
-                                      </div>
-                                      <div class="flex items-center gap-1 mt-1">
-                                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                          </svg>
-                                          <span>{{ blog.time_read }} زمان مطالعه</span>
-                                      </div>
-                                  </div>
-                              </div>
+                <div class="nav-actions">
+                    <button class="nav-action-btn share-btn" data-share-url="{{ request.build_absolute_uri }}">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+                        </svg>
+                        اشتراک
+                    </button>
+                    <button class="nav-action-btn bookmark-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                        </svg>
+                        ذخیره
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-                              <!-- بیوگرافی نویسنده (در صورت وجود) -->
-                              {% if blog.Auther_blog.first.bio %}
-                              <div class="mt-3 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                                  {{ blog.Auther_blog.first.bio|truncatewords:20 }}
-                              </div>
-                              {% endif %}
-                          </div>
-                      {% else %}
-                          <!-- حالت پیش‌فرض (تیم فودیلایو) -->
-                          <div class="flex-shrink-0">
-                              <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-                                  ف
-                              </div>
-                          </div>
-                          <div class="flex-1">
-                              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                  <div>
-                                      <a href="#" rel="author" class="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 transition-colors">تیم فودیلایو</a>
-                                      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">تیم تولید محتوا</p>
-                                  </div>
-                                  <div class="flex flex-col sm:items-end text-sm text-gray-500 dark:text-gray-400">
-                                      <div class="flex items-center gap-1">
-                                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                          </svg>
-                                          <span>{{ blog.get_jalali_register_date }}</span>
-                                      </div>
-                                      <div class="flex items-center gap-1 mt-1">
-                                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                          </svg>
-                                          <span>{{ blog.time_read }} زمان مطالعه</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      {% endif %}
-                  </div>
-              </div>
+    <!-- اطلاعات هدر -->
+    <div class="header-info">
+        <div class="container">
+            <!-- دسته‌بندی و زمان -->
+            <div class="article-meta-header">
+                <div class="category-chip">
+                    <span class="chip-icon">🏷️</span>
+                    {{ blog.grop_blog.group_name }}
+                </div>
 
-              <!-- عنوان مقاله -->
-              <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
-                  {{ blog.subject }}
-              </h1>
+                <div class="meta-badges">
+                    <div class="meta-badge">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        {{ blog.time_read }} دقیقه مطالعه
+                    </div>
 
-              <!-- متا اطلاعات -->
-              <div class="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-500 dark:text-gray-400">
-                  <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                      </svg>
-                      <span>{{ blog.view }} بازدید</span>
-                  </div>
-                  <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-                      {{ blog.grop_blog.group_name }}
-                  </div>
-              </div>
+                    <div class="meta-badge">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        {{ blog.view|intcomma }} بازدید
+                    </div>
+                </div>
+            </div>
 
-              <!-- عکس اصلی -->
-              {% if blog.image_name %}
-              <figure class="mb-8">
-                  <img src="{{ blog.image_name.url }}" alt="{{ blog.subject }}" class="w-full h-auto rounded-lg shadow-lg">
-                  <figcaption class="mt-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                      {{ blog.subject }}
-                  </figcaption>
-              </figure>
-              {% endif %}
-          </header>
+            <!-- عنوان مقاله -->
+            <h1 class="article-title">{{ blog.subject }}</h1>
 
-          <!-- توضیحات اولیه -->
-          {% if blog.description %}
-          <div class="mb-8 p-6 bg-gray-50 rounded-lg dark:bg-gray-800">
-              <p class="text-lg leading-relaxed text-gray-700 dark:text-gray-300">{{ blog.description }}</p>
-          </div>
-          {% endif %}
+            <!-- خلاصه مقاله -->
+            {% if blog.description %}
+            <p class="article-excerpt">{{ blog.description|truncatewords:30 }}</p>
+            {% endif %}
 
-          <!-- محتوای اصلی -->
-          {% if blog.description2 %}
-          <div class="prose max-w-none dark:prose-invert">
-              {{ blog.description2|safe }}
-          </div>
-          {% endif %}
+            <!-- اطلاعات نویسنده -->
+            <div class="author-header">
+                {% if blog.Auther_blog.all %}
+                    {% for author in blog.Auther_blog.all|slice:":3" %}
+                    <div class="author-avatar">
+                        {% if author.profile_image %}
+                        <img src="{{ author.profile_image.url }}" alt="{{ author.Author_name }}">
+                        {% else %}
+                        <div class="avatar-placeholder" style="background: linear-gradient(45deg, var(--color-{{ forloop.counter }}), var(--color-{{ forloop.counter|add:1 }}))">
+                            {{ author.Author_name|first }}
+                        </div>
+                        {% endif %}
+                        <div class="author-tooltip">
+                            <strong>{{ author.Author_name }}</strong>
+                            {% if author.bio %}<p>{{ author.bio|truncatewords:10 }}</p>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
 
-          <!-- سوالات متداول -->
-          {% if blog.blog_faq.all %}
-          <section class="mt-12">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">سوالات متداول</h2>
-              <div class="space-y-4">
-                  {% for faq in blog.blog_faq.all %}
-                  <div class="bg-gray-50 rounded-lg p-6 dark:bg-gray-800">
-                      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ faq.qus }}</h3>
-                      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ faq.answer }}</p>
-                  </div>
-                  {% endfor %}
-              </div>
-          </section>
-          {% endif %}
+                    <div class="author-info">
+                        <div class="author-names">
+                            نوشته شده توسط
+                            {% for author in blog.Auther_blog.all %}
+                                <strong>{{ author.Author_name }}</strong>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="publish-date">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            {{ blog.get_jalali_register_date }}
+                        </div>
+                    </div>
+                {% else %}
+                <div class="author-avatar">
+                    <div class="avatar-placeholder" style="background: linear-gradient(45deg, #6366f1, #8b5cf6)">
+                        ف
+                    </div>
+                </div>
+                <div class="author-info">
+                    <div class="author-names">نوشته شده توسط <strong>تیم فودیلایو</strong></div>
+                    <div class="publish-date">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        {{ blog.get_jalali_register_date }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-          <!-- تگ‌ها -->
-          {% if blog.key_words %}
-          <section class="mt-12">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">کلمات کلیدی</h2>
-              <div class="flex flex-wrap gap-2">
-                  {% for tag in blog.key_words.split %}
-                  <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded dark:bg-blue-900 dark:text-blue-300">
-                      {{ tag }}
-                  </span>
-                  {% endfor %}
-              </div>
-          </section>
-          {% endif %}
+    <!-- اسکرول اندیکاتور -->
+    <div class="scroll-indicator">
+        <div class="scroll-progress"></div>
+    </div>
+</header>
 
-          <!-- بخش بهبود یافته نویسندگان -->
-          {% if blog.Auther_blog.all and blog.Auther_blog.count > 1 %}
-          <section class="mt-12">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">نویسندگان این مقاله</h2>
-              <div class="grid gap-4 md:grid-cols-2">
-                  {% for author in blog.Auther_blog.all %}
-                  <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                      <div class="flex-shrink-0">
-                          <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
-                              {{ author.Author_name|first }}
-                          </div>
-                      </div>
-                      <div class="flex-1">
-                          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ author.Author_name }}</h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">نویسنده</p>
-                          {% if author.bio %}
-                          <p class="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">{{ author.bio|truncatewords:15 }}</p>
-                          {% endif %}
-                      </div>
-                  </div>
-                  {% endfor %}
-              </div>
-          </section>
-          {% endif %}
-      </article>
-  </div>
+<!-- محتوای اصلی -->
+<main class="article-content">
+    <div class="container">
+        <div class="content-layout">
+            <!-- سایدبار چسبان -->
+            <aside class="sticky-sidebar">
+                <!-- جدول محتوا -->
+                <div class="toc-widget">
+                    <div class="toc-header">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 6h18M3 12h18M3 18h18"/>
+                        </svg>
+                        فهرست مطالب
+                    </div>
+                    <div class="toc-content">
+                        <!-- دینامیک از JavaScript پر می‌شود -->
+                    </div>
+                </div>
+
+                <!-- اشتراک اجتماعی -->
+                <div class="social-share-widget">
+                    <span>اشتراک گذاری</span>
+                    <div class="share-buttons">
+                        <a href="https://telegram.me/share/url?url={{ request.build_absolute_uri }}&text={{ blog.subject }}"
+                           class="share-btn telegram" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M21 5L2 12.5L9 13.5M21 5L15 21L9 13.5M21 5L9 13.5M9 13.5V19L12.5 15.5"/>
+                            </svg>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ blog.subject }}"
+                           class="share-btn twitter" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                            </svg>
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}"
+                           class="share-btn linkedin" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+                                <circle cx="4" cy="4" r="2"/>
+                            </svg>
+                        </a>
+                        <a href="https://wa.me/?text={{ blog.subject }}%20{{ request.build_absolute_uri }}"
+                           class="share-btn whatsapp" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12c0 1.69.49 3.28 1.33 4.64L2 22l5.38-1.33A9.98 9.98 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.5 14.5c-.25.66-1.43 1.22-1.97 1.25-.54.03-.65.37-2.06-.37-1.41-.74-2.32-2.5-2.39-2.61-.07-.11-.56-1.43.08-2.74.3-.61.67-1.04 1.04-1.33.36-.29.79-.43 1.18-.43h.29c.26 0 .47.19.57.27.1.08.21.19.21.47s-.21 1.07-.32 1.23c-.11.16-.23.19-.43.11-.21-.08-.86-.32-1.64-.96-1.19-1.05-1.98-2.51-2.18-2.93-.2-.42-.02-.65.15-.85.15-.18.34-.47.51-.71.17-.25.23-.41.35-.68.12-.27.06-.51-.03-.71-.09-.2-.86-2.07-1.18-2.83-.31-.76-.63-.66-.86-.66h-.73c-.25 0-.64.03-.98.5-.34.47-1.3 1.27-1.3 3.1s1.34 3.6 1.52 3.85c.18.25 2.62 4.01 6.36 5.57 3.74 1.56 3.74 1.04 4.42.97.68-.07 2.19-.89 2.5-1.75.31-.86.31-1.6.21-1.75-.1-.15-.41-.24-.86-.42z"/>
+                            </svg>
+                        </a>
+                        <button class="share-btn copy-link" data-url="{{ request.build_absolute_uri }}">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866m-6 .17h8c1.105 0 2 .91 2 2.035v10.857C20 20.09 19.105 21 18 21h-8c-1.105 0-2-.911-2-2.036V8.107c0-1.124.895-2.036 2-2.036z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- تبلیغ یا CTA -->
+                <div class="sidebar-cta">
+                    <div class="cta-content">
+                        <p>راهنمای کامل مدیریت رستوران</p>
+                        <button class="cta-button">دریافت کنید</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- محتوای مقاله -->
+            <article class="main-content">
+                <!-- عکس اصلی با افکت -->
+                {% if blog.image_name %}
+                <figure class="featured-image">
+                    <div class="image-wrapper">
+                        <img src="{{ blog.image_name.url }}"
+                             alt="{{ blog.subject }}"
+                             loading="eager"
+                             class="main-image">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <figcaption class="image-caption">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        {{ blog.subject }}
+                    </figcaption>
+                </figure>
+                {% endif %}
+
+                <!-- خلاصه اجرایی -->
+                {% if blog.description %}
+                <div class="executive-summary">
+                    <div class="summary-header">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        خلاصه مقاله
+                    </div>
+                    <div class="summary-content">
+                        {{ blog.description }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- محتوای اصلی -->
+                {% if blog.description2 %}
+                <div class="content-body rich-content">
+                    {{ blog.description2|safe }}
+                </div>
+                {% endif %}
+
+                <!-- تایملاین پیشرفت -->
+                <div class="progress-timeline">
+                    <div class="timeline-header">
+                        <span>پیشرفت مطالعه</span>
+                        <span class="progress-percent">0%</span>
+                    </div>
+                    <div class="timeline-bar">
+                        <div class="timeline-progress"></div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- سایدبار راست -->
+            <aside class="right-sidebar">
+                <!-- نویسندگان -->
+                {% if blog.Auther_blog.all %}
+                <div class="authors-widget">
+                    <span class="widget-title">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        نویسندگان
+                    </span>
+                    <div class="authors-list">
+                        {% for author in blog.Auther_blog.all %}
+                        <div class="author-card">
+                            {% if author.profile_image %}
+                            <img src="{{ author.profile_image.url }}" alt="{{ author.Author_name }}" class="author-img">
+                            {% else %}
+                            <div class="author-initials" style="background: var(--author-color-{{ forloop.counter }})">
+                                {{ author.Author_name|first }}
+                            </div>
+                            {% endif %}
+                            <div class="author-details">
+                                <h4>{{ author.Author_name }}</h4>
+                                <p class="author-role">نویسنده مقاله</p>
+                                {% if author.bio %}
+                                <p class="author-bio">{{ author.bio|truncatewords:10 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- کلمات کلیدی -->
+                {% if blog.key_words %}
+                <div class="keywords-widget">
+                    <h3 class="widget-title">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                            <line x1="7" y1="7" x2="7.01" y2="7"/>
+                        </svg>
+                        کلمات کلیدی
+                    </h3>
+                    <div class="keywords-list">
+                        {% for keyword in blog.key_words.split %}
+                        <a href="{% url 'blog:blogs' %}?q={{ keyword|urlencode }}" class="keyword-tag">
+                            #{{ keyword }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- آماریکا -->
+                <div class="stats-widget">
+                    <h3 class="widget-title">آمار مقاله</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ blog.time_read }}</div>
+                            <div class="stat-label">دقیقه مطالعه</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ blog.view|intcomma }}</div>
+                            <div class="stat-label">بازدید</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ word_count }}</div>
+                            <div class="stat-label">کلمه</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ blog.get_jalali_register_date }}</div>
+                            <div class="stat-label">تاریخ انتشار</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- سوالات متداول -->
+        {% if blog.blog_faq.all %}
+        <section class="faq-section">
+            <div class="section-header">
+                <h2>
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    سوالات متداول
+                </h2>
+                <p>پاسخ به سوالات پرتکرار درباره این موضوع</p>
+            </div>
+
+            <div class="faq-accordion">
+                {% for faq in blog.blog_faq.all %}
+                <div class="faq-item {% if forloop.first %}active{% endif %}">
+                    <div class="faq-question">
+                        <span class="faq-number">0{{ forloop.counter }}</span>
+                        <h3>{{ faq.qus }}</h3>
+                        <svg class="faq-icon" viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            {{ faq.answer|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- مقالات مرتبط -->
+        {% if related_articles %}
+        <section class="related-articles">
+            <div class="section-header">
+                <h2>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                    </svg>
+                    مقالات مرتبط
+                </h2>
+                <p>مطالب مشابه که ممکن است برای شما جالب باشد</p>
+            </div>
+
+            <div class="articles-grid">
+                {% for related in related_articles|slice:":3" %}
+                <article class="related-article-card">
+                    <a href="{{ related.get_absolute_url }}" class="article-link">
+                        <div class="article-image">
+                            {% if related.image_name %}
+                            <img src="{{ related.image_name.url }}" alt="{{ related.subject }}" loading="lazy">
+                            {% else %}
+                            <div class="image-placeholder">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                                    <circle cx="12" cy="13" r="4"/>
+                                </svg>
+                            </div>
+                            {% endif %}
+                            <div class="image-overlay"></div>
+                            <span class="category-badge">{{ related.grop_blog.group_name }}</span>
+                        </div>
+
+                        <div class="article-content">
+                            <div class="article-meta">
+                                <span class="read-time">
+                                    <svg viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                    {{ related.time_read }} دقیقه
+                                </span>
+                                <span class="publish-date">{{ related.get_jalali_register_date }}</span>
+                            </div>
+
+                            <h3 class="article-title">{{ related.subject|truncatewords:8 }}</h3>
+
+                            <p class="article-excerpt">{{ related.description|truncatewords:15|default:"..." }}</p>
+
+                            <div class="article-footer">
+                                <div class="views-count">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    {{ related.view|intcomma }}
+                                </div>
+                                <span class="read-more">
+                                    مطالعه مقاله
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M5 12h14m-7-7l7 7-7 7"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+
+            <div class="related-cta">
+                <a href="{% url 'blog:blogs' %}" class="btn-primary">
+                    مشاهده همه مقالات
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5 12h14m-7-7l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- بخش نظرات -->
+        <section class="comments-section">
+            <div class="section-header">
+                <h2>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    نظرات و دیدگاه‌ها
+                </h2>
+                <p>نظر خود را درباره این مقاله با ما به اشتراک بگذارید</p>
+            </div>
+
+            <div class="comments-container">
+                <!-- فرم نظر -->
+                <div class="comment-form">
+                    <div class="form-header">
+                        <div class="user-avatar">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <h3>نظر خود را بنویسید</h3>
+                    </div>
+
+                    <form id="commentForm">
+                        <div class="form-group">
+                            <textarea placeholder="نظر شما..." rows="4" required></textarea>
+                        </div>
+
+                        <div class="form-footer">
+                            <div class="form-actions">
+                                <button type="button" class="btn-emoji">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                        <path d="M9 9h.01M15 9h.01"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="btn-attach">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                ارسال نظر
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- لیست نظرات -->
+                <div class="comments-list">
+                    <div class="no-comments">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        </svg>
+                        <p>هنوز نظری برای این مقاله ثبت نشده است</p>
+                        <p class="subtext">اولین نفری باشید که نظر می‌دهد</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 </main>
 
-<!-- مقالات مرتبط -->
-{% if related_articles %}
-<aside aria-label="مقالات مرتبط" class="py-8 lg:py-16 bg-gray-50 dark:bg-gray-800">
-  <div class="px-4 mx-auto max-w-screen-xl">
-      <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">مقالات مرتبط</h2>
-      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {% for related in related_articles|slice:":3" %}
-          <article class="max-w-xs mx-auto bg-white rounded-lg shadow-md dark:bg-gray-900 overflow-hidden hover:shadow-lg transition-shadow">
-              <a href="{{ related.get_absolute_url }}">
-                  {% if related.image_name %}
-                  <img src="{{ related.image_name.url }}" class="w-full h-48 object-cover" alt="{{ related.subject }}">
-                  {% else %}
-                  <div class="w-full h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white">
-                      <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9m0 0v2m0-2a2 2 0 012-2h2a2 2 0 012 2m-6 5v2m0-2a2 2 0 012-2h2a2 2 0 012 2m0 0v2"/>
-                      </svg>
-                  </div>
-                  {% endif %}
-              </a>
-              <div class="p-4">
-                  <h2 class="mb-2 text-xl font-bold leading-tight text-gray-900 dark:text-white line-clamp-2">
-                      <a href="{{ related.get_absolute_url }}">{{ related.subject }}</a>
-                  </h2>
-                  <p class="mb-4 text-gray-500 dark:text-gray-400 line-clamp-2">{{ related.description|truncatewords:20 }}</p>
-                  <a href="{{ related.get_absolute_url }}" class="inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                      مطالعه مقاله
-                      <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                      </svg>
-                  </a>
-              </div>
-          </article>
-          {% endfor %}
-      </div>
-  </div>
-</aside>
-{% endif %}
+<!-- CTA پایانی -->
+<section class="final-cta">
+    <div class="container">
+        <div class="cta-content">
+            <div class="cta-text">
+                <h2>از مقالات ما لذت بردید؟</h2>
+                <p>برای دریافت جدیدترین مطالب در ایمیل خود عضو شوید</p>
+            </div>
 
-<!-- خبرنامه -->
-<section class="bg-white dark:bg-gray-900">
-  <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-      <div class="mx-auto max-w-screen-md text-center">
-          <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl dark:text-white">در خبرنامه ما عضو شوید</h2>
-          <p class="mx-auto mb-8 max-w-2xl text-gray-500 md:mb-12 sm:text-xl dark:text-gray-400">
-              از آخرین مقالات و آموزش‌های حوزه رستوران‌داری و مدیریت منو با خبر شوید
-          </p>
-          <form action="#">
-              <div class="items-center mx-auto mb-3 space-y-4 max-w-screen-sm sm:flex sm:space-y-0">
-                  <div class="relative w-full">
-                      <label for="email" class="hidden mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">آدرس ایمیل</label>
-                      <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 16">
-                              <path d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z"/>
-                              <path d="M11.241 9.817c-.36.275-.801.425-1.255.427-.428 0-.845-.138-1.187-.395L0 2.6V14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2.5l-8.759 7.317Z"/>
-                          </svg>
-                      </div>
-                      <input class="block p-3 pl-9 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 sm:rounded-none sm:rounded-l-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ایمیل خود را وارد کنید" type="email" id="email" required>
-                  </div>
-                  <div>
-                      <button type="submit" class="py-3 px-5 w-full text-sm font-medium text-center text-white rounded-lg border cursor-pointer bg-blue-700 border-blue-600 sm:rounded-none sm:rounded-r-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                          عضو شوید
-                      </button>
-                  </div>
-              </div>
-              <div class="mx-auto max-w-screen-sm text-sm text-center text-gray-500 newsletter-form-footer dark:text-gray-300">
-                  ما از اطلاعات شما محافظت می‌کنیم.
-                  <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">حریم خصوصی</a>.
-              </div>
-          </form>
-      </div>
-  </div>
+            <form class="newsletter-form">
+                <div class="input-group">
+                    <input type="email" placeholder="آدرس ایمیل شما" required>
+                    <button type="submit">
+                        عضویت
+                        <svg viewBox="0 0 24 24">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </div>
+                <p class="form-note">با عضویت، موافق <a href="#">قوانین حریم خصوصی</a> ما هستید</p>
+            </form>
+        </div>
+    </div>
 </section>
 
+<!-- پاپ‌آپ اشتراک -->
+<div class="share-modal" id="shareModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>اشتراک مقاله</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="share-options">
+                <a href="#" class="share-option telegram">تلگرام</a>
+                <a href="#" class="share-option whatsapp">واتساپ</a>
+                <a href="#" class="share-option twitter">توییتر</a>
+                <a href="#" class="share-option linkedin">لینکدین</a>
+                <a href="#" class="share-option email">ایمیل</a>
+            </div>
+
+            <div class="copy-link-section">
+                <div class="link-input">
+                    <input type="text" readonly value="{{ request.build_absolute_uri }}">
+                    <button class="copy-btn">کپی</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // انیمیشن پارالکس
+    const layers = document.querySelectorAll('.parallax-layer');
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        layers.forEach((layer, index) => {
+            const speed = 0.5 + (index * 0.1);
+            const yPos = -(scrolled * speed);
+            layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
+        });
+    });
+
+    // اسکرول اندیکاتور
+    const progressBar = document.querySelector('.scroll-progress');
+    window.addEventListener('scroll', () => {
+        const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        progressBar.style.width = `${scrolled}%`;
+    });
+
+    // تایملاین پیشرفت مطالعه
+    const progressTimeline = document.querySelector('.timeline-progress');
+    const progressPercent = document.querySelector('.progress-percent');
+    const contentElement = document.querySelector('.main-content');
+
+    const updateReadingProgress = () => {
+        const contentHeight = contentElement.scrollHeight;
+        const scrolled = window.scrollY;
+        const start = contentElement.offsetTop;
+        const end = start + contentHeight;
+
+        if (scrolled < start) {
+            progress = 0;
+        } else if (scrolled > end) {
+            progress = 100;
+        } else {
+            progress = ((scrolled - start) / (end - start)) * 100;
+        }
+
+        progressTimeline.style.width = `${progress}%`;
+        progressPercent.textContent = `${Math.round(progress)}%`;
+    };
+
+    window.addEventListener('scroll', updateReadingProgress);
+    updateReadingProgress();
+
+    // ساخت فهرست مطالب
+    const generateTOC = () => {
+        const content = document.querySelector('.content-body');
+        const headings = content.querySelectorAll('h2, h3');
+        const tocContent = document.querySelector('.toc-content');
+
+        if (headings.length > 0) {
+            tocContent.innerHTML = '';
+
+            headings.forEach((heading, index) => {
+                const level = heading.tagName === 'H2' ? 1 : 2;
+                const id = `section-${index}`;
+                heading.id = id;
+
+                const tocItem = document.createElement('a');
+                tocItem.href = `#${id}`;
+                tocItem.className = `toc-item level-${level}`;
+                tocItem.textContent = heading.textContent;
+
+                tocContent.appendChild(tocItem);
+
+                // اسکرول اسموث
+                tocItem.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelector(`#${id}`).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+            });
+        } else {
+            tocContent.innerHTML = '<p class="no-toc">فهرست مطالب موجود نیست</p>';
+        }
+    };
+
+    generateTOC();
+
+    // آکاردئون FAQ
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        question.addEventListener('click', () => {
+            // بستن بقیه آیتم‌ها
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('active');
+                }
+            });
+
+            // باز/بسته کردن آیتم جاری
+            item.classList.toggle('active');
+        });
+    });
+
+    // اشتراک گذاری
+    const shareBtn = document.querySelector('.share-btn');
+    const shareModal = document.getElementById('shareModal');
+    const closeModal = document.querySelector('.modal-close');
+
+    shareBtn.addEventListener('click', () => {
+        shareModal.style.display = 'flex';
+    });
+
+    closeModal.addEventListener('click', () => {
+        shareModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === shareModal) {
+            shareModal.style.display = 'none';
+        }
+    });
+
+    // کپی لینک
+    const copyBtn = document.querySelector('.copy-btn');
+    copyBtn.addEventListener('click', () => {
+        const urlInput = document.querySelector('.link-input input');
+        urlInput.select();
+        document.execCommand('copy');
+
+        // نمایش پیام موفقیت
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'کپی شد!';
+        copyBtn.style.background = '#10b981';
+
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.style.background = '';
+        }, 2000);
+    });
+
+    // لایک و ذخیره
+    const bookmarkBtn = document.querySelector('.bookmark-btn');
+    bookmarkBtn.addEventListener('click', function() {
+        this.classList.toggle('bookmarked');
+        const isBookmarked = this.classList.contains('bookmarked');
+
+        // انیمیشن
+        const icon = this.querySelector('svg');
+        icon.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            icon.style.transform = 'scale(1)';
+        }, 300);
+
+        // ذخیره در localStorage
+        if (isBookmarked) {
+            localStorage.setItem(`bookmarked-{{ blog.id }}`, 'true');
+        } else {
+            localStorage.removeItem(`bookmarked-{{ blog.id }}`);
+        }
+    });
+
+    // بررسی وضعیت ذخیره شده
+    if (localStorage.getItem(`bookmarked-{{ blog.id }}`) === 'true') {
+        bookmarkBtn.classList.add('bookmarked');
+    }
+
+    // اسکرول اسموث برای لینک‌های داخلی
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href !== '#') {
+                e.preventDefault();
+                document.querySelector(href)?.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Intersection Observer برای انیمیشن‌ها
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animated');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.faq-item, .related-article-card, .author-card').forEach(el => {
+        observer.observe(el);
+    });
+
+    // مدیریت فرم نظر
+    const commentForm = document.getElementById('commentForm');
+    commentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // در اینجا می‌توانید منطق ارسال نظر را پیاده‌سازی کنید
+        alert('نظر شما با موفقیت ثبت شد!');
+        commentForm.reset();
+    });
+
+    // شمردن کلمات
+    const contentText = document.querySelector('.content-body')?.textContent || '';
+    const wordCount = contentText.split(/\s+/).length;
+    document.querySelector('.stat-value:nth-child(3)').textContent = wordCount.toLocaleString();
+});
+
+// مدیریت تم تاریک/روشن
+const darkModeToggle = document.createElement('button');
+darkModeToggle.className = 'theme-toggle';
+darkModeToggle.innerHTML = `
+    <svg class="sun" viewBox="0 0 24 24">
+        <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707"/>
+        <circle cx="12" cy="12" r="4"/>
+    </svg>
+    <svg class="moon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+    </svg>
+`;
+
+darkModeToggle.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light');
+});
+
+document.body.appendChild(darkModeToggle);
+
+// بررسی تم ذخیره شده
+if (localStorage.getItem('theme') === 'dark' ||
+    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark-mode');
+}
+
+// مدیریت خواندن با صدای بلند
+const initTextToSpeech = () => {
+    if ('speechSynthesis' in window) {
+        const speechBtn = document.createElement('button');
+        speechBtn.className = 'speech-btn';
+        speechBtn.innerHTML = `
+            <svg viewBox="0 0 24 24">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                <path d="M19 10v2a7 7 0 01-7 7m0-18v18m7-9a7 7 0 00-7-7"/>
+            </svg>
+        `;
+
+        let isSpeaking = false;
+        let utterance = null;
+
+        speechBtn.addEventListener('click', () => {
+            const content = document.querySelector('.content-body')?.textContent ||
+                           document.querySelector('.main-content')?.textContent;
+
+            if (!isSpeaking) {
+                utterance = new SpeechSynthesisUtterance(content);
+                utterance.lang = 'fa-IR';
+                utterance.rate = 1;
+                utterance.pitch = 1;
+
+                utterance.onend = () => {
+                    isSpeaking = false;
+                    speechBtn.classList.remove('active');
+                };
+
+                speechSynthesis.speak(utterance);
+                isSpeaking = true;
+                speechBtn.classList.add('active');
+            } else {
+                speechSynthesis.cancel();
+                isSpeaking = false;
+                speechBtn.classList.remove('active');
+            }
+        });
+
+        document.querySelector('.nav-actions').appendChild(speechBtn);
+    }
+};
+
+initTextToSpeech();
+</script>
+
+<!-- CSS -->
 <style>
-.prose {
-  max-width: none;
-  line-height: 1.75;
+:root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    --accent: #ec4899;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #1e293b;
+    --dark-light: #334155;
+    --light: #f8fafc;
+    --gray: #64748b;
+    --gray-light: #e2e8f0;
+    --gray-lighter: #f1f5f9;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 9999px;
+
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --author-color-1: linear-gradient(45deg, #6366f1, #8b5cf6);
+    --author-color-2: linear-gradient(45deg, #10b981, #059669);
+    --author-color-3: linear-gradient(45deg, #f59e0b, #d97706);
+    --author-color-4: linear-gradient(45deg, #ec4899, #db2777);
 }
 
-.prose p {
-  margin-bottom: 1.25em;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.prose h2 {
-  font-size: 1.5em;
-  margin-top: 2em;
-  margin-bottom: 1em;
-  font-weight: 700;
-  line-height: 1.3333333;
-  color: #1f2937;
+body {
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-.dark .prose h2 {
-  color: #f9fafb;
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
 }
 
-.prose h3 {
-  font-size: 1.25em;
-  margin-top: 1.6em;
-  margin-bottom: 0.6em;
-  font-weight: 600;
-  line-height: 1.6;
+/* هدر پارالکس */
+.glass-parallax-header {
+    position: relative;
+    min-height: 80vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
-.prose ul, .prose ol {
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
-  padding-right: 1.625em;
+.parallax-layers {
+    position: absolute;
+    inset: 0;
 }
 
-.prose li {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+.layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0.1;
 }
 
-.prose blockquote {
-  font-weight: 500;
-  font-style: italic;
-  border-right-width: 0.25rem;
-  border-right-color: #e5e7eb;
-  quotes: "\201C""\201D""\2018""\2019";
-  margin-top: 1.6em;
-  margin-bottom: 1.6em;
-  padding-right: 1em;
+.layer-1 {
+    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%);
+    animation: float-1 20s infinite ease-in-out;
 }
 
-.dark .prose blockquote {
-  border-right-color: #4b5563;
+.layer-2 {
+    background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 50%);
+    animation: float-2 25s infinite ease-in-out;
 }
 
-.prose table {
-  width: 100%;
-  table-layout: auto;
-  text-align: right;
-  margin-top: 2em;
-  margin-bottom: 2em;
-  font-size: 0.875em;
-  line-height: 1.7142857;
+.layer-3 {
+    background: radial-gradient(circle at 40% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    animation: float-3 30s infinite ease-in-out;
 }
 
-.prose thead {
-  border-bottom-width: 1px;
-  border-bottom-color: #d1d5db;
+@keyframes float-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, 20px) scale(1.1); }
+    66% { transform: translate(-20px, -10px) scale(0.9); }
 }
 
-.dark .prose thead {
-  border-bottom-color: #4b5563;
+@keyframes float-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-25px, 15px) scale(0.95); }
+    66% { transform: translate(20px, -20px) scale(1.05); }
 }
 
-.prose thead th {
-  padding-right: 0.5714286em;
-  padding-bottom: 0.5714286em;
-  padding-left: 0.5714286em;
-  font-weight: 600;
-  vertical-align: bottom;
+@keyframes float-3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(15px, -25px) scale(1.1); }
+    66% { transform: translate(-30px, 10px) scale(0.9); }
 }
 
-.prose tbody tr {
-  border-bottom-width: 1px;
-  border-bottom-color: #e5e7eb;
+/* ناوبری */
+.article-nav {
+    position: relative;
+    z-index: 10;
+    padding: 1rem 0;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.dark .prose tbody tr {
-  border-bottom-color: #374151;
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.prose tbody td {
-  padding: 0.5714286em;
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
 }
 
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-5px);
 }
 
-.author-section {
-  border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 1.5rem;
+.back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
 }
 
-.dark .author-section {
-  border-bottom-color: #374151;
+.nav-actions {
+    display: flex;
+    gap: 1rem;
 }
+
+.nav-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.nav-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.nav-action-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.bookmark-btn.bookmarked svg {
+    fill: #fbbf24;
+    stroke: #fbbf24;
+}
+
+/* اطلاعات هدر */
+.header-info {
+    position: relative;
+    z-index: 5;
+    padding: 4rem 0;
+}
+
+.article-meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+.meta-badges {
+    display: flex;
+    gap: 1rem;
+}
+
+.meta-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+}
+
+.meta-badge svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.article-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.article-excerpt {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    max-width: 800px;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+/* نویسنده هدر */
+.author-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-avatar {
+    position: relative;
+}
+
+.avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+    box-shadow: var(--shadow-md);
+}
+
+.author-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: var(--shadow-md);
+}
+
+.author-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: var(--dark);
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    z-index: 100;
+}
+
+.author-avatar:hover .author-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+.author-info {
+    flex: 1;
+}
+
+.author-names {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.author-names strong {
+    color: white;
+}
+
+.publish-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.publish-date svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+/* اسکرول اندیکاتور */
+.scroll-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.scroll-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+/* لایه محتوا */
+.content-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: 3rem;
+    margin-top: -100px;
+    position: relative;
+    z-index: 20;
+}
+
+/* سایدبار چسبان */
+.sticky-sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.toc-widget {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-light);
+}
+
+.toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.toc-header svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--primary);
+}
+
+.toc-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.toc-item {
+    display: block;
+    padding: 0.75rem 0.5rem;
+    text-decoration: none;
+    color: var(--gray);
+    border-right: 3px solid transparent;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.toc-item:hover {
+    color: var(--primary);
+    border-right-color: var(--primary);
+    background: var(--gray-lighter);
+}
+
+.toc-item.level-1 {
+    font-weight: 500;
+    padding-right: 1rem;
+}
+
+.toc-item.level-2 {
+    padding-right: 2rem;
+    font-size: 0.85rem;
+}
+
+.social-share-widget {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-light);
+}
+
+.social-share-widget h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.share-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    background: var(--gray-lighter);
+}
+
+.share-btn:hover {
+    transform: translateY(-2px) scale(1.1);
+}
+
+.share-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.share-btn.telegram:hover {
+    background: #0088cc;
+    color: white;
+}
+
+.share-btn.twitter:hover {
+    background: #1da1f2;
+    color: white;
+}
+
+.share-btn.linkedin:hover {
+    background: #0077b5;
+    color: white;
+}
+
+.share-btn.whatsapp:hover {
+    background: #25d366;
+    color: white;
+}
+
+.share-btn.copy-link:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.sidebar-cta {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    color: white;
+}
+
+.cta-content h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.cta-content p {
+    opacity: 0.9;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.cta-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: white;
+    color: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* محتوای اصلی */
+.main-content {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 3rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-light);
+}
+
+.featured-image {
+    margin-bottom: 3rem;
+}
+
+.image-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+}
+
+.main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.image-wrapper:hover .main-image {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3));
+}
+
+.image-caption {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.image-caption svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.executive-summary {
+    background: linear-gradient(135deg, var(--gray-lighter), white);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border-right: 4px solid var(--primary);
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.summary-header svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--primary);
+}
+
+.summary-content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--dark-light);
+}
+
+/* محتوای غنی */
+.content-body {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--dark-light);
+}
+
+.content-body h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 3rem 0 1.5rem;
+    color: var(--dark);
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.content-body h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: var(--radius-full);
+}
+
+.content-body h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem;
+    color: var(--dark);
+}
+
+.content-body p {
+    margin-bottom: 1.5rem;
+}
+
+.content-body blockquote {
+    border-right: 4px solid var(--primary);
+    padding-right: 2rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--gray);
+    font-size: 1.25rem;
+}
+
+.content-body ul, .content-body ol {
+    margin-right: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.content-body li {
+    margin-bottom: 0.5rem;
+}
+
+.content-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.content-body th {
+    background: var(--primary);
+    color: white;
+    padding: 1rem;
+    text-align: right;
+    font-weight: 600;
+}
+
+.content-body td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.content-body tr:hover {
+    background: var(--gray-lighter);
+}
+
+/* تایملاین پیشرفت */
+.progress-timeline {
+    position: sticky;
+    bottom: 2rem;
+    background: white;
+    border-radius: var(--radius-full);
+    padding: 1rem 1.5rem;
+    margin-top: 3rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-light);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    color: var(--dark);
+}
+
+.progress-percent {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.timeline-bar {
+    height: 6px;
+    background: var(--gray-light);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.timeline-progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    width: 0%;
+    transition: width 0.1s ease;
+    border-radius: var(--radius-full);
+}
+
+/* سایدبار راست */
+.right-sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.authors-widget,
+.keywords-widget,
+.stats-widget {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-light);
+}
+
+.widget-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+}
+
+.widget-title svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--primary);
+}
+
+.authors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.author-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    background: var(--gray-lighter);
+    transition: var(--transition);
+}
+
+.author-card:hover {
+    background: var(--gray-light);
+    transform: translateX(-5px);
+}
+
+.author-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author-initials {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.author-details h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--dark);
+}
+
+.author-role {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 0.25rem;
+}
+
+.author-bio {
+    font-size: 0.85rem;
+    color: var(--dark-light);
+    line-height: 1.4;
+}
+
+.keywords-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.keyword-tag {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--gray-lighter);
+    color: var(--gray);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.keyword-tag:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--gray-lighter);
+    border-radius: var(--radius);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+/* FAQ */
+.faq-section {
+    margin: 4rem 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    color: var(--gray);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.section-header svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--primary);
+}
+
+.faq-accordion {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.faq-item.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.faq-question {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.faq-item.active .faq-question {
+    background: var(--gray-lighter);
+}
+
+.faq-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.faq-question h3 {
+    flex: 1;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin: 0;
+}
+
+.faq-icon {
+    width: 24px;
+    height: 24px;
+    stroke: var(--gray);
+    transition: var(--transition);
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(180deg);
+    stroke: var(--primary);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 1000px;
+}
+
+.answer-content {
+    padding: 0 1.5rem 1.5rem 4rem;
+    color: var(--dark-light);
+    line-height: 1.7;
+}
+
+/* مقالات مرتبط */
+.related-articles {
+    margin: 4rem 0;
+}
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.related-article-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--gray-light);
+}
+
+.related-article-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.article-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.article-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.related-article-card:hover .article-image img {
+    transform: scale(1.1);
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-placeholder svg {
+    width: 64px;
+    height: 64px;
+    stroke: white;
+    opacity: 0.5;
+}
+
+.category-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.article-content {
+    padding: 1.5rem;
+}
+
+.article-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.read-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.read-time svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+}
+
+.article-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+    color: var(--dark);
+}
+
+.article-excerpt {
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.article-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.views-count {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.views-count svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.read-more {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.related-article-card:hover .read-more {
+    color: var(--primary-dark);
+}
+
+.read-more svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.related-cta {
+    text-align: center;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+/* بخش نظرات */
+.comments-section {
+    margin: 4rem 0;
+}
+
+.comments-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.comment-form {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-light);
+}
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gray-lighter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--gray);
+}
+
+.form-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 120px;
+    transition: var(--transition);
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-emoji,
+.btn-attach {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gray-lighter);
+    color: var(--gray);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-emoji:hover,
+.btn-attach:hover {
+    background: var(--gray-light);
+    transform: scale(1.1);
+}
+
+.btn-emoji svg,
+.btn-attach svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.btn-submit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: var(--radius-full);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-submit svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.no-comments {
+    text-align: center;
+    padding: 3rem;
+    color: var(--gray);
+}
+
+.no-comments svg {
+    width: 64px;
+    height: 64px;
+    stroke: currentColor;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.subtext {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    opacity: 0.7;
+}
+
+/* CTA پایانی */
+.final-cta {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 4rem 0;
+    margin-top: 4rem;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.cta-text h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.cta-text p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.newsletter-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.input-group {
+    display: flex;
+    gap: 0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.input-group input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.input-group input:focus {
+    outline: none;
+}
+
+.input-group button {
+    background: white;
+    color: var(--primary);
+    border: none;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.input-group button:hover {
+    background: var(--gray-lighter);
+}
+
+.input-group button svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.form-note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.form-note a {
+    color: white;
+    text-decoration: underline;
+}
+
+/* پاپ‌آپ اشتراک */
+.share-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-xl);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlide 0.3s ease;
+}
+
+@keyframes modalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--gray);
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    color: var(--danger);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.share-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.share-option:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.share-option.telegram {
+    background: #0088cc;
+}
+
+.share-option.whatsapp {
+    background: #25d366;
+}
+
+.share-option.twitter {
+    background: #1da1f2;
+}
+
+.share-option.linkedin {
+    background: #0077b5;
+}
+
+.share-option.email {
+    background: var(--gray);
+}
+
+.link-input {
+    display: flex;
+    gap: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--gray-light);
+}
+
+.link-input input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: var(--gray-lighter);
+}
+
+.link-input input:focus {
+    outline: none;
+}
+
+.copy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+}
+
+.copy-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* ریسپانسیو */
+@media (max-width: 1024px) {
+    .content-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .sticky-sidebar,
+    .right-sidebar {
+        position: static;
+        order: 3;
+    }
+
+    .sticky-sidebar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .toc-widget {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .article-title {
+        font-size: 2.5rem;
+    }
+
+    .content-layout {
+        margin-top: -50px;
+    }
+
+    .main-content {
+        padding: 2rem;
+    }
+
+    .header-info {
+        padding: 2rem 0;
+    }
+
+    .article-meta-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .meta-badges {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .articles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .article-title {
+        font-size: 2rem;
+    }
+
+    .main-content {
+        padding: 1.5rem;
+    }
+
+    .container {
+        padding: 0 1rem;
+    }
+
+    .author-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .form-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .btn-submit {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* تم تاریک */
+.dark-mode {
+    --light: #1a1a2e;
+    --dark: #f8fafc;
+    --dark-light: #cbd5e1;
+    --gray: #94a3b8;
+    --gray-light: #334155;
+    --gray-lighter: #1e293b;
+}
+
+.dark-mode body {
+    background: var(--light);
+    color: var(--dark);
+}
+
+.dark-mode .toc-widget,
+.dark-mode .social-share-widget,
+.dark-mode .authors-widget,
+.dark-mode .keywords-widget,
+.dark-mode .stats-widget,
+.dark-mode .main-content,
+.dark-mode .comment-form,
+.dark-mode .related-article-card,
+.dark-mode .faq-item {
+    background: var(--gray-lighter);
+    border-color: var(--gray-light);
+    color: var(--dark);
+}
+
+.dark-mode .executive-summary {
+    background: linear-gradient(135deg, var(--gray-lighter), var(--gray-light));
+}
+
+.dark-mode .content-body h2,
+.dark-mode .content-body h3,
+.dark-mode .widget-title,
+.dark-mode .section-header h2,
+.dark-mode .article-title,
+.dark-mode .author-details h4,
+.dark-mode .modal-header h3 {
+    color: var(--dark);
+}
+
+.dark-mode .content-body,
+.dark-mode .summary-content,
+.dark-mode .answer-content,
+.dark-mode .article-excerpt,
+.dark-mode .author-bio {
+    color: var(--dark-light);
+}
+
+.dark-mode .author-card {
+    background: var(--gray-light);
+}
+
+.dark-mode .keyword-tag {
+    background: var(--gray-light);
+    color: var(--dark-light);
+}
+
+.dark-mode .keyword-tag:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.dark-mode .form-group textarea {
+    background: var(--gray-lighter);
+    border-color: var(--gray-light);
+    color: var(--dark);
+}
+
+.dark-mode .form-group textarea:focus {
+    border-color: var(--primary);
+}
+
+.dark-mode .btn-emoji,
+.dark-mode .btn-attach {
+    background: var(--gray-light);
+    color: var(--dark-light);
+}
+
+.dark-mode .share-modal .modal-content {
+    background: var(--gray-lighter);
+}
+
+.dark-mode .link-input input {
+    background: var(--gray-light);
+    color: var(--dark);
+}
+
+/* انیمیشن‌های ورود */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.faq-item,
+.related-article-card,
+.author-card {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.faq-item:nth-child(1) { animation-delay: 0.1s; }
+.faq-item:nth-child(2) { animation-delay: 0.2s; }
+.faq-item:nth-child(3) { animation-delay: 0.3s; }
+.faq-item:nth-child(4) { animation-delay: 0.4s; }
+
+.related-article-card:nth-child(1) { animation-delay: 0.1s; }
+.related-article-card:nth-child(2) { animation-delay: 0.2s; }
+.related-article-card:nth-child(3) { animation-delay: 0.3s; }
+
+.author-card:nth-child(1) { animation-delay: 0.1s; }
+.author-card:nth-child(2) { animation-delay: 0.2s; }
+.author-card:nth-child(3) { animation-delay: 0.3s; }
 </style>
 {% endblock %}

@@ -23,6 +23,13 @@ def plan_list(request):
 
 
 
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from apps.menu.models.menufreemodels.models import Restaurant
+from .models import Plan, PlanOrder
 
 @login_required
 def purchase_plan(request, plan_slug):
@@ -37,9 +44,10 @@ def purchase_plan(request, plan_slug):
             request,
             'برای خرید پلن باید حداقل یک رستوران ایجاد کرده باشید'
         )
-        return redirect('panel:panel')  # یا صفحه لیست پلن‌ها
+        return redirect('panel:panel')
 
-    # ---------- اعتبارسنجی دوم: باید از ایجاد اولین رستوران 15 روز گذشته باشد ----------
+    # ---------- اعتبارسنجی جدید: بررسی تاریخ انقضای رستوران ----------
+    # گرفتن اولین رستوران (قدیمی‌ترین)
     oldest_restaurant = user_restaurants.order_by('createdAt').first()
 
     # بررسی اینکه آیا رستوران تاریخ ایجاد دارد
@@ -50,26 +58,33 @@ def purchase_plan(request, plan_slug):
         )
         return redirect('panel:panel')
 
-    # محاسبه مدت زمان از ایجاد رستوران
-    time_since_creation = timezone.now() - oldest_restaurant.createdAt
+    # اگر تاریخ انقضا وجود ندارد، اجازه خرید بده
+    if not oldest_restaurant.expireDate:
+        # هیچ تاریخ انقضایی نیست، می‌تواند پلن بخرد
+        pass
+    else:
+        # بررسی فاصله بین ایجاد و انقضا
+        time_to_expiry = oldest_restaurant.expireDate - oldest_restaurant.createdAt
 
-    # بررسی آیا 15 روز (360 ساعت) گذشته است
-    if time_since_creation < timedelta(days=15):
-        days_left = 15 - time_since_creation.days
-        hours_left = 23 - time_since_creation.seconds // 3600
-
-        messages.error(
-            request,
-            f'برای خرید پلن باید از تاریخ ایجاد رستوران شما حداقل ۱۵ روز گذشته باشد. '
-            f'{days_left} روز و {hours_left} ساعت دیگر مجاز به خرید پلن هستید.'
-        )
-        return redirect('panel:panel')
+        # اگر فاصله کمتر از 16 روز است، اجازه خرید بده
+        if time_to_expiry <= timedelta(days=16):
+            # می‌تواند پلن بخرد
+            pass
+        else:
+            # هنوز زمان زیادی تا انقضا باقی مانده
+            days_left = (oldest_restaurant.expireDate - timezone.now()).days
+            messages.error(
+                request,
+                f'شما نمی‌توانید پلن جدید خریداری کنید زیرا رستوران شما تا {days_left} روز دیگر منقضی می‌شود. '
+                f'لطفاً نزدیک به تاریخ انقضا اقدام به خرید پلن جدید کنید.'
+            )
+            return redirect('panel:panel')
 
     # ---------- بررسی اینکه آیا همین پلن قبلاً انتخاب شده و پرداخت نشده ----------
     existing_unpaid_order = PlanOrder.objects.filter(
         user=request.user,
         plan=plan,
-        isPaid=False  # فقط بررسی پلن‌های پرداخت نشده
+        isPaid=False
     ).first()
 
     if existing_unpaid_order:
@@ -81,17 +96,15 @@ def purchase_plan(request, plan_slug):
         plan=plan,
         user=request.user,
         finalPrice=plan.price if plan.price else 0,
-        isPaid=False,  # مهم: ابتدا False باشد
-        paidAt=None    # پرداخت نشده
+        isPaid=False,
+        paidAt=None
     )
 
     messages.success(request, f'پلن {plan.name} به سبد خرید اضافه شد')
-    return redirect('plan:shop_cart')  # هدایت به سبد خرید
-
-
-# apps/plan/views.py
+    return redirect('plan:shop_cart')
 # apps/plan/views.py
 from apps.menu.models.menufreemodels.models import Restaurant
+
 
 @login_required
 def shop_cart(request):

@@ -49,60 +49,7 @@
     </div>
 
     <!-- آمار کلی -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-blue-100 text-sm mb-2">کل سفارشات</p>
-                    <h3 class="text-2xl font-bold">{{ all_orders|length|default:0 }}</h3>
-                    <p class="text-blue-100 text-xs mt-2">همه انواع سفارشات</p>
-                </div>
-                <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-shopping-bag text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-green-100 text-sm mb-2">منوهای ساخته شده</p>
-                    <h3 class="text-2xl font-bold">{{ restaurants.count|default:0 }}</h3>
-                    <p class="text-green-100 text-xs mt-2">همه منوهای فعال</p>
-                </div>
-                <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-utensils text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-purple-100 text-sm mb-2">سفارشات امروز</p>
-                    <h3 class="text-2xl font-bold">{{ today_orders|default:0 }}</h3>
-                    <p class="text-purple-100 text-xs mt-2">24 ساعت گذشته</p>
-                </div>
-                <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-receipt text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg hover-lift transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-orange-100 text-sm mb-2">درآمد امروز</p>
-                    <h3 class="text-2xl font-bold">{{ today_revenue|default:0|intcomma }}</h3>
-                    <p class="text-orange-100 text-xs mt-2">تومان</p>
-                </div>
-                <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-wallet text-2xl"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
+   
     <!-- فیلترهای سفارشات -->
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
     <div class="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between">

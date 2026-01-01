@@ -14,7 +14,8 @@ urlpatterns = [
     path('restaurants/latest/', views.LatestRestaurantsView.as_view(), name='latest_restaurants'),
     path('restaurants/all/', views.AllRestaurantsView.as_view(), name='all_restaurants'),
     path('api/restaurants/load-more/', views.load_more_restaurants, name='load_more_restaurants'),
-    path('faq/',views.faq,name='faq')
+    path('faq/',views.faq,name='faq'),
+    path('course/',views.active_courses,name='course')
 
 
 ]
