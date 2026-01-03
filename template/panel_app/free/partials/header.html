@@ -38,7 +38,6 @@
 </header>
 
 <!-- مودال افتتاح رستوران -->
-<!-- مودال افتتاح رستوران -->
 <div id="createRestaurantModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
@@ -137,7 +136,7 @@
                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                    placeholder="مثال: my-restaurant"
                                    autofocus
-                                   oninput="checkEnglishName()">
+                                   oninput="normalizeEnglishName()">
                             <div id="englishNameFeedback" class="text-sm mt-2 flex items-center space-x-1 space-x-reverse"></div>
                         </div>
                         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
@@ -326,13 +325,12 @@
                                 <i class="fas fa-save ml-2"></i>
                                 ذخیره عکس‌ها
                             </button>
-                           <!-- در step 4، دکمه پرداخت را به این صورت به‌روزرسانی کنید -->
-<button id="uploadButton" onclick="proceedToPayment()"
-        class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-        disabled>
-    ادامه به پرداخت
-    <i class="fas fa-arrow-left mr-2"></i>
-</button>
+                            <button id="uploadButton" onclick="proceedToPayment()"
+                                    class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                    disabled>
+                                ادامه به پرداخت
+                                <i class="fas fa-arrow-left mr-2"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -358,7 +356,6 @@
 
 <script>
 // متغیرهای سراسری
-// متغیرهای سراسری
 let currentStep = 1;
 let restaurantData = {
     step1: {},
@@ -380,8 +377,6 @@ function openCreateRestaurantModal() {
     showStep(1);
     resetForm();
     updateProgress();
-
-    // بازیابی داده‌های ذخیره شده
     loadSavedData();
 }
 
@@ -515,8 +510,6 @@ function resetForm() {
     }
 
     updateProgress();
-
-    // پاک کردن داده‌های ذخیره شده
     localStorage.removeItem('restaurantData');
 }
 
@@ -549,7 +542,6 @@ function updateSeoCheckbox() {
     }
 }
 
-// در تابع updateTotalPrice، اطلاعات را به صورت واضح‌تر نمایش دهید
 function updateTotalPrice() {
     const totalPriceElement = document.getElementById('totalPrice');
     const basePriceElement = document.querySelector('#seoPriceDetails div:first-child span:last-child');
@@ -579,7 +571,6 @@ function updateTotalPrice() {
         }
     }
 
-    // به‌روزرسانی متن دکمه پرداخت
     const uploadButton = document.getElementById('uploadButton');
     if (uploadButton) {
         uploadButton.innerHTML = `پرداخت ${(total / 10).toLocaleString('fa-IR')} تومان <i class="fas fa-arrow-left mr-2"></i>`;
@@ -598,8 +589,6 @@ function proceedToStep2() {
 
     const fullName = fullNameInput.value.trim();
     const restaurantName = restaurantNameInput.value.trim();
-
-    console.log('Step 2 Data:', { fullName, restaurantName });
 
     if (!fullName || !restaurantName) {
         alert('لطفاً تمام فیلدها را پر کنید');
@@ -631,7 +620,45 @@ function backToStep1() {
     showStep(1);
 }
 
-// Step 2 -> Step 3
+// Step 2: نرمال‌سازی و بررسی نام انگلیسی
+function normalizeEnglishName() {
+    const englishNameInput = document.getElementById('englishNameInput');
+    if (!englishNameInput) return;
+
+    // ذخیره موقعیت کرسر
+    const start = englishNameInput.selectionStart;
+    const end = englishNameInput.selectionEnd;
+
+    // جایگزینی فاصله با خط تیره
+    let value = englishNameInput.value;
+    const originalLength = value.length;
+
+    // جایگزینی فاصله و underline با خط تیره
+    value = value.replace(/\s+/g, '-') // فاصله به خط تیره
+                .replace(/_/g, '-')    // underline به خط تیره
+                .replace(/[^a-z0-9-]/gi, '') // حذف کاراکترهای غیرمجاز
+                .toLowerCase();
+
+    // جلوگیری از خط تیره‌های متوالی
+    value = value.replace(/-+/g, '-');
+
+    // حذف خط تیره از ابتدا و انتها
+    value = value.replace(/^-+|-+$/g, '');
+
+    if (value !== englishNameInput.value) {
+        englishNameInput.value = value;
+
+        // تنظیم مجدد موقعیت کرسر
+        const newLength = value.length;
+        const diff = newLength - originalLength;
+        englishNameInput.selectionStart = start + diff;
+        englishNameInput.selectionEnd = end + diff;
+    }
+
+    // بررسی نام انگلیسی
+    checkEnglishName();
+}
+
 function checkEnglishName() {
     const englishNameInput = document.getElementById('englishNameInput');
     const feedback = document.getElementById('englishNameFeedback');
@@ -645,8 +672,6 @@ function checkEnglishName() {
     const englishName = englishNameInput.value.trim().toLowerCase();
     menuUrl.textContent = `/menu/${englishName}`;
 
-    console.log('Checking English Name:', englishName);
-
     if (!englishName) {
         feedback.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-times-circle ml-1"></i> نام انگلیسی نمی‌تواند خالی باشد</span>';
         button.disabled = true;
@@ -656,6 +681,18 @@ function checkEnglishName() {
     const englishNameRegex = /^[a-z0-9-]+$/;
     if (!englishNameRegex.test(englishName)) {
         feedback.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-times-circle ml-1"></i> فقط حروف انگلیسی، اعداد و خط تیره مجاز است</span>';
+        button.disabled = true;
+        return;
+    }
+
+    if (englishName.startsWith('-') || englishName.endsWith('-')) {
+        feedback.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-times-circle ml-1"></i> نام انگلیسی نمی‌تواند با خط تیره شروع یا پایان یابد</span>';
+        button.disabled = true;
+        return;
+    }
+
+    if (englishName.includes('--')) {
+        feedback.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-times-circle ml-1"></i> خط تیره‌های متوالی مجاز نیست</span>';
         button.disabled = true;
         return;
     }
@@ -948,7 +985,6 @@ function showMessage(message, type = 'info') {
     }, 4000);
 }
 
-// تابع برای ذخیره عکس‌ها
 function saveImages() {
     if (restaurantData.uploadedImages.length === 0) {
         showMessage('لطفاً حداقل یک عکس آپلود کنید', 'error');
@@ -975,16 +1011,6 @@ function saveImages() {
         formData.append(`menu_images`, file);
     });
 
-    console.log('ارسال داده‌ها برای ذخیره عکس:', {
-        name: restaurantData.step1.name,
-        family: restaurantData.step1.family,
-        restaurant_name: restaurantData.step1.restaurant_name,
-        english_name: restaurantData.step2.english_name,
-        is_seo_enabled: restaurantData.isSeoEnabled,
-        image_count: restaurantData.uploadedImages.length,
-        expire_days: 29
-    });
-
     fetch("{% url 'panel:create_restaurant_modal' %}", {
         method: 'POST',
         headers: {
@@ -999,8 +1025,6 @@ function saveImages() {
         return response.json();
     })
     .then(data => {
-        console.log('پاسخ سرور:', data);
-
         if (data.success) {
             showMessage(data.message, 'success');
             restaurantData.imagesSaved = true;
@@ -1055,8 +1079,6 @@ function proceedToPayment() {
     }, 1000);
 }
 
-// ایجاد رستوران نهایی (ساخت توسط خود کاربر)
-// ایجاد رستوران نهایی (ساخت توسط خود کاربر)
 function createRestaurantFinal() {
     showStep(5);
     const processingTitle = document.getElementById('processingTitle');
@@ -1066,8 +1088,6 @@ function createRestaurantFinal() {
     if (processingTitle) processingTitle.textContent = 'در حال ایجاد رستوران...';
     if (processingMessage) processingMessage.textContent = 'لطفاً چند لحظه صبر کنید';
     if (progressBar) progressBar.style.width = '30%';
-
-    console.log('ایجاد رستوران نهایی - سئو فعال:', restaurantData.isSeoEnabled);
 
     fetch("{% url 'panel:create_restaurant_modal' %}", {
         method: 'POST',
@@ -1082,7 +1102,7 @@ function createRestaurantFinal() {
             restaurant_name: restaurantData.step1.restaurant_name,
             english_name: restaurantData.step2.english_name,
             is_seo_enabled: restaurantData.isSeoEnabled,
-            expire_days: 29 // اضافه کردن این پارامتر برای 29 روز انقضا
+            expire_days: 29
         })
     })
     .then(response => {
@@ -1092,7 +1112,6 @@ function createRestaurantFinal() {
         return response.json();
     })
     .then(data => {
-        console.log('پاسخ ایجاد رستوران:', data);
         if (progressBar) progressBar.style.width = '100%';
 
         if (data.success) {
@@ -1117,8 +1136,6 @@ function createRestaurantFinal() {
     });
 }
 
-// پردازش ساخت منو توسط شرکت
-// پردازش ساخت منو توسط شرکت - اصلاح شده برای پرداخت
 function processCompanyMenuCreation() {
     const formData = new FormData();
     formData.append('step', 'create_with_company');
@@ -1133,16 +1150,6 @@ function processCompanyMenuCreation() {
         formData.append(`menu_images`, file);
     });
 
-    console.log('ارسال داده‌ها برای پرداخت:', {
-        name: restaurantData.step1.name,
-        family: restaurantData.step1.family,
-        restaurant_name: restaurantData.step1.restaurant_name,
-        english_name: restaurantData.step2.english_name,
-        is_seo_enabled: restaurantData.isSeoEnabled,
-        image_count: restaurantData.uploadedImages.length
-    });
-
-    // به‌روزرسانی UI
     const processingTitle = document.getElementById('processingTitle');
     const processingMessage = document.getElementById('processingMessage');
     const progressBar = document.getElementById('progressBarAnimated');
@@ -1165,8 +1172,6 @@ function processCompanyMenuCreation() {
         return response.json();
     })
     .then(data => {
-        console.log('پاسخ پرداخت:', data);
-
         if (progressBar) progressBar.style.width = '100%';
 
         if (data.success) {
@@ -1176,12 +1181,10 @@ function processCompanyMenuCreation() {
             clearPendingRestaurant();
             localStorage.removeItem('restaurantData');
 
-            // انتقال به درگاه پرداخت
             setTimeout(() => {
                 if (data.redirect_url) {
                     window.location.href = data.redirect_url;
                 } else {
-                    // اگر redirect_url وجود ندارد، از سیستم پرداخت یکپارچه استفاده کن
                     window.location.href = `/peyment/request/menu/${data.order_id}/`;
                 }
             }, 1500);
@@ -1222,7 +1225,6 @@ function loadSavedData() {
             restaurantData.step2 = parsedData.step2 || {};
             restaurantData.isSeoEnabled = parsedData.isSeoEnabled !== undefined ? parsedData.isSeoEnabled : true;
 
-            // پر کردن فیلدها
             if (restaurantData.step1.name && restaurantData.step1.family) {
                 const fullNameInput = document.getElementById('fullNameInput');
                 if (fullNameInput) {
@@ -1239,7 +1241,6 @@ function loadSavedData() {
                 const englishNameInput = document.getElementById('englishNameInput');
                 if (englishNameInput) {
                     englishNameInput.value = restaurantData.step2.english_name;
-                    // فعال کردن دکمه مرحله 2 اگر نام انگلیسی معتبر است
                     const step2Button = document.getElementById('step2Button');
                     if (step2Button && restaurantData.step2.english_name) {
                         step2Button.disabled = false;
@@ -1255,8 +1256,6 @@ function loadSavedData() {
     }
 }
 
-
-
 function checkPendingRestaurant() {
     fetch("{% url 'panel:check_pending_restaurant' %}")
         .then(response => response.json())
@@ -1269,7 +1268,6 @@ function checkPendingRestaurant() {
             console.error('Error checking pending restaurant:', error);
         });
 }
-
 
 function clearPendingRestaurant() {
     fetch("{% url 'panel:clear_pending_restaurant' %}", {
@@ -1306,10 +1304,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-
 document.addEventListener('DOMContentLoaded', function() {
     checkPendingRestaurant();
 });
-
-
 </script>
