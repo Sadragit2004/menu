@@ -10,7 +10,7 @@
                     <h1>اینده رستوران داری با<br><span style="color: var(--primary);">پلتفرم منو بساز</span></h1>
                     <p>پلتفرم جامع مدیریت منوی دیجیتال، رزرواسیون میز و سفارش‌گیری آنلاین. تجربه‌ای مدرن برای مشتریان شما.</p>
                     <div class="hero-btns">
-                        <a href="/panel" class="btn btn-primary">ساخت رستوران (رایگان)</a>
+                        <a style='background-color:#fe001a;' href="/panel" class="btn btn-primary">ساخت رستوران (رایگان)</a>
                         <a href="#restaurants" class="btn btn-secondary">مشاهده رستوران‌ها</a>
                     </div>
                 </div>
@@ -19,7 +19,7 @@
                     <div class="ui-bar" style="width: 40%;"></div>
                     <div class="ui-bar" style="width: 70%; margin-top: 10px; height: 20px;"></div>
                     <div class="ui-grid">
-                        <div class="ui-card" style="background-image:url('/assets/img/food-1.jpg')"></div>
+                        <div class="ui-card" style="background-image:url('/media/images/c1.jpg')"></div>
                         <div class="ui-card" style="background-image:url('/assets/img/food-2.jpg')"></div>
                         <div class="ui-card" style="background-image:url('/assets/img/food-3.jpg')"></div>
                         <div class="ui-card" style="background-image:url('/assets/img/food-4.jpg')"></div>
@@ -29,6 +29,54 @@
                         <svg style="margin: 13px; color: white;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- بخش جدید عکس و انیمیشن -->
+    <section class="featured-image-section">
+        <div class="container">
+            <div class="featured-image-wrapper">
+                <!-- قاب انیمیشن دور عکس -->
+                <div class="image-frame">
+                    <!-- دایره‌های متحرک پشت عکس -->
+                    <div class="pulse-ring ring-1"></div>
+                    <div class="pulse-ring ring-2"></div>
+                    <div class="pulse-ring ring-3"></div>
+
+                    <!-- عکس اصلی -->
+                    <img
+                        src="/media/images/moc.jpg"
+                        alt="داشبورد مدیریت رستوران منو بساز"
+                        class="featured-main-image"
+                        onerror="this.src='/assets/img/default-restaurant.jpg'"
+                    >
+
+                    <!-- آیتم‌های شناور اطراف عکس -->
+                    <div class="floating-icon icon-1">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#fe001a" stroke="#fff" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+
+                    <div class="floating-icon icon-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fe001a" stroke="#fff" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+
+                    <div class="floating-icon icon-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="#fe001a" stroke="#fff" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- متن توضیحی زیر عکس -->
+
             </div>
         </div>
     </section>
@@ -87,11 +135,78 @@
         </div>
     </section>
 
+     <section class="clean-image-section">
+        <div class="clean-image-container">
+            <!-- انیمیشن نورانی اطراف -->
+            <div class="light-beam beam-1"></div>
+            <div class="light-beam beam-2"></div>
+            <div class="light-beam beam-3"></div>
+
+            <!-- عکس در قاب شفاف -->
+            <div class="clean-image-frame">
+                <!-- عکس اصلی -->
+                <img
+                    src="/media/images/moc2.png"
+                    alt="راهکار جامع مدیریت رستوران"
+                    class="clean-main-image"
+                    onerror="this.src='/assets/img/restaurant-tech.jpg'"
+                >
+
+                <!-- افکت نور روی لبه‌ها -->
+                <div class="edge-glow"></div>
+
+                <!-- انعکاس سبک -->
+                <div class="subtle-reflection"></div>
+            </div>
+
+            <!-- نقاط نورانی متحرک -->
+            <div class="sparkle s-1">✦</div>
+            <div class="sparkle s-2">✧</div>
+            <div class="sparkle s-3">✦</div>
+            <div class="sparkle s-4">✧</div>
+        </div>
+    </section>
+
     {% render_partial 'main:latest_restaurants' %}
 
     {% render_partial 'plan:plan_list' %}
 
+    <!-- بخش دوم عکس - بعد از پلن قیمت (بدون بک‌گراند رنگی) -->
+    <section class="floating-image-section">
+        <div class="floating-image-container">
+            <!-- خطوط اتصال متحرک -->
+            <div class="flow-line line-a"></div>
+            <div class="flow-line line-b"></div>
+            <div class="flow-line line-c"></div>
+
+            <!-- عکس شناور -->
+            <div class="floating-image-frame">
+                <!-- افکت موج نور -->
+                <div class="light-wave"></div>
+
+                <!-- عکس اصلی -->
+                <img
+                    src="/media/images/main1.jpg"
+                    alt="فناوری نوین رستوران‌داری"
+                    class="floating-main-image"
+                    onerror="this.src='/assets/img/tech-showcase.jpg'"
+                >
+
+                <!-- سایه متحرک -->
+                <div class="dynamic-shadow"></div>
+            </div>
+
+            <!-- دایره‌های چرخان -->
+            <div class="rotating-circle circle-1"></div>
+            <div class="rotating-circle circle-2"></div>
+            <div class="rotating-circle circle-3"></div>
+        </div>
+    </section>
+
+
     {% render_partial 'blog:show_blog' %}
+
+    <!-- بخش سوم عکس - بعد از بلاگ (بدون بک‌گراند رنگی) -->
 
     <section class="section" id="contact">
         <div class="container">
@@ -103,7 +218,7 @@
                 <p>همین امروز ثبت نام کنید یا با مشاوران ما تماس بگیرید.</p>
                 <div class="contact-btns">
                     <button class="btn-white">041-32331053</button>
-                    <button class="btn btn-primary">شروع رایگان</button>
+                    <button style='background-color:#fe001a;' class="btn btn-primary">شروع رایگان</button>
                 </div>
             </div>
         </div>
@@ -111,5 +226,690 @@
 
  {% render_partial "main:block" %}
 
+<style>
+/* استایل بخش اول عکس (همان قبلی - دست نخورده) */
+.featured-image-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-image-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.image-frame {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 50px;
+}
+
+.pulse-ring {
+    position: absolute;
+    border: 2px solid rgba(254, 0, 26, 0.3);
+    border-radius: 50%;
+    animation: pulse 3s infinite;
+}
+
+.ring-1 {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    animation-delay: 0s;
+}
+
+.ring-2 {
+    width: 110%;
+    height: 110%;
+    top: -5%;
+    left: -5%;
+    animation-delay: 1s;
+}
+
+.ring-3 {
+    width: 120%;
+    height: 120%;
+    top: -10%;
+    left: -10%;
+    animation-delay: 2s;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    70% {
+        transform: scale(1.1);
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+.featured-main-image {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 2;
+    transition: transform 0.5s ease;
+}
+
+.featured-main-image:hover {
+    transform: translateY(-10px);
+}
+
+.floating-icon {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(254, 0, 26, 0.2);
+    z-index: 3;
+    animation: float 6s ease-in-out infinite;
+}
+
+.icon-1 {
+    top: -25px;
+    right: -25px;
+    animation-delay: 0s;
+}
+
+.icon-2 {
+    bottom: -25px;
+    left: -25px;
+    animation-delay: 2s;
+}
+
+.icon-3 {
+    top: 50%;
+    left: -25px;
+    transform: translateY(-50%);
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+/* استایل بخش دوم عکس - بدون بک‌گراند رنگی */
+.clean-image-section {
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.clean-image-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* پرتوهای نورانی */
+.light-beam {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(254, 0, 26, 0.1), transparent);
+    height: 2px;
+    filter: blur(1px);
+    opacity: 0;
+    animation: beamMove 6s linear infinite;
+}
+
+.beam-1 {
+    width: 300px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.beam-2 {
+    width: 250px;
+    bottom: 30%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+.beam-3 {
+    width: 200px;
+    top: 50%;
+    left: 70%;
+    animation-delay: 4s;
+}
+
+@keyframes beamMove {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.3;
+    }
+    80% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* قاب عکس شفاف */
+.clean-image-frame {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 30px;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.1),
+        0 15px 35px rgba(254, 0, 26, 0.1);
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+}
+
+.clean-image-frame:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.02);
+    box-shadow:
+        0 35px 70px rgba(0, 0, 0, 0.15),
+        0 25px 50px rgba(254, 0, 26, 0.15);
+}
+
+/* عکس اصلی */
+.clean-main-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: contrast(1.05) saturate(1.1);
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+    border-radius: 30px;
+}
+
+.clean-image-frame:hover .clean-main-image {
+    transform: scale(1.03);
+}
+
+/* افکت نور روی لبه‌ها */
+.edge-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 30px;
+    box-shadow:
+        inset 0 0 0 1px rgba(254, 0, 26, 0.1),
+        inset 0 0 20px rgba(254, 0, 26, 0.05);
+    pointer-events: none;
+    transition: all 0.8s ease;
+}
+
+.clean-image-frame:hover .edge-glow {
+    box-shadow:
+        inset 0 0 0 2px rgba(254, 0, 26, 0.2),
+        inset 0 0 30px rgba(254, 0, 26, 0.1);
+}
+
+/* انعکاس سبک */
+.subtle-reflection {
+    position: absolute;
+    bottom: -50%;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 100%
+    );
+    opacity: 0.2;
+    filter: blur(5px);
+    transform: scaleY(-1);
+    pointer-events: none;
+    border-radius: 30px;
+    transition: opacity 0.6s ease;
+}
+
+.clean-image-frame:hover .subtle-reflection {
+    opacity: 0.3;
+}
+
+/* نقاط نورانی */
+.sparkle {
+    position: absolute;
+    color: rgba(254, 0, 26, 0.4);
+    font-size: 20px;
+    z-index: 1;
+    animation: sparkleFloat 8s linear infinite;
+}
+
+.s-1 {
+    top: 15%;
+    left: 8%;
+    animation-delay: 0s;
+}
+
+.s-2 {
+    top: 25%;
+    right: 12%;
+    animation-delay: 2s;
+}
+
+.s-3 {
+    bottom: 35%;
+    left: 15%;
+    animation-delay: 4s;
+}
+
+.s-4 {
+    bottom: 20%;
+    right: 20%;
+    animation-delay: 6s;
+}
+
+@keyframes sparkleFloat {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(50px, -50px) rotate(180deg);
+        opacity: 0;
+    }
+}
+
+/* استایل بخش سوم عکس - شناور و متحرک */
+.floating-image-section {
+    padding: 120px 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.floating-image-container {
+    position: relative;
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* خطوط جریان */
+.flow-line {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(254, 0, 26, 0.15), transparent);
+    height: 1px;
+    filter: blur(0.5px);
+    opacity: 0;
+    animation: flowLineMove 8s linear infinite;
+}
+
+.line-a {
+    width: 400px;
+    top: 25%;
+    left: 5%;
+    animation-delay: 0s;
+}
+
+.line-b {
+    width: 350px;
+    bottom: 35%;
+    right: 8%;
+    animation-delay: 3s;
+}
+
+.line-c {
+    width: 300px;
+    top: 60%;
+    left: 75%;
+    animation-delay: 6s;
+}
+
+@keyframes flowLineMove {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    15% {
+        opacity: 0.4;
+    }
+    85% {
+        opacity: 0.4;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* عکس شناور */
+.floating-image-frame {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    border-radius: 35px;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.12),
+        0 20px 40px rgba(254, 0, 26, 0.08);
+    animation: floatUpDown 6s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes floatUpDown {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(0.5deg);
+    }
+}
+
+.floating-image-frame:hover {
+    animation-play-state: paused;
+}
+
+/* موج نور */
+.light-wave {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(254, 0, 26, 0) 0%,
+        rgba(254, 0, 26, 0.05) 25%,
+        rgba(254, 0, 26, 0) 50%,
+        rgba(254, 0, 26, 0.05) 75%,
+        rgba(254, 0, 26, 0) 100%
+    );
+    background-size: 200% 200%;
+    animation: waveMove 4s linear infinite;
+    pointer-events: none;
+    border-radius: 35px;
+}
+
+@keyframes waveMove {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 200% 0%;
+    }
+}
+
+/* عکس اصلی */
+.floating-main-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: contrast(1.1) saturate(1.2);
+    transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+    border-radius: 35px;
+}
+
+.floating-image-frame:hover .floating-main-image {
+    transform: scale(1.04);
+}
+
+/* سایه متحرک */
+.dynamic-shadow {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    right: 10%;
+    bottom: -20%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0.2) 0%,
+        transparent 70%
+    );
+    filter: blur(20px);
+    opacity: 0.3;
+    animation: shadowPulse 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+    border-radius: 50%;
+}
+
+@keyframes shadowPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.4;
+    }
+}
+
+/* دایره‌های چرخان */
+.rotating-circle {
+    position: absolute;
+    border: 1px dashed rgba(254, 0, 26, 0.2);
+    border-radius: 50%;
+    animation: rotateCircle 20s linear infinite;
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 250px;
+    height: 250px;
+    bottom: 30%;
+    right: 15%;
+    animation-delay: 5s;
+}
+
+.circle-3 {
+    width: 200px;
+    height: 200px;
+    top: 60%;
+    left: 70%;
+    animation-delay: 10s;
+}
+
+@keyframes rotateCircle {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ریسپانسیو بخش دوم */
+@media (max-width: 1200px) {
+    .clean-image-section {
+        min-height: 500px;
+        padding: 80px 0;
+    }
+
+    .clean-image-frame {
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 992px) {
+    .clean-image-section {
+        min-height: 450px;
+        padding: 70px 0;
+    }
+
+    .clean-image-frame {
+        max-width: 700px;
+        border-radius: 25px;
+    }
+
+    .floating-image-section {
+        min-height: 600px;
+        padding: 100px 0;
+    }
+
+    .floating-image-frame {
+        max-width: 800px;
+        border-radius: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .clean-image-section {
+        min-height: 400px;
+        padding: 60px 15px;
+    }
+
+    .clean-image-frame {
+        max-width: 550px;
+        border-radius: 20px;
+        transform: perspective(800px) rotateY(-3deg);
+    }
+
+    .clean-image-frame:hover {
+        transform: perspective(800px) rotateY(0deg) scale(1.01);
+    }
+
+    .sparkle {
+        font-size: 16px;
+    }
+
+    .floating-image-section {
+        min-height: 500px;
+        padding: 80px 15px;
+    }
+
+    .floating-image-frame {
+        max-width: 600px;
+        border-radius: 20px;
+        animation: floatUpDownMobile 4s ease-in-out infinite;
+    }
+
+    @keyframes floatUpDownMobile {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .rotating-circle {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .clean-image-section {
+        min-height: 350px;
+        padding: 50px 10px;
+    }
+
+    .clean-image-frame {
+        border-radius: 15px;
+        box-shadow:
+            0 15px 30px rgba(0, 0, 0, 0.08),
+            0 10px 20px rgba(254, 0, 26, 0.05);
+    }
+
+    .light-beam,
+    .flow-line {
+        display: none;
+    }
+
+    .sparkle {
+        display: none;
+    }
+
+    .floating-image-section {
+        min-height: 400px;
+        padding: 60px 10px;
+    }
+
+    .floating-image-frame {
+        border-radius: 15px;
+    }
+
+    .dynamic-shadow {
+        display: none;
+    }
+}
+
+/* ریسپانسیو بخش اول */
+@media (max-width: 992px) {
+    .featured-image-section {
+        padding: 60px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .featured-image-section {
+        padding: 50px 15px;
+    }
+
+    .featured-main-image {
+        border-radius: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .featured-image-section {
+        padding: 40px 10px;
+    }
+}
+</style>
 
 {% endblock content %}

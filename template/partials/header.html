@@ -1,58 +1,432 @@
-<header class="header">
-        <div class="header-inner">
-            <a href="#" class="logo">
-               <img style='width: 80px;
-' src="/media/images/logo.png" alt="">
-                <span>مِنو</span><span>بساز</span>
-            </a>
+<!-- استیکرهای غذا (بالای هدر) -->
+<div class="food-stickers-wrapper">
+    <div class="food-stickers-container">
+        <div class="food-stickers-slider">
+            <div class="sticker-item" onclick="selectFoodSticker('burger')">🍔</div>
+            <div class="sticker-item" onclick="selectFoodSticker('pizza')">🍕</div>
+            <div class="sticker-item" onclick="selectFoodSticker('salad')">🥗</div>
+            <div class="sticker-item" onclick="selectFoodSticker('noodles')">🍜</div>
+            <div class="sticker-item" onclick="selectFoodSticker('sandwich')">🥪</div>
+            <div class="sticker-item" onclick="selectFoodSticker('fries')">🍟</div>
+            <div class="sticker-item" onclick="selectFoodSticker('chicken')">🍗</div>
+            <div class="sticker-item" onclick="selectFoodSticker('icecream')">🍦</div>
+            <div class="sticker-item" onclick="selectFoodSticker('drink')">🥤</div>
+            <div class="sticker-item" onclick="selectFoodSticker('coffee')">☕</div>
 
-            <nav class="nav-desktop">
-                <a href="/" class="nav-link">خانه</a>
-                <a href="/faq" class="nav-link">راهنمای سایت</a>
-                <a href="/course" class="nav-link"> اموزش ها</a>
-                <a href="#features" class="nav-link">ویژگی‌ها</a>
-                <a href="#restaurants" class="nav-link">رستوران‌ها</a>
-                <a href="#pricing" class="nav-link">تعرفه‌ها</a>
-                <a href="#contact" class="nav-link">تماس با ما</a>
-            </nav>
-
-            <div class="nav-actions">
-                <a href="#" class="btn btn-primary" style="display: none; height: 40px; font-size: 0.9rem; @media(min-width:768px){display:inline-flex;}">ورود / ثبت نام</a>
-
-             <a href='/panel' class="icon-btn relative" aria-label="حساب کاربری">
-    {% if request.user.is_authenticated %}
-        <!-- نشانگر سبز لاگین -->
-        <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full border-2 border-white shadow-lg ring-2 ring-green-500/50 animate-pulse"></span>
-
-        <!-- هاله سبز درخشان دور آیکون -->
-        <div class="absolute inset-0 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-full blur-sm opacity-70"></div>
-    {% endif %}
-
-    <!-- آیکون اصلی (همیشه یکسان) -->
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-</a>
-
-                <div class="mobile-toggle" onclick="toggleMenu()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="#home" class="mobile-nav-link" onclick="toggleMenu()">خانه</a>
-        <a href="/faq" class="mobile-nav-link" onclick="toggleMenu()">راهنمای سایت</a>
-        <a href="#features" class="mobile-nav-link" onclick="toggleMenu()">ویژگی‌ها</a>
-        <a href="#restaurants" class="mobile-nav-link" onclick="toggleMenu()">رستوران‌ها</a>
-        <a href="#pricing" class="mobile-nav-link" onclick="toggleMenu()">تعرفه‌ها</a>
-        <a href="#blog" class="mobile-nav-link" onclick="toggleMenu()">وبلاگ</a>
-        <a href="#contact" class="mobile-nav-link" onclick="toggleMenu()">تماس با ما</a>
-        <div style="padding: 20px;">
-            <a href="{% url 'account:send_mobile' %}" class="btn btn-primary" style="width: 100%;">ورود / ثبت نام</a>
+            <!-- تکرار برای حرکت پیوسته -->
+            <div class="sticker-item" onclick="selectFoodSticker('burger')">🍔</div>
+            <div class="sticker-item" onclick="selectFoodSticker('pizza')">🍕</div>
+            <div class="sticker-item" onclick="selectFoodSticker('salad')">🥗</div>
+            <div class="sticker-item" onclick="selectFoodSticker('noodles')">🍜</div>
+            <div class="sticker-item" onclick="selectFoodSticker('sandwich')">🥪</div>
+            <div class="sticker-item" onclick="selectFoodSticker('fries')">🍟</div>
+            <div class="sticker-item" onclick="selectFoodSticker('chicken')">🍗</div>
+            <div class="sticker-item" onclick="selectFoodSticker('icecream')">🍦</div>
+            <div class="sticker-item" onclick="selectFoodSticker('drink')">🥤</div>
+            <div class="sticker-item" onclick="selectFoodSticker('coffee')">☕</div>
         </div>
     </div>
+</div>
+
+<!-- هدر اصلی (بدون تغییر) -->
+<header class="header">
+    <div class="header-inner">
+        <a href="#" class="logo">
+            <img style='width: 80px;' src="/media/images/logo.jpg" alt="">
+            <span style='color:#fe001a;'>مِنو</span><span style='color:#fe001a;'>بساز</span>
+        </a>
+
+        <nav class="nav-desktop">
+            <a href="/" class="nav-link">خانه</a>
+            <a href="/faq" class="nav-link">راهنمای سایت</a>
+            <a href="/course" class="nav-link"> آموزش ها</a>
+            <a href="#features" class="nav-link">ویژگی‌ها</a>
+            <a href="#restaurants" class="nav-link">رستوران‌ها</a>
+            <a href="#pricing" class="nav-link">تعرفه‌ها</a>
+            <a href="#contact" class="nav-link">تماس با ما</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="{% url 'account:send_mobile' %}" class="btn btn-primary" style="display: none; height: 40px; font-size: 0.9rem; @media(min-width:768px){display:inline-flex;}">ورود / ثبت نام</a>
+
+            <a href='/panel' class="icon-btn relative" aria-label="حساب کاربری">
+                {% if request.user.is_authenticated %}
+                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full border-2 border-white shadow-lg ring-2 ring-green-500/50 animate-pulse"></span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-full blur-sm opacity-70"></div>
+                {% endif %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </a>
+
+            <div class="mobile-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#home" class="mobile-nav-link" onclick="toggleMenu()">خانه</a>
+    <a href="/faq" class="mobile-nav-link" onclick="toggleMenu()">راهنمای سایت</a>
+    <a href="#features" class="mobile-nav-link" onclick="toggleMenu()">ویژگی‌ها</a>
+    <a href="#restaurants" class="mobile-nav-link" onclick="toggleMenu()">رستوران‌ها</a>
+    <a href="#pricing" class="mobile-nav-link" onclick="toggleMenu()">تعرفه‌ها</a>
+    <a href="#blog" class="mobile-nav-link" onclick="toggleMenu()">وبلاگ</a>
+    <a href="#contact" class="mobile-nav-link" onclick="toggleMenu()">تماس با ما</a>
+    <div style="padding: 20px;">
+        <a href="{% url 'account:send_mobile' %}" class="btn btn-primary" style="width: 100%;">ورود / ثبت نام</a>
+    </div>
+</div>
+
+<style>
+
+.hero {
+  padding-top: calc(var(--header-height) + 0px);
+  padding-bottom: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+    .food-stickers-wrapper {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    overflow: hidden;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1001;
+}
+
+.food-stickers-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.food-stickers-slider {
+    display: inline-flex;
+    gap: 20px;
+    padding: 0 15px;
+    animation: foodStickerScroll 35s linear infinite;
+    white-space: nowrap;
+}
+
+.food-stickers-slider:hover {
+    animation-play-state: paused;
+}
+
+@keyframes foodStickerScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.sticker-item {
+    width: 38px;
+    height: 38px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    user-select: none;
+    border: 1px solid transparent;
+}
+
+.sticker-item:hover {
+    transform: scale(1.1);
+    background: #ffecec;
+    border-color: #fe001a;
+    box-shadow: 0 3px 8px rgba(254, 0, 26, 0.15);
+}
+
+.sticker-item.active {
+    background: #fe001a;
+    color: white;
+    transform: scale(1.1);
+    border-color: #fe001a;
+    box-shadow: 0 3px 10px rgba(254, 0, 26, 0.2);
+}
+
+/* استایل هدر اصلی (بدون تغییر) */
+.header {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-desktop {
+    display: none;
+    gap: 25px;
+}
+
+@media (min-width: 992px) {
+    .nav-desktop {
+        display: flex;
+    }
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: #fe001a;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #fe001a;
+    transition: width 0.3s;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #fe001a 0%, #ff6b6b 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(254, 0, 26, 0.3);
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    color: #333;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.icon-btn:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.mobile-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+@media (min-width: 992px) {
+    .mobile-toggle {
+        display: none;
+    }
+}
+
+.mobile-toggle span {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    padding: 80px 20px 20px;
+    transition: right 0.3s;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mobile-menu.active {
+    right: 0;
+}
+
+.mobile-nav-link {
+    text-decoration: none;
+    color: #333;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.mobile-nav-link:hover {
+    background: #f8f9fa;
+    color: #fe001a;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .food-stickers-wrapper {
+        height: 44px;
+    }
+
+    .sticker-item {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+
+    .food-stickers-slider {
+        gap: 16px;
+        animation-duration: 30s;
+    }
+}
+
+@media (max-width: 480px) {
+    .food-stickers-wrapper {
+        height: 42px;
+    }
+
+    .sticker-item {
+        width: 32px;
+        height: 32px;
+        font-size: 17px;
+    }
+
+    .food-stickers-slider {
+        gap: 14px;
+        animation-duration: 25s;
+    }
+}
+</style>
+
+<script>
+// تابع انتخاب استیکر
+function selectFoodSticker(type) {
+    // حذف کلاس active از همه
+    document.querySelectorAll('.sticker-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // اضافه کردن به همه استیکرهای این نوع
+    const emojis = {
+        'burger': '🍔',
+        'pizza': '🍕',
+        'salad': '🥗',
+        'noodles': '🍜',
+        'sandwich': '🥪',
+        'fries': '🍟',
+        'chicken': '🍗',
+        'icecream': '🍦',
+        'drink': '🥤',
+        'coffee': '☕'
+    };
+
+    const targetEmoji = emojis[type];
+
+    document.querySelectorAll('.sticker-item').forEach(item => {
+        if (item.textContent === targetEmoji) {
+            item.classList.add('active');
+        }
+    });
+
+    // برای فیلتر کردن غذاها
+    console.log(`استیکر ${type} انتخاب شد`);
+    // filterFoods(type);
+}
+
+// تابع منو موبایل
+function toggleMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenu.classList.toggle('active');
+    document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+}
+
+// بستن منو
+document.addEventListener('click', function(event) {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileToggle = document.querySelector('.mobile-toggle');
+
+    if (mobileMenu.classList.contains('active') &&
+        !mobileMenu.contains(event.target) &&
+        !mobileToggle.contains(event.target)) {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
+
+// انتخاب اولین استیکر
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        selectFoodSticker('burger');
+    }, 100);
+});
+
+// بستن منو با کلیک روی لینک‌ها
+document.querySelectorAll('.mobile-nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.remove('active');
+        document.body.style.overflow = '';
+    });
+});
+</script>
