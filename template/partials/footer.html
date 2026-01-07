@@ -7,6 +7,16 @@
                     راهکار جامع دیجیتال برای رستوران‌ها، کافه‌ها و فودکورت‌ها.
                     ما به شما کمک می‌کنیم تا تجربه‌ای لذت‌بخش برای مشتریانتان بسازید.
                 </p>
+
+                <!-- بخش اینماد -->
+                <div class="enamad-section" style="margin-top: 25px;">
+                    <a href="/course" target="_blank" rel="noopener noreferrer">
+                        <img src="/media/images/enamad1.png"
+                             alt="نماد اعتماد الکترونیک"
+                             style="max-width: 120px; height: auto; border-radius: 8px;"
+                             loading="lazy">
+                    </a>
+                </div>
             </div>
 
             <div class="footer-col">
@@ -164,6 +174,27 @@
         color: #60a5fa;
     }
 
+    /* استایل بخش اینماد */
+    .enamad-section {
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 20px;
+    }
+
+    .enamad-section a {
+        display: inline-block;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .enamad-section a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .enamad-section img {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     @media (max-width: 768px) {
         .footer-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -173,11 +204,24 @@
             flex-direction: column;
             text-align: center;
         }
+
+        .enamad-section {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .enamad-section img {
+            max-width: 100px;
+        }
     }
 
     @media (max-width: 480px) {
         .footer-grid {
             grid-template-columns: 1fr;
+        }
+
+        .enamad-section {
+            text-align: center;
         }
     }
 </style>
