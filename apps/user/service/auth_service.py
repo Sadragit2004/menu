@@ -40,8 +40,7 @@ class AuthService:
         security.expireCode = expire_time
         security.isBan = False
         security.save()
-        # TODO: ارسال پیامک واقعی
-        print(f"کد فعال‌سازی برای {security.user.mobileNumber}: {code}")
+
         return code
 
     @staticmethod
