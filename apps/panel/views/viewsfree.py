@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 try:
     import qrcode
     QRCODE_AVAILABLE = True
-    print("✅ qrcode imported successfully")
+
 except ImportError as e:
-    print(f"❌ qrcode import failed: {e}")
+   
     QRCODE_AVAILABLE = False
     qrcode = None
 
