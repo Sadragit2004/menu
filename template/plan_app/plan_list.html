@@ -13,8 +13,8 @@
 
         <div class="pricing-grid">
             {% for plan in plans %}
-            <div class="price-card {% if plan.is_recommended %}featured{% endif %}">
-                {% if plan.is_recommended %}
+            <div class="price-card {% if plan.isFavorit %}featured{% endif %}">
+                {% if plan.isFavorit %}
                 <div class="featured-tag">{{ plan.recommended_tag|default:"پیشنهادی" }}</div>
                 {% endif %}
 
@@ -55,8 +55,8 @@
                 {% if plan.price == 0 %}
                     <a href="{% url 'plan:start_free_plan' plan.slug %}" class="btn btn-secondary" style="width: 100%;">شروع کنید</a>
                 {% elif plan.price %}
-                    <a href="{% url 'plan:purchase_plan' plan.slug %}" class="btn {% if plan.is_recommended %}btn-primary{% else %}btn-secondary{% endif %}" style="width: 100%;">
-                        {% if plan.is_recommended %}خرید اشتراک{% else %}انتخاب پلن{% endif %}
+                    <a href="{% url 'plan:purchase_plan' plan.slug %}" class="btn {% if plan.isFavorit %}btn-primary{% else %}btn-secondary{% endif %}" style="width: 100%;">
+                        {% if plan.isFavorit %}خرید اشتراک{% else %}انتخاب پلن{% endif %}
                     </a>
                 {% else %}
                     <a href="{% url 'contact:sales' %}" class="btn btn-secondary" style="width: 100%;">تماس با فروش</a>
