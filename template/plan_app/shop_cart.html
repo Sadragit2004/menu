@@ -2085,7 +2085,7 @@
                         } else {
                             console.log('[DEBUG] No products in cart, redirecting to panel');
                             console.log('[DEBUG] Redirect URL:', "/panel/");
-                            window.location.href = "/panel/";
+                            window.location.href = "{% url 'product:create_checkout' %}";
                         }
                     {% endif %}
                 {% else %}
