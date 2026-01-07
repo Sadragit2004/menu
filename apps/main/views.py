@@ -234,4 +234,4 @@ from .models import Course
 def active_courses(request):
     """لیست دوره‌های فعال"""
     courses = Course.objects.filter(is_active=True).order_by('-created_at')
-    return render(request, 'courses_َapp/course_list.html', {'courses': courses})
+    return render(request, 'courses_app/course_list.html', {'courses': courses})
