@@ -42,7 +42,7 @@
 
                 <ul class="price-features">
                     {% for feature in plan.features.all %}
-                    <li {% if not feature.is_available %}style="color: var(--text-light); text-decoration: line-through;"{% endif %}>
+                    <li {% if not feature.is_available %}style="color: var(--text-light);"{% endif %}>
                         {% if feature.is_available %}
                             {{ feature.title }}
                         {% else %}
