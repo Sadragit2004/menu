@@ -51,7 +51,7 @@ def verify_code(request):
                 AuthService.verify_code(security, code)
                 AuthService.activate_user(user)
                 login(request, user)
-                messages.success(request, "✅ ورود با موفقیت انجام شد.")
+                messages.success(request, " ورود با موفقیت انجام شد.")
                 return redirect(next_url or "main:index")
             except Exception as e:
                 messages.error(request, str(e))
