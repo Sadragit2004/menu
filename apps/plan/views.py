@@ -105,11 +105,10 @@ def purchase_plan(request, plan_slug):
 # apps/plan/views.py
 from apps.menu.models.menufreemodels.models import Restaurant
 
-
 @login_required
 def shop_cart(request):
     """
-    نمایش سبد خرید کاربر با آخرین پلن انتخابی (پرداخت نشده) و محصولات
+    نمایش پلن انتخابی کاربر - بدون سبد خرید
     """
     # دریافت آخرین پلن پرداخت نشده کاربر
     latest_plan_order = PlanOrder.objects.filter(
@@ -117,20 +116,11 @@ def shop_cart(request):
         isPaid=False
     ).select_related('plan', 'restaurant').order_by('-createdAt').first()
 
-    # دریافت محصولات فعال
-    products = Product.objects.filter(
-        is_active=True
-    ).prefetch_related(
-        'features',
-        'gallery'
-    ).order_by('-publish_date')
-
     # دریافت رستوران‌های کاربر
     user_restaurants = Restaurant.objects.filter(owner=request.user)
 
     selected_plan = None
     plan_cost = 0
-    stands_cost = 0
     tax_cost = 0
     total_cost = 0
     needs_restaurant_selection = False
@@ -144,25 +134,21 @@ def shop_cart(request):
             needs_restaurant_selection = True
 
         # محاسبات مالی
-        stands_cost = 0
-        tax_cost = int((plan_cost + stands_cost) * 0.09)
-        total_cost = plan_cost + stands_cost + tax_cost
+        tax_cost = int(plan_cost * 0.09)
+        total_cost = plan_cost + tax_cost
 
     context = {
         'selected_plan': selected_plan,
         'plan_cost': plan_cost,
-        'stands_cost': stands_cost,
         'tax_cost': tax_cost,
         'total_cost': total_cost,
         'latest_plan_order': latest_plan_order,
-        'products': products,
         'user_restaurants': user_restaurants,
         'has_restaurants': user_restaurants.exists(),
-        'needs_restaurant_selection': needs_restaurant_selection,  # فیلد جدید
+        'needs_restaurant_selection': needs_restaurant_selection,
     }
 
     return render(request, 'plan_app/shop_cart.html', context)
-
 
 
 @login_required

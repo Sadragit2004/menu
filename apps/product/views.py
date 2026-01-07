@@ -9,6 +9,8 @@ from .models import Product, ProductOrder, ProductOrderDetail
 from apps.plan.models import Plan
 from django.contrib.auth.decorators import login_required
 from apps.user.model.user import CustomUser
+from django.contrib import messages
+
 
 def get_or_create_cart(request):
     """دریافت یا ایجاد سبد خرید برای کاربر"""
@@ -309,52 +311,33 @@ from django.utils import timezone
 import json
 from .models import ProductOrder, ProductOrderDetail, OrderDetailInfo, Plan
 
-
 @login_required
 def checkout_view(request, order_id):
-    """صفحه checkout با داده‌های داینامیک و اطلاعات قبلی کاربر"""
+    """صفحه checkout بسیار ساده"""
     # دریافت سفارش با بررسی مالکیت
     cart = get_object_or_404(ProductOrder, id=order_id, user=request.user, status='draft')
 
-    if cart.items.count() == 0:
-        return redirect('cart_empty')
+    # بررسی آیا پلنی وجود دارد
+    plan = cart.plan
+    if not plan:
+        messages.error(request, 'پلنی برای این سفارش یافت نشد')
+        return redirect('plan:plan_list')
 
-    # محاسبه قیمت‌ها (این کار در save مدل انجام می‌شود)
-    cart.calculate_prices()
+    # محاسبه قیمت‌ها
+    plan_price = plan.price if plan.price else 0
+    tax_amount = int(plan_price * 0.09)
+    total_price = plan_price + tax_amount
 
-    # هزینه‌های اضافی
-    shipping_cost = 0  # هزینه ارسال
-
-    # مالیات قبلاً در مدل محاسبه شده است
-    total_with_tax = cart.final_price + shipping_cost
-
-    # بررسی آیا اطلاعات قبلی برای این سفارش وجود دارد
-    previous_info = None
-    try:
-        previous_info = OrderDetailInfo.objects.get(product_order=cart)
-    except OrderDetailInfo.DoesNotExist:
-        # اگر اطلاعات برای این سفارش وجود ندارد، اطلاعات آخرین سفارش کاربر را پیدا کن
-        previous_orders = ProductOrder.objects.filter(
-            user=request.user
-        ).exclude(id=order_id).order_by('-createdAt')
-
-        for order in previous_orders:
-            try:
-                previous_info = OrderDetailInfo.objects.get(product_order=order)
-                break
-            except OrderDetailInfo.DoesNotExist:
-                continue
+    # دریافت شماره موبایل کاربر
+    mobile_number = request.user.mobileNumber
 
     context = {
-        'cart': cart,
-        'plan': cart.plan,
-        'items': cart.items.all(),
-        'subtotal': cart.total_price_without_tax,  # قیمت بدون مالیات
-        'tax': cart.tax_amount,  # مبلغ مالیات ۹٪
-        'shipping': shipping_cost,
-        'total': total_with_tax,  # قیمت نهایی با مالیات
+        'plan': plan,
+        'plan_price': plan_price,
+        'tax_amount': tax_amount,
+        'total_price': total_price,
         'order_id': order_id,
-        'previous_info': previous_info  # اطلاعات قبلی کاربر
+        'mobile_number': mobile_number,
     }
 
     return render(request, 'plan_app/checkout.html', context)
@@ -406,80 +389,19 @@ def apply_discount(request, order_id):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'خطا: {str(e)}'})
 
+
 @require_http_methods(["POST"])
 def complete_order(request, order_id):
-    """تکمیل سفارش و هدایت مستقیم به درگاه پرداخت"""
+    """هدایت مستقیم به درگاه پرداخت بدون ذخیره داده"""
     if not request.user.is_authenticated:
-        return JsonResponse({'success': False, 'message': 'لطفاً وارد شوید'})
+        messages.error(request, 'لطفاً وارد شوید')
+        return redirect('accounts:send_mobile')
 
     try:
-        # بررسی مالکیت سفارش
+        # فقط بررسی مالکیت سفارش
         cart = get_object_or_404(ProductOrder, id=order_id, user=request.user, status='draft')
 
-        if cart.items.count() == 0:
-            return JsonResponse({'success': False, 'message': 'سبد خرید خالی است'})
-
-        # دریافت اطلاعات از فرم
-        full_name = request.POST.get('full_name')
-        phone_number = request.POST.get('phone_number')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        province = request.POST.get('province')
-        postal_code = request.POST.get('postal_code')
-        description = request.POST.get('description')
-        discount_code = request.POST.get('discount_code', '')
-
-        # اعتبارسنجی داده‌ها
-        if not all([full_name, phone_number, address, city, province, postal_code]):
-            return JsonResponse({'success': False, 'message': 'لطفاً تمام فیلدهای ضروری را پر کنید'})
-
-        # محاسبه تخفیف
-        discount_amount = 0
-        if discount_code:
-            if discount_code == "WELCOME10":
-                discount_amount = int(cart.final_price * 0.1)
-            elif discount_code == "SAVE5":
-                discount_amount = int(cart.final_price * 0.05)
-            elif discount_code == "FIXED5000" and cart.final_price >= 100000:
-                discount_amount = 5000
-
-        # اعمال تخفیف بر روی قیمت نهایی
-        if discount_amount > 0:
-            cart.final_price -= discount_amount
-            cart.save()
-
-        # ایجاد یا بروزرسانی اطلاعات سفارش
-        order_info, created = OrderDetailInfo.objects.get_or_create(
-            product_order=cart,
-            defaults={
-                'full_name': full_name,
-                'phone_number': phone_number,
-                'email': email,
-                'address': address,
-                'city': city,
-                'province': province,
-                'codePost': postal_code,
-                'description': description,
-                'discount_code': discount_code if discount_amount > 0 else '',
-                'discount_amount': discount_amount
-            }
-        )
-
-        if not created:
-            order_info.full_name = full_name
-            order_info.phone_number = phone_number
-            order_info.email = email
-            order_info.address = address
-            order_info.city = city
-            order_info.province = province
-            order_info.codePost = postal_code
-            order_info.description = description
-            order_info.discount_code = discount_code if discount_amount > 0 else ''
-            order_info.discount_amount = discount_amount
-            order_info.save()
-
-        # تغییر وضعیت سفارش به pending
+        # تغییر وضعیت سفارش به pending (اختیاری)
         cart.status = 'pending'
         cart.save()
 
@@ -487,8 +409,14 @@ def complete_order(request, order_id):
         from apps.peyment.views import unified_send_request
         return unified_send_request(request, 'product', cart.id)
 
+    except ProductOrder.DoesNotExist:
+        messages.error(request, 'سفارش یافت نشد')
+        return redirect('plan:plan_list')
     except Exception as e:
-        return JsonResponse({'success': False, 'message': f'خطا در ثبت سفارش: {str(e)}'})
+        logger.error(f"Error in complete_order: {str(e)}")
+        messages.error(request, 'خطا در اتصال به درگاه پرداخت')
+        return redirect('product:checkout_view', order_id=order_id)
+
 
 def get_or_create_cart(request):
     """دریافت یا ایجاد سبد خرید - تابع کمکی"""
@@ -516,8 +444,7 @@ def create_checkout_session(request):
         return redirect('login')
 
     cart = get_or_create_cart(request)
-    if not cart or cart.items.count() == 0:
-        return redirect('cart_empty')
+
 
     # redirect به صفحه checkout با ID سفارش
     return redirect('product:checkout', order_id=cart.id)

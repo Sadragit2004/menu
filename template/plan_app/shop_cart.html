@@ -28,191 +28,60 @@
             color: var(--dark-color);
             line-height: 1.6;
             padding: 20px;
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
         }
 
         /* Header */
         .page-header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 25px;
-            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            z-index: 10;
         }
 
         .page-header h1 {
             color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
         }
 
         .page-header p {
             color: var(--gray-color);
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto;
+            font-size: 1.1rem;
         }
 
-        /* Plan Status Section */
-        .plan-status-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: var(--radius);
-            padding: 35px;
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .plan-status-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            animation: float 20s linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .status-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .status-title {
-            font-size: 1.6rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .status-icon {
-            background: rgba(255, 255, 255, 0.2);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .status-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-        }
-
-        .plan-details {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        /* Selected Plan Section */
+        .selected-plan-section {
+            background-color: white;
             border-radius: var(--radius);
             padding: 25px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .plan-name {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .plan-price {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .plan-description {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 25px;
-            line-height: 1.8;
-        }
-
-        .plan-features-list {
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .plan-feature-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .plan-feature-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-        }
-
-        .feature-check {
-            color: #10b981;
-            font-size: 1.2rem;
-        }
-
-        /* Restaurant Selection Section */
-        .restaurant-section {
-            background: white;
-            border-radius: var(--radius);
-            padding: 30px;
             box-shadow: var(--shadow);
-            margin-bottom: 40px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border-right: 5px solid var(--primary-color);
+            position: relative;
         }
 
-        .restaurant-section.attention {
-            border-color: #f59e0b;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-        }
-
-        .section-header {
+        .plan-section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--dark-color);
-            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -222,554 +91,862 @@
             color: var(--primary-color);
         }
 
-        .restaurant-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .restaurant-card {
-            background: var(--light-color);
-            border: 2px solid var(--border-color);
+        .plan-card {
+            background-color: #f8fafc;
             border-radius: var(--radius);
             padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
-        .restaurant-card:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.1);
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
-        .restaurant-card.selected {
-            border-color: var(--secondary-color);
-            background: #f0fdf4;
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
         }
 
-        .restaurant-card::before {
-            content: '';
-            position: absolute;
+        .plan-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-features i {
+            color: var(--secondary-color);
+            margin-left: 10px;
+        }
+
+        /* Restaurant Selection Modal */
+        .restaurant-modal {
+            display: none;
+            position: fixed;
             top: 0;
             right: 0;
-            width: 0;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1));
-            transition: width 0.3s ease;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
         }
 
-        .restaurant-card.selected::before {
-            width: 100%;
+        .restaurant-modal.active {
+            display: flex;
+        }
+
+        .restaurant-modal-content {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .restaurant-modal-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            text-align: center;
+        }
+
+        .restaurant-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .restaurant-item {
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .restaurant-item:hover {
+            border-color: var(--primary-color);
+            background-color: #f8fafc;
+        }
+
+        .restaurant-item.selected {
+            border-color: var(--secondary-color);
+            background-color: #f0fdf4;
         }
 
         .restaurant-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
         }
 
         .restaurant-address {
             color: var(--gray-color);
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-
-        .restaurant-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
             font-size: 0.9rem;
-            color: var(--gray-color);
         }
 
-        .restaurant-status {
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
 
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        /* No Restaurant Message */
-        .no-restaurant-message {
-            text-align: center;
-            padding: 50px 30px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: var(--radius);
-            border: 2px dashed var(--border-color);
-        }
-
-        .no-restaurant-icon {
-            font-size: 3.5rem;
-            color: var(--gray-color);
-            margin-bottom: 20px;
-        }
-
-        .no-restaurant-title {
-            font-size: 1.8rem;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .no-restaurant-description {
-            color: var(--gray-color);
-            margin-bottom: 30px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.7;
-        }
-
-        .create-restaurant-btn {
-            background: var(--primary-color);
+        .select-restaurant-btn {
+            background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 25px;
             border-radius: var(--radius);
             font-size: 1rem;
-            font-weight: 500;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            text-decoration: none;
+            transition: background-color 0.3s;
         }
 
-        .create-restaurant-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        .select-restaurant-btn:hover {
+            background-color: #0da271;
         }
 
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            padding: 15px 35px;
-            border-radius: var(--radius);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            border: none;
-            text-decoration: none;
-            min-width: 200px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary-color) 0%, #0da271 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        /* Alerts */
-        .alerts-container {
-            margin-bottom: 30px;
-        }
-
+        /* Alert Messages */
         .alert {
-            padding: 20px 25px;
+            padding: 15px 20px;
             border-radius: var(--radius);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            gap: 10px;
         }
 
         .alert-success {
-            background: #d1fae5;
+            background-color: #d1fae5;
             color: #065f46;
             border: 1px solid #a7f3d0;
         }
 
         .alert-warning {
-            background: #fef3c7;
+            background-color: #fef3c7;
             color: #92400e;
             border: 1px solid #fde68a;
         }
 
         .alert-info {
-            background: #dbeafe;
+            background-color: #dbeafe;
             color: #1e40af;
             border: 1px solid #bfdbfe;
         }
 
-        .alert-icon {
-            font-size: 1.5rem;
+        /* Invoice Section (Desktop) */
+        .invoice-section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            z-index: 5;
         }
 
-        /* Responsive */
+        .invoice-section.sticky {
+            position: sticky;
+            top: 20px;
+        }
+
+        .invoice-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .invoice-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+        }
+
+        .discount {
+            color: var(--secondary-color);
+        }
+
+        .final-price {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .checkout-btn-desktop {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .checkout-btn-desktop:hover {
+            background-color: #0da271;
+        }
+
+        .checkout-btn-desktop i {
+            font-size: 1.2rem;
+        }
+
+        /* Mobile Fixed Checkout Button */
+        .mobile-checkout-container {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background-color: white;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            z-index: 999;
+        }
+
+        .mobile-checkout-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .mobile-final-price {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .mobile-checkout-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mobile-checkout-btn:hover {
+            background-color: #0da271;
+        }
+
+        /* Floating Button */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .invoice-section {
+                display: none;
+            }
+        }
+
         @media (max-width: 768px) {
-            body {
-                padding: 15px;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .plan-status-section {
-                padding: 25px 20px;
-            }
-
-            .status-header {
+            .plan-section-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
 
-            .plan-name {
-                font-size: 1.6rem;
+            .mobile-checkout-container {
+                display: block;
             }
 
-            .plan-price {
-                font-size: 2rem;
+            body {
+                padding-bottom: 80px;
             }
 
-            .plan-features-list {
-                grid-template-columns: 1fr;
-            }
-
-            .restaurant-list {
-                grid-template-columns: 1fr;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .action-btn {
-                width: 100%;
-            }
-
-            .restaurant-section {
-                padding: 20px;
+            .floating-btn {
+                bottom: 90px;
+                left: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
             }
         }
 
         @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+
             .page-header h1 {
-                font-size: 1.7rem;
-            }
-
-            .plan-status-section {
-                padding: 20px 15px;
-            }
-
-            .plan-name {
-                font-size: 1.4rem;
-            }
-
-            .plan-price {
                 font-size: 1.8rem;
             }
 
-            .section-title {
+            .plan-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .mobile-checkout-container {
+                padding: 12px 15px;
+            }
+
+            .mobile-final-price {
                 font-size: 1.3rem;
             }
 
-            .action-btn {
-                padding: 12px 25px;
-                font-size: 1rem;
+            .mobile-checkout-btn {
+                padding: 10px 18px;
+                font-size: 0.95rem;
+            }
+
+            .floating-btn {
+                bottom: 90px;
+                left: 15px;
+            }
+        }
+
+        /* Fix for desktop scrolling issue */
+        @media (min-width: 1025px) {
+            .main-content {
+                padding-bottom: 40px;
+            }
+
+            .invoice-section {
+                position: sticky;
+                top: 20px;
+                transition: top 0.3s ease;
+            }
+
+            .invoice-section.scrolled {
+                top: 100px;
             }
         }
     </style>
+</head>
+<body>
+
 
     <!-- نمایش پیام‌های Django -->
     {% if messages %}
         <div class="alerts-container">
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
-                    {% if message.tags == 'success' %}
-                        <i class="fas fa-check-circle alert-icon"></i>
-                    {% elif message.tags == 'warning' %}
-                        <i class="fas fa-exclamation-triangle alert-icon"></i>
-                    {% elif message.tags == 'error' %}
-                        <i class="fas fa-times-circle alert-icon"></i>
-                    {% else %}
-                        <i class="fas fa-info-circle alert-icon"></i>
-                    {% endif %}
+                    <i class="fas fa-info-circle"></i>
                     {{ message }}
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <header class="page-header">
-        <h1>مدیریت پلن رستوران</h1>
-        <p>در این صفحه می‌توانید پلن خود را مدیریت کنید و رستوران مورد نظر را انتخاب نمایید</p>
-    </header>
-
-    <!-- Selected Plan Section -->
-    <section class="plan-status-section">
-        <div class="status-header">
-            <div class="status-title">
-                <div class="status-icon">
-                    <i class="fas fa-crown"></i>
+    <div class="container">
+        <div class="main-content">
+            <!-- Selected Plan Section -->
+            <section class="selected-plan-section">
+                <div class="plan-section-header">
+                    <h2 class="section-title"><i class="fas fa-crown"></i> پلن انتخابی</h2>
                 </div>
-                وضعیت پلن شما
-            </div>
-            <div class="status-badge">
-                {% if selected_plan %}فعال{% else %}غیرفعال{% endif %}
-            </div>
-        </div>
 
-        {% if selected_plan %}
-            <div class="plan-details">
-                <div class="plan-name">{{ selected_plan.name }}</div>
-                <div class="plan-price">{{ plan_cost|floatformat:"0" }} تومان</div>
-                <p class="plan-description">{{ selected_plan.description|default:"توضیحات پلن" }}</p>
-
-                <ul class="plan-features-list">
-                    {% for feature in selected_plan.features.all %}
-                        <li class="plan-feature-item">
-                            <i class="fas fa-check feature-check"></i>
-                            <div>
-                                <strong>{{ feature.title }}:</strong>
-                                <span>{{ feature.value|default:"" }}</span>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="plan-feature-item">
-                            <i class="fas fa-info-circle feature-check"></i>
-                            <div>ویژگی‌ای برای این پلن تعریف نشده است</div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% else %}
-            <div class="plan-details">
-                <div class="plan-name">بدون پلن فعال</div>
-                <p class="plan-description" style="font-size: 1.3rem;">
-                    شما هنوز پلنی انتخاب نکرده‌اید. برای شروع استفاده از خدمات منو بساز، لطفاً یک پلن انتخاب کنید.
-                </p>
-            </div>
-        {% endif %}
-    </section>
-
-    <!-- Restaurant Selection Section -->
-    <section class="restaurant-section {% if needs_restaurant_selection %}attention{% endif %}">
-        <div class="section-header">
-            <h2 class="section-title">
-                <i class="fas fa-utensils"></i>
-                رستوران‌های شما
-            </h2>
-            {% if selected_plan and latest_plan_order.restaurant %}
-                <div style="color: var(--secondary-color); font-weight: 500; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-check-circle"></i>
-                    انتخاب شده: {{ latest_plan_order.restaurant.title }}
-                </div>
-            {% endif %}
-        </div>
-
-        {% if needs_restaurant_selection %}
-            <div class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle alert-icon"></i>
-                <div>
-                    <strong>توجه:</strong> لطفاً یک رستوران برای پلن انتخابی خود انتخاب کنید.
-                    {% if user_restaurants %}
-                        لیست رستوران‌های شما در زیر نمایش داده شده است.
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
-
-        {% if user_restaurants %}
-            <form method="post" action="{% url 'plan:assign_restaurant' %}">
-                {% csrf_token %}
-                <input type="hidden" name="restaurant_id" id="selectedRestaurantId">
-
-                <div class="restaurant-list">
-                    {% for restaurant in user_restaurants %}
-                        <div class="restaurant-card {% if latest_plan_order.restaurant.id == restaurant.id %}selected{% endif %}"
-                             onclick="selectRestaurant({{ restaurant.id }})">
-                            <h3 class="restaurant-name">
-                                <i class="fas fa-store"></i>
-                                {{ restaurant.title }}
-                            </h3>
-
-                            {% if restaurant.address %}
-                                <p class="restaurant-address">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    {{ restaurant.address }}
-                                </p>
-                            {% endif %}
-
-                            <div class="restaurant-meta">
-                                <span>شناسه: {{ restaurant.id }}</span>
-                                <span class="restaurant-status {% if restaurant.is_active %}status-active{% else %}status-pending{% endif %}">
-                                    {% if restaurant.is_active %}
-                                        فعال
-                                    {% else %}
-                                        در انتظار
-                                    {% endif %}
-                                </span>
-                            </div>
+                {% if selected_plan %}
+                    <div class="plan-card">
+                        <div class="plan-header">
+                            <div class="plan-name">{{ selected_plan.name }}</div>
+                            <div class="plan-price">{{ plan_cost|floatformat:"0" }} تومان</div>
                         </div>
-                    {% endfor %}
-                </div>
+                        <p>{{ selected_plan.description|default:"توضیحات پلن" }}</p>
+                        <ul class="plan-features">
+                            {% for feature in selected_plan.features.all %}
+                                <li><i class="fas fa-check"></i> {{ feature.title }}: {{ feature.value|default:"" }}</li>
+                            {% empty %}
+                                <li>ویژگی‌ای برای این پلن تعریف نشده است</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
 
-                <div class="action-buttons">
                     {% if needs_restaurant_selection %}
-                        <button type="submit" class="action-btn btn-primary" id="submitRestaurantBtn" disabled>
-                            <i class="fas fa-check"></i>
-                            تأیید انتخاب رستوران
-                        </button>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            لطفاً یک رستوران برای پلن انتخابی خود انتخاب کنید.
+                            <button id="selectRestaurantBtn" style="margin-right: 10px; background-color: var(--secondary-color); color: white; border: none; padding: 5px 15px; border-radius: var(--radius); cursor: pointer;">
+                                انتخاب رستوران
+                            </button>
+                        </div>
+                    {% elif latest_plan_order.restaurant %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            رستوران انتخاب شده: <strong>{{ latest_plan_order.restaurant.title }}</strong>
+                        </div>
                     {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        شما هنوز پلنی انتخاب نکرده‌اید. لطفاً ابتدا از صفحه <a href="{% url 'plan:plan_list' %}" style="color: var(--primary-color); font-weight: bold;">لیست پلن‌ها</a> یک پلن انتخاب کنید.
+                    </div>
+                {% endif %}
+            </section>
 
-                  
-                </div>
-            </form>
-        {% else %}
-            <div class="no-restaurant-message">
-                <div class="no-restaurant-icon">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <h3 class="no-restaurant-title">شما هیچ رستورانی ندارید</h3>
-                <p class="no-restaurant-description">
-                    برای استفاده از پلن انتخابی، ابتدا باید یک رستوران ایجاد کنید.
-                    پس از ایجاد رستوران می‌توانید آن را به پلن خود متصل کنید.
-                </p>
+        </div>
 
+        <!-- Desktop Invoice Section -->
+        <aside class="invoice-section" id="invoiceSection">
+            <h2 class="section-title"><i class="fas fa-receipt"></i> فاکتور</h2>
+            <div class="invoice-item">
+                <span>قیمت پلن:</span>
+                <span class="plan-price">{{ plan_cost|floatformat:"0" }} تومان</span>
             </div>
-        {% endif %}
-    </section>
-
-    <!-- Action Buttons Section -->
-    <div class="action-buttons">
-        {% if selected_plan %}
-            {% if not needs_restaurant_selection %}
-                <a href="{% url 'plan:plan_list' %}" class="action-btn btn-secondary">
-                    <i class="fas fa-exchange-alt"></i>
-                    تغییر پلن
-                </a>
+            <div class="invoice-item">
+                <span>مالیات (9%):</span>
+                <span id="desktopTaxPrice">{{ tax_cost|floatformat:"0" }} تومان</span>
+            </div>
+            <div class="invoice-item invoice-total">
+                <span>قیمت نهایی:</span>
+                <span class="final-price" id="desktopFinalPrice">{{ total_cost|floatformat:"0" }} تومان</span>
+            </div>
+            {% if selected_plan %}
+                <button class="checkout-btn-desktop" id="desktopCheckoutBtn">
+                    <i class="fas fa-shopping-bag"></i>
+                    پرداخت و تکمیل خرید
+                </button>
+            {% else %}
+                <button class="checkout-btn-desktop" disabled style="background-color: var(--gray-color);">
+                    <i class="fas fa-shopping-bag"></i>
+                    ابتدا یک پلن انتخاب کنید
+                </button>
             {% endif %}
-        {% else %}
-            <a href="{% url 'plan:plan_list' %}" class="action-btn btn-primary">
-                <i class="fas fa-shopping-cart"></i>
-                مشاهده و انتخاب پلن
-            </a>
-        {% endif %}
-
-        {% if selected_plan and not needs_restaurant_selection %}
-            <button onclick="window.location.href='/panel/'" class="action-btn btn-primary">
-                <i class="fas fa-rocket"></i>
-                رفتن به پنل مدیریت
-            </button>
-        {% endif %}
+        </aside>
     </div>
 
+    <!-- Restaurant Selection Modal -->
+    <div class="restaurant-modal" id="restaurantModal">
+        <div class="restaurant-modal-content">
+            <h2 class="restaurant-modal-title">انتخاب رستوران</h2>
+            <p style="text-align: center; margin-bottom: 20px; color: var(--gray-color);">لطفاً یک رستوران برای پلن انتخابی خود انتخاب کنید:</p>
+
+            <div class="restaurant-list" id="restaurantList">
+                {% for restaurant in user_restaurants %}
+                    <div class="restaurant-item" data-id="{{ restaurant.id }}">
+                        <div class="restaurant-name">{{ restaurant.title }}</div>
+                        {% if restaurant.address %}
+                            <div class="restaurant-address">{{ restaurant.address|truncatechars:50 }}</div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div style="text-align: center; padding: 20px; color: var(--gray-color);">
+                        <i class="fas fa-utensils" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>شما هیچ رستورانی ندارید. لطفاً ابتدا یک رستوران ایجاد کنید.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="modal-buttons">
+                <button class="select-restaurant-btn" id="confirmRestaurantBtn" {% if not user_restaurants %}disabled{% endif %}>
+                    تأیید و ادامه
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Fixed Checkout Button -->
+    <div class="mobile-checkout-container">
+        <div class="mobile-checkout-content">
+            <div class="mobile-final-price" id="mobileFinalPrice">{{ total_cost|floatformat:"0" }} تومان</div>
+            {% if selected_plan %}
+                <button class="mobile-checkout-btn" id="mobileCheckoutBtn">
+                    <i class="fas fa-shopping-bag"></i>
+                    پرداخت
+                </button>
+            {% else %}
+                <button class="mobile-checkout-btn" disabled style="background-color: var(--gray-color);">
+                    <i class="fas fa-shopping-bag"></i>
+                    انتخاب پلن
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Floating Cart Button -->
+    <div class="floating-btn" id="floatingBtn">
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+
+    <!-- CSRF Token for JavaScript -->
+    {% csrf_token %}
+
     <script>
-        // تابع انتخاب رستوران
-        function selectRestaurant(restaurantId) {
-            console.log('[DEBUG] Selecting restaurant:', restaurantId);
+        // Global variables and functions that need to be accessible from HTML onclick attributes
+        let selectedRestaurantId = null;
+        let csrftoken = '';
 
-            // Remove selected class from all cards
-            const cards = document.querySelectorAll('.restaurant-card');
-            cards.forEach(card => {
-                card.classList.remove('selected');
-            });
+        // Show notification - globally accessible
+        function showNotification(message, type = 'success') {
+            console.log('[DEBUG] showNotification called:', { message, type });
 
-            // Add selected class to clicked card
-            const selectedCard = document.querySelector(`.restaurant-card[onclick*="${restaurantId}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-            }
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.id = 'debug-notification-' + Date.now();
 
-            // Set hidden input value
-            const hiddenInput = document.getElementById('selectedRestaurantId');
-            if (hiddenInput) {
-                hiddenInput.value = restaurantId;
-            }
+            console.log('[DEBUG] Notification element created:', notification.id);
 
-            // Enable submit button
-            const submitBtn = document.getElementById('submitRestaurantBtn');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-            }
+            // Style and add to DOM
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = type === 'error' ? '#ef4444' :
+                                               (type === 'warning' ? '#f59e0b' : '#10b981');
+            notification.style.color = 'white';
+            notification.style.padding = '15px 25px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            notification.style.zIndex = '9999';
+            notification.style.minWidth = '300px';
+            notification.style.textAlign = 'center';
+            notification.style.fontFamily = 'system-ui, -apple-system, sans-serif';
 
-            console.log('[DEBUG] Restaurant selected:', restaurantId);
+            document.body.appendChild(notification);
+            console.log('[DEBUG] Notification added to DOM');
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                console.log('[DEBUG] Removing notification:', notification.id);
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                        console.log('[DEBUG] Notification removed from DOM');
+                    }
+                }, 300);
+            }, 3000);
         }
 
-        // نمایش پیام موفقیت
-        {% if messages %}
-            setTimeout(() => {
-                const alerts = document.querySelectorAll('.alert');
-                alerts.forEach(alert => {
-                    alert.style.opacity = '0';
-                    alert.style.transition = 'opacity 0.5s ease';
-                    setTimeout(() => {
-                        if (alert.parentNode) {
-                            alert.parentNode.removeChild(alert);
-                        }
-                    }, 500);
-                });
-            }, 5000);
-        {% endif %}
+        try {
+            console.log('[INIT] Script loaded successfully!');
 
-        // Auto-select already selected restaurant
-        document.addEventListener('DOMContentLoaded', function() {
-            {% if latest_plan_order.restaurant %}
-                const selectedRestaurantId = {{ latest_plan_order.restaurant.id }};
-                const hiddenInput = document.getElementById('selectedRestaurantId');
-                if (hiddenInput) {
-                    hiddenInput.value = selectedRestaurantId;
+            // 1. بررسی CSRF Token
+            function getCsrfToken() {
+                const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+                console.log('[DEBUG] CSRF Input found:', csrfInput ? 'Yes' : 'No');
+
+                if (csrfInput) {
+                    console.log('[DEBUG] CSRF Input value length:', csrfInput.value.length);
+                    return csrfInput.value;
                 }
-            {% endif %}
-        });
-    </script>
+
+                console.log('[DEBUG] Checking CSRF in cookies...');
+                const cookieValue = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('csrftoken='))
+                    ?.split('=')[1];
+
+                console.log('[DEBUG] CSRF Cookie found:', cookieValue ? 'Yes' : 'No');
+                if (cookieValue) {
+                    console.log('[DEBUG] CSRF Cookie value length:', cookieValue.length);
+                }
+
+                return cookieValue || '';
+            }
+
+            // ذخیره توکن
+            csrftoken = getCsrfToken();
+            console.log('[DEBUG] Final CSRF Token:', {
+                exists: !!csrftoken,
+                length: csrftoken.length,
+                first10: csrftoken.substring(0, 10) + '...'
+            });
+
+            console.log('[DEBUG] Variables initialized:', {
+                selectedRestaurantId
+            });
+
+            // تابع assignRestaurant
+            async function assignRestaurant(restaurantId) {
+                console.log('[DEBUG] ========== assignRestaurant START ==========');
+                console.log('[DEBUG] Restaurant ID:', restaurantId);
+
+                try {
+                    const formData = new FormData();
+                    formData.append('restaurant_id', restaurantId);
+
+                    console.log('[DEBUG] FormData entries:');
+                    for (let pair of formData.entries()) {
+                        console.log(`[DEBUG]   ${pair[0]}: ${pair[1]}`);
+                    }
+
+                    const url = "{% url 'plan:assign_restaurant' %}";
+                    console.log('[DEBUG] Sending to URL:', url);
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+
+                    console.log('[DEBUG] Response status:', response.status);
+                    const data = await response.json();
+                    console.log('[DEBUG] Response data:', data);
+
+                    if (data.success) {
+                        console.log('[DEBUG] Restaurant assigned successfully');
+                        showNotification('رستوران با موفقیت انتخاب شد');
+                        setTimeout(() => {
+                            console.log('[DEBUG] Reloading page...');
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        console.error('[DEBUG] Failed to assign restaurant:', data.message);
+                        showNotification(data.message || 'خطا در انتخاب رستوران', 'error');
+                    }
+                } catch (error) {
+                    console.error('[DEBUG] Error in assignRestaurant:', {
+                        name: error.name,
+                        message: error.message
+                    });
+                    showNotification('خطا در انتخاب رستوران', 'error');
+                }
+
+                console.log('[DEBUG] ========== assignRestaurant END ==========');
+            }
+
+            // Checkout function
+            function proceedToCheckout() {
+                console.log('[DEBUG] ========== proceedToCheckout START ==========');
+
+                console.log('[DEBUG] Current state:', {
+                    selected_plan: {% if selected_plan %}true{% else %}false{% endif %},
+                    needs_restaurant_selection: {% if needs_restaurant_selection %}true{% else %}false{% endif %}
+                });
+
+                {% if selected_plan %}
+                    {% if needs_restaurant_selection %}
+                        console.log('[DEBUG] Needs restaurant selection');
+                        showNotification('لطفاً ابتدا یک رستوران انتخاب کنید', 'warning');
+                        const restaurantModal = document.getElementById('restaurantModal');
+                        if (restaurantModal) {
+                            console.log('[DEBUG] Opening restaurant modal');
+                            restaurantModal.classList.add('active');
+                        } else {
+                            console.error('[DEBUG] Restaurant modal not found!');
+                        }
+                    {% else %}
+                        console.log('[DEBUG] Restaurant already selected, redirecting to checkout');
+                        console.log('[DEBUG] Redirect URL:', "{% url 'product:create_checkout' %}");
+                        window.location.href = "{% url 'product:create_checkout' %}";
+                    {% endif %}
+                {% else %}
+                    console.log('[DEBUG] No plan selected');
+                    showNotification('لطفاً ابتدا یک پلن انتخاب کنید', 'warning');
+                {% endif %}
+
+                console.log('[DEBUG] ========== proceedToCheckout END ==========');
+            }
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('[DEBUG] ========== DOMContentLoaded START ==========');
+                console.log('[DEBUG] DOM fully loaded and parsed');
+
+                // بررسی CSRF Token
+                console.log('[DEBUG] Checking CSRF token on init...');
+                if (!csrftoken) {
+                    console.error('[DEBUG] CRITICAL: CSRF Token not found!');
+                    console.log('[DEBUG] Document cookies:', document.cookie);
+                    console.log('[DEBUG] CSRF inputs:', document.querySelectorAll('input[name="csrfmiddlewaretoken"]').length);
+                    showNotification('خطای امنیتی! لطفاً صفحه را رفرش کنید.', 'error');
+                } else {
+                    console.log('[DEBUG] CSRF Token verified, length:', csrftoken.length);
+                }
+
+                // Restaurant selection button events
+                const selectRestaurantBtn = document.getElementById('selectRestaurantBtn');
+                console.log(`[DEBUG] Found select restaurant button:`, !!selectRestaurantBtn);
+
+                if (selectRestaurantBtn) {
+                    selectRestaurantBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('[DEBUG] Select restaurant button clicked');
+                        const restaurantModal = document.getElementById('restaurantModal');
+                        if (restaurantModal) {
+                            console.log('[DEBUG] Opening restaurant modal');
+                            restaurantModal.classList.add('active');
+                        } else {
+                            console.error('[DEBUG] Restaurant modal not found!');
+                        }
+                    });
+                }
+
+                // Restaurant item selection
+                const restaurantItems = document.querySelectorAll('.restaurant-item');
+                console.log(`[DEBUG] Found ${restaurantItems.length} restaurant items`);
+
+                restaurantItems.forEach((item, index) => {
+                    console.log(`[DEBUG] Restaurant item ${index + 1}:`, {
+                        id: item.dataset.id,
+                        hasDataId: !!item.dataset.id
+                    });
+
+                    item.addEventListener('click', () => {
+                        console.log(`[DEBUG] Restaurant item clicked:`, item.dataset.id);
+
+                        // Remove selected class from all items
+                        restaurantItems.forEach(i => i.classList.remove('selected'));
+
+                        // Add selected class to clicked item
+                        item.classList.add('selected');
+
+                        // Store selected restaurant ID
+                        selectedRestaurantId = parseInt(item.dataset.id);
+                        console.log('[DEBUG] Selected restaurant ID:', selectedRestaurantId);
+                    });
+                });
+
+                // Confirm restaurant selection
+                const confirmRestaurantBtn = document.getElementById('confirmRestaurantBtn');
+                console.log(`[DEBUG] Found confirm restaurant button:`, !!confirmRestaurantBtn);
+
+                if (confirmRestaurantBtn) {
+                    confirmRestaurantBtn.addEventListener('click', () => {
+                        console.log('[DEBUG] Confirm restaurant button clicked');
+                        if (selectedRestaurantId) {
+                            console.log('[DEBUG] Assigning restaurant:', selectedRestaurantId);
+                            assignRestaurant(selectedRestaurantId);
+                        } else {
+                            console.log('[DEBUG] No restaurant selected');
+                            showNotification('لطفاً یک رستوران انتخاب کنید', 'warning');
+                        }
+                    });
+                }
+
+                // Checkout button events
+                const desktopCheckoutBtn = document.getElementById('desktopCheckoutBtn');
+                const mobileCheckoutBtn = document.getElementById('mobileCheckoutBtn');
+
+                console.log(`[DEBUG] Found checkout buttons:`, {
+                    desktop: !!desktopCheckoutBtn,
+                    mobile: !!mobileCheckoutBtn
+                });
+
+                if (desktopCheckoutBtn) {
+                    desktopCheckoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('[DEBUG] Desktop checkout button clicked');
+                        proceedToCheckout();
+                    });
+                }
+
+                if (mobileCheckoutBtn) {
+                    mobileCheckoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('[DEBUG] Mobile checkout button clicked');
+                        proceedToCheckout();
+                    });
+                }
+
+                // Floating cart button
+                const floatingBtn = document.getElementById('floatingBtn');
+                console.log(`[DEBUG] Found floating button:`, !!floatingBtn);
+
+                if (floatingBtn) {
+                    floatingBtn.addEventListener('click', () => {
+                        console.log('[DEBUG] Floating cart button clicked');
+                        // Scroll to invoice section
+                        const invoiceSection = document.querySelector('.invoice-section');
+                        if (invoiceSection) {
+                            invoiceSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    });
+                }
+
+                console.log('[DEBUG] ========== DOMContentLoaded END ==========');
+                console.log('[DEBUG] Initialization complete!');
+            });
+
+            } catch (error) {
+                console.error('[FATAL] JavaScript execution failed:', error);
+                console.error('Error stack:', error.stack);
+            }
+
+            // Global error handler
+            window.addEventListener('error', function(event) {
+                console.error('[DEBUG] Global JavaScript Error:', {
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno
+                });
+            });
+
+            // Unhandled promise rejection
+            window.addEventListener('unhandledrejection', function(event) {
+                console.error('[DEBUG] Unhandled Promise Rejection:', {
+                    reason: event.reason,
+                    promise: event.promise
+                });
+            });
+        </script>
 
 {% endblock %}
