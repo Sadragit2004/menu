@@ -311,9 +311,9 @@ class UnifiedVerifyView(LoginRequiredMixin, View):
                     # پاک کردن session
                     self.clear_session(request)
 
-                    success_message = f'پرداخت موفقیت‌آمیز بود'
+                 
                     if ref_id:
-                        success_message += f' - کد رهگیری: {ref_id}'
+                        success_message += f'{ref_id}'
 
                     return redirect('peyment:show_success', success_message)
                 else:
