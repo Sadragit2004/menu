@@ -39,16 +39,6 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        .ticket-border {
-            background: linear-gradient(90deg, #10b981 50%, transparent 50%),
-                        linear-gradient(90deg, #10b981 50%, transparent 50%),
-                        linear-gradient(0deg, #10b981 50%, transparent 50%),
-                        linear-gradient(0deg, #10b981 50%, transparent 50%);
-            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-            background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
-            background-position: 0 0, 0 100%, 0 0, 100% 0;
-            padding: 10px;
-        }
         .copy-btn {
             transition: all 0.2s;
         }
@@ -59,7 +49,6 @@
             transform: translateY(0);
         }
 
-        /* responsive fixes */
         @media (max-width: 640px) {
             body {
                 padding: 10px;
@@ -86,7 +75,7 @@
     </div>
 
     <div class="w-full max-w-md md:max-w-lg mx-auto">
-        <!-- کارت اصلی - کامپکت -->
+        <!-- کارت اصلی -->
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden success-animation max-h-[90vh] overflow-y-auto">
 
             <!-- هدر رنگی -->
@@ -154,11 +143,7 @@
                                                       border-blue-200 rounded-lg p-3 text-center">
                             <div class="font-mono font-bold text-lg md:text-xl text-blue-700 tracking-wider"
                                  id="tracking-number">
-                                {% if 'کد رهگیری:' in message %}
-                                    {{ message|split:':'|last|trim }}
-                                {% else %}
-                                    {{ message }}
-                                {% endif %}
+                                {{ tracking_code }}
                             </div>
                             <div class="text-blue-600 text-xs mt-2">
                                 <i class="fas fa-info-circle ml-1"></i>
@@ -194,6 +179,17 @@
                                 <i class="fas fa-check ml-1"></i>
                                 موفق
                             </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- پیام کامل -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 fade-in">
+                    <div class="flex items-start">
+                        <i class="fas fa-comment-alt text-blue-500 text-lg mt-0.5 ml-3"></i>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-blue-800 text-sm mb-2">پیام سیستم</h4>
+                            <p class="text-blue-700 text-sm">{{ message }}</p>
                         </div>
                     </div>
                 </div>
@@ -415,19 +411,16 @@
         }
 
         // استخراج کد رهگیری از پیام
-        function extractTrackingCode(message) {
-            const match = message.match(/کد رهگیری:\s*([^\s-]+)/);
-            return match ? match[1] : message;
-        }
-
-        // بروزرسانی کد رهگیری در صورت نیاز
-        window.addEventListener('DOMContentLoaded', () => {
-            const message = "{{ message }}";
+        function extractTrackingCode() {
+            const message = "{{ message|safe }}";
             if (message.includes('کد رهگیری:')) {
-                const trackingNumber = extractTrackingCode(message);
-                document.getElementById('tracking-number').textContent = trackingNumber;
+                const parts = message.split('کد رهگیری:');
+                if (parts.length > 1) {
+                    const trackingCode = parts[1].trim().split(' ')[0];
+                    document.getElementById('tracking-number').textContent = trackingCode;
+                }
             }
-        });
+        }
 
         // شروع تایمر
         startRedirectTimer();
@@ -436,6 +429,9 @@
         setTimeout(() => {
             document.getElementById('auto-redirect').style.display = 'block';
         }, 1000);
+
+        // استخراج کد رهگیری
+        extractTrackingCode();
 
         // جلوگیری از اسکرول اضافی
         document.body.style.overflow = 'hidden';
