@@ -4,317 +4,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
+    <title>پرداخت موفق - {{ title }}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: 'Vazirmatn', sans-serif;
         }
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .success-animation {
-            animation: successScale 0.5s ease-out;
-        }
-        @keyframes successScale {
-            0% { transform: scale(0.95); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .fade-in {
-            animation: fadeInUp 0.6s ease-out;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .pulse-effect {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .copy-btn {
-            transition: all 0.2s;
-        }
-        .copy-btn:hover {
-            transform: translateY(-2px);
-        }
-        .copy-btn:active {
-            transform: translateY(0);
+
+        /* استایل دسکتاپ */
+        @media (min-width: 768px) {
+            .desktop-container {
+                width: 500px;
+                margin: 0 auto;
+            }
+            .desktop-card {
+                padding: 40px;
+            }
+            .desktop-title {
+                font-size: 1.75rem;
+            }
+            .desktop-message {
+                font-size: 1.1rem;
+            }
         }
 
-        @media (max-width: 640px) {
-            body {
-                padding: 10px;
+        /* استایل موبایل */
+        @media (max-width: 767px) {
+            .mobile-container {
+                width: 100%;
+                padding: 16px;
             }
-            .mobile-padding {
-                padding: 1rem !important;
+            .mobile-card {
+                padding: 24px;
             }
-            .mobile-text {
-                font-size: 0.9rem !important;
+            .mobile-title {
+                font-size: 1.25rem;
             }
-            .mobile-header {
-                font-size: 1.5rem !important;
+            .mobile-message {
+                font-size: 0.95rem;
             }
+        }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .tracking-code {
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 1px;
+        }
+
+        .border-gradient {
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #10b981 0%, #059669 100%) border-box;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .timer-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
-    <!-- تایمر خودکار -->
-    <div id="auto-redirect" class="fixed top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2 z-50 hidden md:block">
-        <div class="flex items-center text-gray-700">
-            <i class="fas fa-clock ml-2"></i>
-            <span>بازگشت خودکار به پنل در <span id="countdown">8</span> ثانیه</span>
-        </div>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <!-- تایمر بازگشت خودکار -->
+    <div id="timer-badge" class="fixed top-4 left-4 bg-white shadow-lg rounded-lg px-4 py-2 z-50 hidden md:flex items-center">
+        <div class="w-2 h-2 bg-green-500 rounded-full ml-2 animate-pulse"></div>
+        <span class="text-gray-700 text-sm">
+            بازگشت به پنل در <span id="countdown" class="font-bold text-green-600">8</span> ثانیه
+        </span>
     </div>
 
-    <div class="w-full max-w-md md:max-w-lg mx-auto">
-        <!-- کارت اصلی -->
-        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden success-animation max-h-[90vh] overflow-y-auto">
+    <!-- کارت اصلی -->
+    <div class="desktop-container mobile-container">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border-gradient">
 
-            <!-- هدر رنگی -->
-            <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-5 px-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-xl md:text-2xl font-bold">
-                            <i class="fas fa-check-circle ml-2"></i>
-                            پرداخت موفق
-                        </h1>
-                        <p class="text-green-100 text-sm mt-1">تراکنش با موفقیت انجام شد</p>
+            <!-- هدر -->
+            <div class="border-b border-gray-100 py-6 px-6 text-center">
+                <div class="flex flex-col items-center">
+                    <!-- لوگو سایت -->
+                    <div class="mb-4">
+                        <div class="success-icon rounded-full flex items-center justify-center mx-auto shadow">
+                            <i class="fas fa-check text-white text-2xl"></i>
+                        </div>
                     </div>
-                    <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-check text-2xl"></i>
-                    </div>
+
+                    <h1 class="desktop-title mobile-title font-bold text-gray-800 mb-2">
+                        پرداخت موفقیت‌آمیز
+                    </h1>
+                    <p class="text-gray-600 text-sm">
+                        تراکنش شما با موفقیت انجام شد
+                    </p>
                 </div>
             </div>
 
-            <!-- بدنه اصلی -->
-            <div class="p-5 md:p-6 mobile-padding">
-                <!-- آیکون مرکزی -->
-                <div class="flex justify-center mb-6">
-                    <div class="relative">
-                        <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full
-                                    flex items-center justify-center shadow-lg pulse-effect">
-                            <i class="fas fa-check text-3xl md:text-4xl text-white"></i>
-                        </div>
-                        <div class="absolute -top-1 -right-1 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                            <i class="fas fa-crown text-xs text-yellow-800"></i>
-                        </div>
-                    </div>
-                </div>
+            <!-- محتوای اصلی -->
+            <div class="desktop-card mobile-card">
 
-                <!-- پیام موفقیت -->
-                <div class="text-center mb-6 fade-in">
-                    <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2 mobile-header">تبریک! پرداخت تکمیل شد</h2>
-                    <p class="text-gray-600 text-sm md:text-base mobile-text">
-                        از اعتماد شما سپاسگزاریم
-                        <i class="fas fa-heart text-red-400 mx-1"></i>
+                <!-- پیام تبریک -->
+                <div class="mb-8 text-center">
+                    <p class="desktop-message mobile-message text-gray-700 mb-6">
+                        سپاس از خرید شما. سفارش شما با موفقیت ثبت شد.
                     </p>
-                </div>
-
-                <!-- کارت اطلاعات پرداخت -->
-                <div class="bg-gray-50 rounded-xl p-5 mb-6 fade-in border border-gray-200">
-                    <h3 class="text-base font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-receipt text-green-500 ml-2"></i>
-                        اطلاعات تراکنش
-                    </h3>
 
                     <!-- کد رهگیری -->
-                    <div class="mb-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-gray-700 text-sm font-medium flex items-center">
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-gray-700 font-medium text-sm flex items-center">
                                 <i class="fas fa-hashtag text-blue-500 ml-2"></i>
-                                         {{ message }}
+                                کد رهگیری:
                             </span>
                             <button onclick="copyToClipboard()"
-                                    class="copy-btn bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs px-3 py-1 rounded-lg
-                                           flex items-center transition-all duration-200">
+                                    class="text-blue-600 hover:text-blue-800 text-xs flex items-center transition-colors">
                                 <i class="fas fa-copy ml-1"></i>
                                 کپی
                             </button>
                         </div>
-                        <div id="tracking-code" class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-dashed
-                                                      border-blue-200 rounded-lg p-3 text-center">
-                            <div class="font-mono font-bold text-lg md:text-xl text-blue-700 tracking-wider"
-                                 id="tracking-number">
-                                {{ tracking_code }}
+
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <div class="tracking-code font-bold text-xl text-center text-gray-800 py-2" id="tracking-number">
+                                {% if 'کد رهگیری:' in message %}
+                                    {% with message|slice:"-11:" as code %}
+                                        {{ code|cut:"کد رهگیری: "|cut:" " }}
+                                    {% endwith %}
+                                {% else %}
+                                    {{ message }}
+                                {% endif %}
                             </div>
-                            <div class="text-blue-600 text-xs mt-2">
-                                <i class="fas fa-info-circle ml-1"></i>
-                                این کد را برای پیگیری حفظ کنید
+                            <p class="text-gray-500 text-xs text-center mt-2">
+                                این کد برای پیگیری سفارش شما ضروری است
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- اطلاعات تراکنش -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600 text-sm">
+                                    <i class="fas fa-calendar ml-2"></i>
+                                    تاریخ:
+                                </span>
+                                <span class="text-gray-800 font-medium text-sm" id="current-date"></span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600 text-sm">
+                                    <i class="fas fa-clock ml-2"></i>
+                                    زمان:
+                                </span>
+                                <span class="text-gray-800 font-medium text-sm" id="current-time"></span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600 text-sm">
+                                    <i class="fas fa-check-circle ml-2"></i>
+                                    وضعیت:
+                                </span>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">
+                                    موفق
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600 text-sm">
+                                    <i class="fas fa-credit-card ml-2"></i>
+                                    درگاه:
+                                </span>
+                                <span class="text-gray-800 font-medium text-sm">زرین‌پال</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- اطلاعات دیگر -->
-                    <div class="space-y-3 mobile-text">
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span class="text-gray-600 flex items-center">
-                                <i class="fas fa-calendar-alt text-purple-500 ml-2"></i>
-                                تاریخ:
-                            </span>
-                            <span class="font-medium text-gray-800" id="current-date"></span>
-                        </div>
-
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span class="text-gray-600 flex items-center">
-                                <i class="fas fa-clock text-amber-500 ml-2"></i>
-                                زمان:
-                            </span>
-                            <span class="font-medium text-gray-800" id="current-time"></span>
-                        </div>
-
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-gray-600 flex items-center">
-                                <i class="fas fa-shield-check text-green-500 ml-2"></i>
-                                وضعیت:
-                            </span>
-                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
-                                <i class="fas fa-check ml-1"></i>
-                                موفق
-                            </span>
+                <!-- پیام توضیحی -->
+                <div class="mb-8">
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5 ml-3"></i>
+                            <div>
+                                <h4 class="font-medium text-blue-800 mb-2 text-sm">اطلاعات تکمیلی</h4>
+                                <ul class="text-blue-700 text-sm space-y-1">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-chevron-left text-blue-400 mt-1 ml-2 text-xs"></i>
+                                        <span>رسید پرداخت به ایمیل شما ارسال خواهد شد</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-chevron-left text-blue-400 mt-1 ml-2 text-xs"></i>
+                                        <span>برای پیگیری سفارش از کد رهگیری استفاده کنید</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-chevron-left text-blue-400 mt-1 ml-2 text-xs"></i>
+                                        <span>در صورت نیاز به پشتیبانی، کد رهگیری را ارائه دهید</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- پیام کامل -->
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 fade-in">
-                    <div class="flex items-start">
-                        <i class="fas fa-comment-alt text-blue-500 text-lg mt-0.5 ml-3"></i>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-blue-800 text-sm mb-2">پیام سیستم</h4>
-                            <p class="text-blue-700 text-sm">{{ message }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- نکات مهم -->
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 fade-in">
-                    <div class="flex items-start">
-                        <i class="fas fa-lightbulb text-amber-500 text-lg mt-0.5 ml-3"></i>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-amber-800 text-sm mb-2">نکات مهم</h4>
-                            <ul class="text-amber-700 text-xs space-y-1.5">
-                                <li class="flex items-start">
-                                    <i class="fas fa-chevron-left text-amber-400 mt-1 ml-2 text-xs"></i>
-                                    <span>کد رهگیری را نزد خود نگه دارید</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-chevron-left text-amber-400 mt-1 ml-2 text-xs"></i>
-                                    <span>رسید به ایمیل شما ارسال شده است</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-chevron-left text-amber-400 mt-1 ml-2 text-xs"></i>
-                                    <span>سفارش در پنل کاربری قابل پیگیری است</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- دکمه‌های اصلی -->
-                <div class="space-y-3 fade-in">
-                    <!-- دکمه اصلی بازگشت به پنل -->
+                <!-- دکمه‌های اقدام -->
+                <div class="space-y-4">
+                    <!-- دکمه اصلی -->
                     <a href="{% url 'panel:panel' %}"
-                       id="main-button"
-                       class="block w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700
-                              text-white font-bold py-3 px-4 rounded-xl transition-all duration-300
-                              flex items-center justify-center group shadow-lg hover:shadow-xl">
-                        <i class="fas fa-tachometer-alt ml-2 group-hover:rotate-12 transition-transform"></i>
-                        ادامه خرید و بازگشت به پنل
+                       class="btn-primary text-white font-medium py-3.5 px-4 rounded-lg w-full flex items-center justify-center">
+                        <i class="fas fa-tachometer-alt ml-2"></i>
+                        بازگشت به پنل کاربری
                     </a>
 
                     <!-- دکمه‌های فرعی -->
                     <div class="grid grid-cols-2 gap-3">
-                        <a href="{% url 'panel:panel' %}"
-                           class="bg-white border border-green-500 text-green-600 hover:bg-green-50
-                                  font-medium py-2.5 px-3 rounded-lg transition duration-200
-                                  flex items-center justify-center text-sm">
-                            <i class="fas fa-home ml-1.5"></i>
-                            پنل کاربری
+                        <a href="#" onclick="window.print()"
+                           class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700
+                                  font-medium py-3 px-3 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-print ml-1.5"></i>
+                            چاپ رسید
                         </a>
-
-                        <button onclick="downloadReceipt()"
-                                class="bg-white border border-blue-500 text-blue-600 hover:bg-blue-50
-                                       font-medium py-2.5 px-3 rounded-lg transition duration-200
-                                       flex items-center justify-center text-sm">
+                        <a href="#" onclick="downloadReceipt()"
+                           class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700
+                                  font-medium py-3 px-3 rounded-lg flex items-center justify-center text-sm">
                             <i class="fas fa-download ml-1.5"></i>
-                            دانلود رسید
-                        </button>
+                            ذخیره PDF
+                        </a>
                     </div>
                 </div>
 
-                <!-- اعلان بازگشت خودکار -->
-                <div class="mt-6 text-center">
+                <!-- تایمر موبایل -->
+                <div id="mobile-timer" class="mt-6 text-center md:hidden">
                     <div class="inline-flex items-center bg-gray-100 rounded-full px-4 py-2">
-                        <i class="fas fa-redo text-gray-500 ml-2"></i>
+                        <div class="w-2 h-2 bg-green-500 rounded-full ml-2 animate-pulse"></div>
                         <span class="text-gray-600 text-xs">
                             بازگشت خودکار در <span id="mobile-countdown" class="font-bold text-green-600">8</span> ثانیه
                         </span>
-                        <button onclick="cancelRedirect()" class="text-gray-500 hover:text-gray-700 mr-2 text-xs">
-                            لغو
-                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- فوتر -->
-            <div class="bg-gray-50 py-4 px-6 border-t border-gray-200 mobile-padding">
-                <div class="flex flex-col md:flex-row justify-between items-center text-gray-600 text-xs">
-                    <div class="flex items-center mb-2 md:mb-0">
-                        <i class="fas fa-lock text-gray-500 ml-2"></i>
-                        <span>پرداخت امن</span>
+            <div class="border-t border-gray-100 py-4 px-6 bg-gray-50">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center text-gray-600 text-xs mb-2 md:mb-0">
+                        <i class="fas fa-shield-alt ml-2"></i>
+                        <span>پرداخت امن با گواهی SSL</span>
                     </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-headset text-gray-500 ml-2"></i>
-                        <span>پشتیبانی: 021-12345678</span>
+                    <div class="flex items-center text-gray-600 text-xs">
+                        <i class="fas fa-headset ml-2"></i>
+                        <span>پشتیبانی: ۰۲۱-۱۲۳۴۵۶۷۸</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- لوگوی زرین‌پال -->
-        <div class="flex justify-center mt-6">
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                <div class="flex items-center text-white text-sm">
+        <!-- لوگو و اطلاعات درگاه -->
+        <div class="mt-6 text-center">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                <div class="flex items-center text-gray-600 text-sm bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2">
                     <img src="https://www.zarinpal.com/assets/images/logo/zarinpal-logo.svg"
-                         alt="ZarinPal" class="h-6 ml-3">
-                    <span>پرداخت با درگاه امن زرین‌پال</span>
+                         alt="ZarinPal" class="h-5 ml-2">
+                    <span>درگاه پرداخت امن زرین‌پال</span>
+                </div>
+                <div class="text-gray-500 text-xs">
+                    <i class="fas fa-check-circle text-green-500 ml-1"></i>
+                    این تراکنش توسط بانک مرکزی تأیید شده است
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // نمایش تاریخ و زمان
-        function updateDateTime() {
+        // تنظیم تاریخ و زمان فارسی
+        function updatePersianDateTime() {
             const now = new Date();
-            const dateOptions = {
+            const dateFormatter = new Intl.DateTimeFormat('fa-IR', {
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric',
-                weekday: 'long'
-            };
-            const timeOptions = {
+                day: 'numeric'
+            });
+            const timeFormatter = new Intl.DateTimeFormat('fa-IR', {
                 hour: '2-digit',
                 minute: '2-digit',
-                second: '2-digit',
                 hour12: false
-            };
+            });
 
-            document.getElementById('current-date').textContent =
-                now.toLocaleDateString('fa-IR', dateOptions);
-            document.getElementById('current-time').textContent =
-                now.toLocaleTimeString('fa-IR', timeOptions);
+            document.getElementById('current-date').textContent = dateFormatter.format(now);
+            document.getElementById('current-time').textContent = timeFormatter.format(now);
         }
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
 
         // تایمر بازگشت خودکار
         let countdown = 8;
@@ -336,68 +321,54 @@
             }, 1000);
         }
 
-        // لغو بازگشت خودکار
-        function cancelRedirect() {
-            clearInterval(redirectTimer);
-            document.getElementById('auto-redirect').style.display = 'none';
-            document.querySelector('.inline-flex.bg-gray-100').innerHTML =
-                '<i class="fas fa-check text-green-500 ml-2"></i>' +
-                '<span class="text-green-600 text-xs font-medium">بازگشت خودکار لغو شد</span>';
-        }
-
         // کپی کد رهگیری
         function copyToClipboard() {
             const trackingNumber = document.getElementById('tracking-number').textContent.trim();
             navigator.clipboard.writeText(trackingNumber).then(() => {
-                const copyBtn = document.querySelector('.copy-btn');
-                const originalHTML = copyBtn.innerHTML;
-
-                copyBtn.innerHTML = '<i class="fas fa-check ml-1"></i> کپی شد';
-                copyBtn.classList.remove('bg-blue-100', 'text-blue-700');
-                copyBtn.classList.add('bg-green-100', 'text-green-700');
-
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalHTML;
-                    copyBtn.classList.remove('bg-green-100', 'text-green-700');
-                    copyBtn.classList.add('bg-blue-100', 'text-blue-700');
-                }, 2000);
+                // نمایش اعلان موفقیت
+                showNotification('کد رهگیری با موفقیت کپی شد');
+            }).catch(err => {
+                console.error('خطا در کپی کردن: ', err);
             });
         }
 
         // شبیه‌سازی دانلود رسید
         function downloadReceipt() {
-            const downloadBtn = document.querySelector('button[onclick="downloadReceipt()"]');
-            const originalHTML = downloadBtn.innerHTML;
+            const button = document.querySelector('a[onclick="downloadReceipt()"]');
+            const originalText = button.innerHTML;
 
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-1.5"></i> درحال دانلود';
-            downloadBtn.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin ml-1.5"></i> در حال آماده‌سازی';
+            button.disabled = true;
 
             setTimeout(() => {
-                downloadBtn.innerHTML = '<i class="fas fa-check ml-1.5"></i> دانلود شد';
-                downloadBtn.classList.remove('border-blue-500', 'text-blue-600');
-                downloadBtn.classList.add('border-green-500', 'text-green-600', 'bg-green-50');
+                button.innerHTML = '<i class="fas fa-check ml-1.5"></i> دانلود شد';
+                button.classList.add('text-green-600', 'border-green-300');
 
-                // نمایش اعلان
-                showNotification('رسید با موفقیت دانلود شد!');
+                showNotification('فایل PDF رسید آماده شد');
 
                 setTimeout(() => {
-                    downloadBtn.innerHTML = originalHTML;
-                    downloadBtn.classList.remove('border-green-500', 'text-green-600', 'bg-green-50');
-                    downloadBtn.classList.add('border-blue-500', 'text-blue-600');
-                    downloadBtn.disabled = false;
-                }, 3000);
+                    button.innerHTML = originalText;
+                    button.classList.remove('text-green-600', 'border-green-300');
+                    button.disabled = false;
+                }, 2000);
             }, 1500);
         }
 
         // نمایش نوتیفیکیشن
         function showNotification(message) {
             const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:bottom-4 md:w-80 ' +
-                                    'bg-green-500 text-white p-3 rounded-xl shadow-lg z-50 animate__animated animate__fadeInUp';
+            notification.className = 'fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 ' +
+                                    'bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 animate__animated animate__fadeInUp';
             notification.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle text-lg ml-3"></i>
-                    <span class="text-sm">${message}</span>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-xl ml-3"></i>
+                        <span class="text-sm">${message}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()"
+                            class="text-white/70 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             `;
             document.body.appendChild(notification);
@@ -414,9 +385,11 @@
         function extractTrackingCode() {
             const message = "{{ message|safe }}";
             if (message.includes('کد رهگیری:')) {
-                const parts = message.split('کد رهگیری:');
-                if (parts.length > 1) {
-                    const trackingCode = parts[1].trim().split(' ')[0];
+                // حذف کاراکترهای غیر عددی
+                const numbers = message.replace(/\D/g, '');
+                // 11 رقم آخر را بگیر (برای کد رهگیری زرین‌پال)
+                const trackingCode = numbers.slice(-11);
+                if (trackingCode.length === 11) {
                     document.getElementById('tracking-number').textContent = trackingCode;
                 }
             }
@@ -427,17 +400,21 @@
 
         // نمایش تایمر دسکتاپ
         setTimeout(() => {
-            document.getElementById('auto-redirect').style.display = 'block';
-        }, 1000);
+            document.getElementById('timer-badge').style.display = 'flex';
+        }, 500);
+
+        // بروزرسانی تاریخ و زمان
+        updatePersianDateTime();
+        setInterval(updatePersianDateTime, 60000); // هر دقیقه
 
         // استخراج کد رهگیری
         extractTrackingCode();
 
-        // جلوگیری از اسکرول اضافی
-        document.body.style.overflow = 'hidden';
+        // نمایش پیام کامل در کنسول برای دیباگ
+        console.log("پیام کامل:", "{{ message|safe }}");
     </script>
 
-    <!-- آیکون‌های انیمیشن -->
+    <!-- کتابخانه انیمیشن -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </body>
 </html>
