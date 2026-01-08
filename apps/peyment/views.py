@@ -18,7 +18,7 @@ ZP_API_REQUEST = "https://api.zarinpal.com/pg/v4/payment/request.json"
 ZP_API_VERIFY = "https://api.zarinpal.com/pg/v4/payment/verify.json"
 ZP_API_STARTPAY = "https://www.zarinpal.com/pg/StartPay/{authority}"
 
-merchant = '41cb2cdd-3a44-4fb4-a0b3-db471b673078'
+merchant = 'ba3b94c2-bc0b-457a-899d-a6e8cc22b027'
 
 # ویوهای پرداخت یکپارچه
 # apps/peyment/views.py
