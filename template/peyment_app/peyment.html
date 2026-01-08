@@ -1,1 +1,412 @@
-<h1 style='color:green;'>موفق شدی</h1>
+<!-- templates/peyment_app/peyment.html -->
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .success-animation {
+            animation: successScale 0.6s ease-in-out;
+        }
+        @keyframes successScale {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pulse-effect {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #fbbf24;
+            border-radius: 50%;
+            opacity: 0;
+        }
+        .receipt-card {
+            background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+            border-left: 5px solid #10b981;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        .code-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px dashed #38bdf8;
+            letter-spacing: 3px;
+            font-feature-settings: "tnum";
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <!-- کانفی -->
+    <div id="confetti-container"></div>
+
+    <div class="w-full max-w-2xl mx-auto">
+        <!-- کارت اصلی -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden success-animation">
+
+            <!-- هدر رنگی -->
+            <div class="bg-gradient-success text-white py-6 px-8 relative">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold">پرداخت موفقیت‌آمیز!</h1>
+                        <p class="text-green-100 mt-2">تراکنش شما با موفقیت انجام شد</p>
+                    </div>
+                    <div class="relative">
+                        <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center pulse-effect">
+                            <i class="fas fa-check-circle text-4xl text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- خطوط تزئینی -->
+                <div class="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute bottom-0 right-0 w-24 h-24 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
+            </div>
+
+            <!-- محتوا -->
+            <div class="p-8">
+                <!-- آیکون موفقیت -->
+                <div class="flex justify-center mb-8">
+                    <div class="relative">
+                        <div class="w-32 h-32 bg-gradient-success rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-check text-6xl text-white"></i>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-crown text-lg text-yellow-800"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- پیام تبریک -->
+                <div class="text-center mb-10 fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-3">تبریک! پرداخت شما تکمیل شد</h2>
+                    <p class="text-gray-600 text-lg">
+                        <i class="fas fa-heart text-red-400 ml-2"></i>
+                        از اعتماد شما سپاسگزاریم
+                        <i class="fas fa-heart text-red-400 mr-2"></i>
+                    </p>
+                </div>
+
+                <!-- کارت رسید -->
+                <div class="receipt-card rounded-xl p-6 mb-8 fade-in card-hover">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-receipt text-green-500 ml-2"></i>
+                            رسید پرداخت
+                        </h3>
+                        <span class="bg-green-100 text-green-800 text-sm font-semibold px-4 py-1.5 rounded-full">
+                            <i class="fas fa-badge-check ml-1"></i>
+                            تأیید شده
+                        </span>
+                    </div>
+
+                    <!-- اطلاعات پرداخت -->
+                    <div class="space-y-5">
+                        {% if 'کد رهگیری' in message %}
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-qrcode text-blue-500 ml-3"></i>
+                                    <span class="font-semibold">کد رهگیری:</span>
+                                </div>
+                                <div class="code-box px-5 py-3 rounded-lg font-bold text-xl text-blue-600">
+                                    {{ message|slice:"-15:"|cut:"کد رهگیری: "|cut:" -" }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-calendar-check text-indigo-500 ml-3"></i>
+                                <span class="font-semibold">تاریخ و زمان:</span>
+                            </div>
+                            <div class="font-medium text-gray-900">
+                                <span id="current-date-time"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-info-circle text-purple-500 ml-3"></i>
+                                <span class="font-semibold">وضعیت تراکنش:</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 bg-green-500 rounded-full ml-2"></span>
+                                <span class="font-bold text-green-600">موفقیت‌آمیز</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-shield-alt text-amber-500 ml-3"></i>
+                                <span class="font-semibold">کد وضعیت درگاه:</span>
+                            </div>
+                            <div class="bg-gray-100 px-4 py-2 rounded-lg font-mono font-bold text-gray-800">
+                                100
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-check-double text-green-500 ml-3"></i>
+                                <span class="font-semibold">تأیید توسط:</span>
+                            </div>
+                            <div class="flex items-center">
+                                <img src="https://www.zarinpal.com/assets/images/logo/zarinpal-logo.svg"
+                                     alt="ZarinPal" class="h-6 ml-2">
+                                <span class="font-medium">زرین‌پال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- پیام توضیحی -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-8 fade-in">
+                    <div class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 text-xl mt-1 ml-3"></i>
+                        <div>
+                            <h4 class="font-bold text-blue-800 mb-2">اطلاعات مهم</h4>
+                            <ul class="text-blue-700 space-y-2 text-justify">
+                                <li class="flex items-start">
+                                    <i class="fas fa-chevron-left text-blue-400 mt-1 ml-2 text-xs"></i>
+                                    <span>کد رهگیری فوق را نزد خود نگه دارید. در صورت نیاز به پشتیبانی، این کد را ارائه دهید.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-chevron-left text-blue-400 mt-1 ml-2 text-xs"></i>
+                                    <span>رسید پرداخت به آدرس ایمیل شما ارسال شده است. لطفاً پوشه اسپم خود را نیز بررسی کنید.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-chevron-left text-blue-400 mt-1 ml-2 text-xs"></i>
+                                    <span>برای پیگیری سفارش خود به بخش "سفارشات من" در پنل کاربری مراجعه کنید.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- دکمه‌های اقدام -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in">
+                    <a href="{% url 'panel:panel' %}"
+                       class="bg-gradient-success hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl
+                              transition duration-300 transform hover:-translate-y-1 hover:shadow-xl
+                              flex items-center justify-center group">
+                        <i class="fas fa-tachometer-alt ml-2 group-hover:rotate-12 transition-transform"></i>
+                        ادامه خرید و بازگشت به پنل
+                    </a>
+
+                    <a href="#"
+                       class="bg-white border-2 border-green-500 text-green-600 hover:bg-green-50
+                              font-bold py-4 px-6 rounded-xl transition duration-300
+                              flex items-center justify-center group">
+                        <i class="fas fa-download ml-2 group-hover:animate-bounce"></i>
+                        دانلود رسید پرداخت
+                    </a>
+                </div>
+
+                <!-- دکمه راهنما -->
+                <div class="text-center mt-8">
+                    <a href="#" class="text-gray-500 hover:text-gray-700 inline-flex items-center text-sm">
+                        <i class="fas fa-question-circle ml-1"></i>
+                        راهنمایی بیشتر
+                        <i class="fas fa-external-link-alt mr-1 text-xs mt-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- فوتر -->
+            <div class="bg-gray-50 py-5 px-8 border-t border-gray-200">
+                <div class="flex flex-col md:flex-row justify-between items-center text-gray-600 text-sm">
+                    <div class="flex items-center mb-3 md:mb-0">
+                        <i class="fas fa-lock ml-2"></i>
+                        <span>پرداخت امن با زرین‌پال</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="far fa-clock ml-2"></i>
+                        <span>مدت‌زمان پرداخت: <span id="payment-time">15</span> ثانیه</span>
+                    </div>
+                    <div class="flex items-center mt-3 md:mt-0">
+                        <i class="fas fa-headset ml-2"></i>
+                        <span>پشتیبانی: 021-12345678</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- بنر تشکر -->
+        <div class="mt-8 text-center fade-in">
+            <p class="text-white/90 text-lg">
+                <i class="fas fa-star text-yellow-300 ml-1"></i>
+                با تشکر از انتخاب شما
+                <i class="fas fa-star text-yellow-300 mr-1"></i>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // نمایش تاریخ و زمان جاری
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('current-date-time').textContent =
+                now.toLocaleDateString('fa-IR', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // ایجاد کانفی
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#fbbf24', '#34d399', '#60a5fa', '#f472b6', '#a78bfa'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+
+                container.appendChild(confetti);
+
+                // انیمیشن سقوط
+                const animation = confetti.animate([
+                    {
+                        transform: 'translateY(0) rotate(0deg)',
+                        opacity: 1
+                    },
+                    {
+                        transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                });
+
+                // حذف المان بعد از انیمیشن
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // ایجاد کانفی در ابتدا و هر 3 ثانیه
+        createConfetti();
+        setInterval(createConfetti, 3000);
+
+        // شبیه‌سازی زمان پرداخت
+        let paymentSeconds = 15;
+        const paymentTimeElement = document.getElementById('payment-time');
+        const paymentInterval = setInterval(() => {
+            paymentSeconds--;
+            paymentTimeElement.textContent = paymentSeconds;
+            if (paymentSeconds <= 0) {
+                clearInterval(paymentInterval);
+            }
+        }, 1000);
+
+        // افکت هورا برای دکمه
+        document.querySelector('a[href*="panel"]').addEventListener('click', function(e) {
+            this.innerHTML = `
+                <i class="fas fa-spinner fa-spin ml-2"></i>
+                در حال انتقال...
+            `;
+        });
+
+        // شبیه‌سازی دانلود رسید
+        document.querySelector('a[href="#"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            this.innerHTML = `
+                <i class="fas fa-check ml-2"></i>
+                رسید دانلود شد
+            `;
+            this.classList.remove('border-green-500', 'text-green-600', 'hover:bg-green-50');
+            this.classList.add('bg-green-100', 'text-green-700', 'border-green-200');
+
+            // نمایش نوتیفیکیشن
+            showNotification('رسید پرداخت با موفقیت دانلود شد!');
+        });
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-green-500 text-white p-4 rounded-xl shadow-lg z-50 animate__animated animate__fadeInDown';
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-xl ml-3"></i>
+                    <span>${message}</span>
+                    <button class="mr-auto text-white/80 hover:text-white" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('animate__fadeOutUp');
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 3000);
+        }
+
+        // افکت تایپ برای پیام
+        const messageElement = document.querySelector('.text-center .text-2xl');
+        if (messageElement) {
+            const originalText = messageElement.textContent;
+            messageElement.textContent = '';
+            let i = 0;
+            const typeWriter = () => {
+                if (i < originalText.length) {
+                    messageElement.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                }
+            };
+            setTimeout(typeWriter, 500);
+        }
+    </script>
+
+    <!-- آیکون‌های انیمیشن -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</body>
+</html>
