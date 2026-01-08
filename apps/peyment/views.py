@@ -311,7 +311,7 @@ class UnifiedVerifyView(LoginRequiredMixin, View):
                     # پاک کردن session
                     self.clear_session(request)
 
-                 
+                    success_message = f''
                     if ref_id:
                         success_message += f'{ref_id}'
 
