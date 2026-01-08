@@ -87,7 +87,7 @@ def unified_send_request(request, payment_type, order_id):
         # ارسال درخواست به درگاه پرداخت
         pay = ZarinPal(
             merchant=merchant,
-            call_back_url="https://rank0.ir/peyment/verify/"
+            call_back_url="https://menubesaz.ir/peyment/verify/"
         )
 
         response = pay.send_request(

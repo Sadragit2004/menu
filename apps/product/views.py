@@ -10,7 +10,10 @@ from apps.plan.models import Plan
 from django.contrib.auth.decorators import login_required
 from apps.user.model.user import CustomUser
 from django.contrib import messages
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def get_or_create_cart(request):
     """دریافت یا ایجاد سبد خرید برای کاربر"""
@@ -415,7 +418,7 @@ def complete_order(request, order_id):
     except Exception as e:
         logger.error(f"Error in complete_order: {str(e)}")
         messages.error(request, 'خطا در اتصال به درگاه پرداخت')
-        return redirect('product:checkout_view', order_id=order_id)
+        return redirect('product:checkout', order_id=order_id)
 
 
 def get_or_create_cart(request):
