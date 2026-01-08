@@ -349,7 +349,7 @@ class UnifiedVerifyView(LoginRequiredMixin, View):
         logger.info("پرداخت توسط کاربر لغو شد")
 
         self.update_related_order(payment_type, order_id, False)
-        return redirect('peyment:show_failed', 'پرداخت توسط کاربر لغو شد')
+        return redirect('peyment:show_failed', '404')
 
     def update_related_order(self, payment_type, order_id, is_success):
         """بروزرسانی وضعیت سفارش مرتبط"""
