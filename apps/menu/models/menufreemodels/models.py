@@ -160,6 +160,7 @@ class Restaurant(BaseModel):
     minimumOrder = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     deliveryFee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     taxRate = models.DecimalField(max_digits=5, decimal_places=2, default=9.0, null=True, blank=True)
+    freeSmoke = models.BooleanField(default=False,verbose_name='ازادی سیگار')
     isSeo = models.BooleanField(default=False,verbose_name='ایا سئو شده',blank=True,null=True)
     expireDate = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ انقضا")
 

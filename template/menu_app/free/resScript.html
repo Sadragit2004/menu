@@ -293,188 +293,232 @@
     }
 
     // ==================== مدیریت لیست انتخاب غذا ====================
-    function initializeSelectionList() {
-        const selectionListBtn = document.querySelector('.selection-list-btn');
-        const selectionListPanel = document.querySelector('.selection-list-panel');
-        const selectionListClose = document.querySelector('.selection-list-close');
-        const selectionListShow = document.querySelector('.selection-list-show');
-        const selectionListClear = document.querySelector('.selection-list-clear');
-        const selectionDisplay = document.querySelector('.selection-display');
-        const selectionDisplayClose = document.querySelector('.selection-display-close');
-        const selectionDisplayBack = document.querySelector('.selection-display-back');
-        const selectionDisplayCall = document.querySelector('.selection-display-call');
-        const overlay = document.querySelector('.overlay');
+   function initializeSelectionList() {
+    const selectionListBtn = document.querySelector('.selection-list-btn');
+    const selectionListPanel = document.querySelector('.selection-list-panel');
+    const selectionListClose = document.querySelector('.selection-list-close');
+    const selectionListShow = document.querySelector('.selection-list-show');
+    const selectionListClear = document.querySelector('.selection-list-clear');
+    const selectionDisplay = document.querySelector('.selection-display');
+    const selectionDisplayClose = document.querySelector('.selection-display-close');
+    const selectionDisplayBack = document.querySelector('.selection-display-back');
+    const selectionDisplayCall = document.querySelector('.selection-display-call');
+    const overlay = document.querySelector('.overlay');
 
-        // باز کردن/بستن پنل لیست انتخاب
-        if (selectionListBtn) {
-            selectionListBtn.addEventListener('click', () => {
-                selectionListPanel.classList.add('open');
-                overlay.classList.add('active');
-            });
-        }
+    // باز کردن/بستن پنل لیست انتخاب
+    if (selectionListBtn) {
+        selectionListBtn.addEventListener('click', () => {
+            selectionListPanel.classList.add('open');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول
+        });
+    }
 
-        if (selectionListClose) {
-            selectionListClose.addEventListener('click', () => {
-                selectionListPanel.classList.remove('open');
-                overlay.classList.remove('active');
-            });
-        }
+    // بستن پنل لیست انتخاب
+    function closeSelectionListPanel() {
+        selectionListPanel.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = ''; // بازگرداندن اسکرول
+    }
 
-        // نمایش به گارسون
-        if (selectionListShow) {
-            selectionListShow.addEventListener('click', () => {
-                if (selectedFoods.length === 0) {
-                    showNotification('لیست انتخاب شما خالی است');
-                    return;
-                }
-                selectionListPanel.classList.remove('open');
+    if (selectionListClose) {
+        selectionListClose.addEventListener('click', closeSelectionListPanel);
+    }
+
+    // نمایش به گارسون - این بخش اصلاح شده
+    if (selectionListShow) {
+        selectionListShow.addEventListener('click', () => {
+            if (selectedFoods.length === 0) {
+                showNotification('لیست انتخاب شما خالی است');
+                return;
+            }
+
+            // ابتدا پنل لیست را ببند
+            closeSelectionListPanel();
+
+            // سپس صفحه نمایش را باز کن
+            setTimeout(() => {
                 selectionDisplay.classList.add('open');
-                updateSelectionDisplay();
-            });
-        }
+                overlay.classList.add('active'); // overlay را فعال کن
+                document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول
+            }, 300);
 
-        // بستن صفحه نمایش
-        if (selectionDisplayClose) {
-            selectionDisplayClose.addEventListener('click', () => {
-                selectionDisplay.classList.remove('open');
-            });
-        }
+            updateSelectionDisplay();
+        });
+    }
 
-        // بازگشت از صفحه نمایش
-        if (selectionDisplayBack) {
-            selectionDisplayBack.addEventListener('click', () => {
-                selectionDisplay.classList.remove('open');
+    // بستن صفحه نمایش - این بخش اصلاح شده
+    function closeSelectionDisplay() {
+        selectionDisplay.classList.remove('open');
+        overlay.classList.remove('active'); // overlay را غیرفعال کن
+        document.body.style.overflow = ''; // بازگرداندن اسکرول
+    }
+
+    if (selectionDisplayClose) {
+        selectionDisplayClose.addEventListener('click', closeSelectionDisplay);
+    }
+
+    // بازگشت از صفحه نمایش - این بخش اصلاح شده
+    if (selectionDisplayBack) {
+        selectionDisplayBack.addEventListener('click', () => {
+            closeSelectionDisplay();
+            setTimeout(() => {
                 selectionListPanel.classList.add('open');
                 overlay.classList.add('active');
-            });
-        }
+                document.body.style.overflow = 'hidden';
+            }, 300);
+        });
+    }
 
-        // فراخوانی گارسون
-        if (selectionDisplayCall) {
-            selectionDisplayCall.addEventListener('click', () => {
-                showNotification('گارسون به میز شما فراخوانده شد');
-                setTimeout(() => {
-                    selectionDisplay.classList.remove('open');
-                    overlay.classList.remove('active');
-                }, 2000);
-            });
-        }
+    // فراخوانی گارسون
+    if (selectionDisplayCall) {
+        selectionDisplayCall.addEventListener('click', () => {
+            showNotification('گارسون به میز شما فراخوانده شد');
+            setTimeout(() => {
+                closeSelectionDisplay();
+            }, 2000);
+        });
+    }
 
-        // پاک کردن لیست
-        if (selectionListClear) {
-            selectionListClear.addEventListener('click', () => {
-                if (selectedFoods.length === 0) {
-                    showNotification('لیست انتخاب شما از قبل خالی است');
-                    return;
-                }
-
-                if (confirm('آیا از پاک کردن لیست انتخاب خود مطمئن هستید؟')) {
-                    selectedFoods = [];
-                    saveSelectionList();
-                    updateSelectionList();
-                    updateOrderButtons();
-                    showNotification('لیست انتخاب شما پاک شد');
-                }
-            });
-        }
-
-        // مدیریت کلیک روی دکمه‌های سفارش
-        document.addEventListener('click', (e) => {
-            // سفارش غذا
-            if (e.target.closest('.order-btn')) {
-                handleOrderButtonClick(e.target.closest('.order-btn'));
+    // پاک کردن لیست
+    if (selectionListClear) {
+        selectionListClear.addEventListener('click', () => {
+            if (selectedFoods.length === 0) {
+                showNotification('لیست انتخاب شما از قبل خالی است');
+                return;
             }
 
-            // مدیریت تعداد
-            if (e.target.closest('.quantity-btn')) {
-                handleQuantityButtonClick(e.target.closest('.quantity-btn'));
-            }
-
-            // حذف آیتم
-            if (e.target.closest('.selection-list-item-remove')) {
-                handleRemoveItemClick(e.target.closest('.selection-list-item-remove'));
+            if (confirm('آیا از پاک کردن لیست انتخاب خود مطمئن هستید؟')) {
+                selectedFoods = [];
+                saveSelectionList();
+                updateSelectionList();
+                updateOrderButtons();
+                showNotification('لیست انتخاب شما پاک شد');
             }
         });
+    }
 
-        function handleOrderButtonClick(orderBtn) {
-            const foodId = orderBtn.getAttribute('data-food-id');
-            const foodTitle = orderBtn.getAttribute('data-food-title');
-            const foodPrice = parseInt(orderBtn.getAttribute('data-food-price'));
-            const foodImage = orderBtn.getAttribute('data-food-image');
+    // مدیریت کلیک روی overlay
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            // اگر پنل لیست باز است، آن را ببند
+            if (selectionListPanel.classList.contains('open')) {
+                closeSelectionListPanel();
+            }
+            // اگر صفحه نمایش باز است، آن را ببند
+            if (selectionDisplay.classList.contains('open')) {
+                closeSelectionDisplay();
+            }
+        });
+    }
 
-            const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
+    // مدیریت کلیک روی دکمه‌های سفارش
+    document.addEventListener('click', (e) => {
+        // سفارش غذا
+        if (e.target.closest('.order-btn')) {
+            handleOrderButtonClick(e.target.closest('.order-btn'));
+        }
 
-            if (existingIndex === -1) {
-                selectedFoods.push({
-                    id: foodId,
-                    title: foodTitle,
-                    price: foodPrice,
-                    image: foodImage,
-                    quantity: 1
-                });
+        // مدیریت تعداد
+        if (e.target.closest('.quantity-btn')) {
+            handleQuantityButtonClick(e.target.closest('.quantity-btn'));
+        }
 
-                orderBtn.classList.add('added');
-                orderBtn.innerHTML = '<i class="fas fa-check"></i><span class="order-text">سفارش شده</span>';
+        // حذف آیتم
+        if (e.target.closest('.selection-list-item-remove')) {
+            handleRemoveItemClick(e.target.closest('.selection-list-item-remove'));
+        }
+    });
 
-                showNotification(`"${foodTitle}" به لیست انتخاب اضافه شد`);
-            } else {
+    function handleOrderButtonClick(orderBtn) {
+        const foodId = orderBtn.getAttribute('data-food-id');
+        const foodTitle = orderBtn.getAttribute('data-food-title');
+        const foodPrice = parseInt(orderBtn.getAttribute('data-food-price'));
+        const foodImage = orderBtn.getAttribute('data-food-image');
+
+        const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
+
+        if (existingIndex === -1) {
+            selectedFoods.push({
+                id: foodId,
+                title: foodTitle,
+                price: foodPrice,
+                image: foodImage,
+                quantity: 1
+            });
+
+            orderBtn.classList.add('added');
+            orderBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512"
+                     width="14"
+                     height="14"
+                     fill="currentColor"
+                     style="margin-left: 4px;">
+                    <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/>
+                </svg>
+                <span class="order-text">سفارش شده</span>
+            `;
+
+            showNotification(`"${foodTitle}" به لیست انتخاب اضافه شد`);
+        } else {
+            selectedFoods[existingIndex].quantity += 1;
+            showNotification(`تعداد "${foodTitle}" به ${selectedFoods[existingIndex].quantity} افزایش یافت`);
+        }
+
+        saveSelectionList();
+        updateSelectionList();
+    }
+
+    function handleQuantityButtonClick(quantityBtn) {
+        const foodItem = quantityBtn.closest('.selection-list-item');
+        if (!foodItem) return;
+
+        const removeBtn = foodItem.querySelector('.selection-list-item-remove');
+        if (!removeBtn) return;
+
+        const foodId = removeBtn.getAttribute('data-food-id');
+        const isIncrease = quantityBtn.classList.contains('increase');
+
+        const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
+        if (existingIndex !== -1) {
+            const foodTitle = selectedFoods[existingIndex].title;
+
+            if (isIncrease) {
                 selectedFoods[existingIndex].quantity += 1;
-                showNotification(`تعداد "${foodTitle}" به ${selectedFoods[existingIndex].quantity} افزایش یافت`);
+                showNotification(`تعداد "${foodTitle}" افزایش یافت`);
+            } else {
+                if (selectedFoods[existingIndex].quantity > 1) {
+                    selectedFoods[existingIndex].quantity -= 1;
+                    showNotification(`تعداد "${foodTitle}" کاهش یافت`);
+                } else {
+                    selectedFoods.splice(existingIndex, 1);
+                    showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
+                    updateOrderButtons();
+                }
             }
 
             saveSelectionList();
             updateSelectionList();
         }
+    }
 
-        function handleQuantityButtonClick(quantityBtn) {
-            const foodItem = quantityBtn.closest('.selection-list-item');
-            if (!foodItem) return;
+    function handleRemoveItemClick(removeBtn) {
+        const foodId = removeBtn.getAttribute('data-food-id');
+        const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
 
-            const removeBtn = foodItem.querySelector('.selection-list-item-remove');
-            if (!removeBtn) return;
+        if (existingIndex !== -1) {
+            const foodTitle = selectedFoods[existingIndex].title;
+            selectedFoods.splice(existingIndex, 1);
 
-            const foodId = removeBtn.getAttribute('data-food-id');
-            const isIncrease = quantityBtn.classList.contains('increase');
+            saveSelectionList();
+            updateSelectionList();
+            updateOrderButtons();
 
-            const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
-            if (existingIndex !== -1) {
-                const foodTitle = selectedFoods[existingIndex].title;
-
-                if (isIncrease) {
-                    selectedFoods[existingIndex].quantity += 1;
-                    showNotification(`تعداد "${foodTitle}" افزایش یافت`);
-                } else {
-                    if (selectedFoods[existingIndex].quantity > 1) {
-                        selectedFoods[existingIndex].quantity -= 1;
-                        showNotification(`تعداد "${foodTitle}" کاهش یافت`);
-                    } else {
-                        selectedFoods.splice(existingIndex, 1);
-                        showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
-                        updateOrderButtons();
-                    }
-                }
-
-                saveSelectionList();
-                updateSelectionList();
-            }
-        }
-
-        function handleRemoveItemClick(removeBtn) {
-            const foodId = removeBtn.getAttribute('data-food-id');
-            const existingIndex = selectedFoods.findIndex(item => item.id === foodId);
-
-            if (existingIndex !== -1) {
-                const foodTitle = selectedFoods[existingIndex].title;
-                selectedFoods.splice(existingIndex, 1);
-
-                saveSelectionList();
-                updateSelectionList();
-                updateOrderButtons();
-
-                showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
-            }
+            showNotification(`"${foodTitle}" از لیست انتخاب حذف شد`);
         }
     }
+}
 
     // ==================== توابع کمکی لیست انتخاب ====================
     function saveSelectionList() {
@@ -517,7 +561,9 @@
                             </div>
                         </div>
                         <div class="selection-list-item-remove" data-food-id="${food.id}">
-                            <i class="fas fa-times"></i>
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512" width="14" height="14" fill="currentColor">
+    <path d="M242.7 256l100.1-100.1c12.3-12.3 12.3-32.2 0-44.5l-22.2-22.2c-12.3-12.3-32.2-12.3-44.5 0L176 189.3 75.9 89.2c-12.3-12.3-32.2-12.3-44.5 0L9.2 111.4c-12.3 12.3-12.3 32.2 0 44.5L109.3 256 9.2 356.1c-12.3 12.3-12.3 32.2 0 44.5l22.2 22.2c12.3 12.3 32.2 12.3 44.5 0L176 322.7l100.1 100.1c12.3 12.3 32.2 12.3 44.5 0l22.2-22.2c12.3-12.3 12.3-32.2 0-44.5L242.7 256z"/>
+</svg>
                         </div>
                     </div>
                 `;
@@ -528,20 +574,30 @@
     }
 
     function updateOrderButtons() {
-        const orderBtns = document.querySelectorAll('.order-btn');
-        orderBtns.forEach(btn => {
-            const foodId = btn.getAttribute('data-food-id');
-            const isSelected = selectedFoods.some(food => food.id === foodId);
+    const orderBtns = document.querySelectorAll('.order-btn');
+    orderBtns.forEach(btn => {
+        const foodId = btn.getAttribute('data-food-id');
+        const isSelected = selectedFoods.some(food => food.id === foodId);
 
-            if (isSelected) {
-                btn.classList.add('added');
-                btn.innerHTML = '<i class="fas fa-check"></i><span class="order-text">سفارش شده</span>';
-            } else {
-                btn.classList.remove('added');
-                btn.innerHTML = '<span class="order-text">سفارش</span>';
-            }
-        });
-    }
+        if (isSelected) {
+            btn.classList.add('added');
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512"
+                     width="14"
+                     height="14"
+                     fill="currentColor"
+                     style="margin-left: 4px;">
+                    <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/>
+                </svg>
+                <span class="order-text">سفارش شده</span>
+            `;
+        } else {
+            btn.classList.remove('added');
+            btn.innerHTML = '<span class="order-text">سفارش</span>';
+        }
+    });
+}
 
     function updateSelectionDisplay() {
         const selectionDisplayItems = document.querySelector('.selection-display-items');

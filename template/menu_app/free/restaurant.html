@@ -766,137 +766,343 @@
     </div>
 
     <!-- نوار بالایی اصلی -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm" style="padding: 8px 0;">
-        <div class="container mx-auto px-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-2" style="min-width: 0; flex: 1;">
-                    <div class="hamburger-icon cursor-pointer text-gray-600" style="padding: 6px;">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 448 512"
-     width="16"
-     height="16"
-     fill="currentColor">
-  <path d="M16 132h416c8.8 0 16-7.2 16-16V84c0-8.8-7.2-16-16-16H16C7.2 68 0 75.2 0 84v32c0 8.8 7.2 16 16 16zm0 156h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16zm0 156h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16z"/>
-</svg>
+   <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700" style="padding: 8px 0;">
+    <div class="container mx-auto px-3">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2" style="min-width: 0; flex: 1;">
+                <!-- دکمه منوی همبرگری -->
+                <div class="hamburger-icon cursor-pointer text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors" style="padding: 6px;" id="hamburgerMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 448 512"
+                         width="18"
+                         height="18"
+                         fill="currentColor">
+                        <path d="M16 132h416c8.8 0 16-7.2 16-16V84c0-8.8-7.2-16-16-16H16C7.2 68 0 75.2 0 84v32c0 8.8 7.2 16 16 16zm0 156h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16zm0 156h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16z"/>
+                    </svg>
+                </div>
 
-                    </div>
-                    <div class="logo-container flex items-center gap-2" style="min-width: 0; flex: 1;">
-                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs flex-shrink: 0;">
+                <div class="logo-container flex items-center gap-2" style="min-width: 0; flex: 1;">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs flex-shrink: 0;">
                         {% if restaurant.logo %}
                         <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.title_en|default:restaurant.title }}"
-                             class="w-10 h-10 rounded-xl object-cover border border-gray-200">
+                             class="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-600">
                         {% else %}
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
                             {{ restaurant.title_en|default:restaurant.title|first }}
                         </div>
                         {% endif %}
+                    </div>
+                    <div class="restaurant-info" style="min-width: 0;">
+                        <div class="restaurant-name text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap overflow-hidden text-ellipsis" style="max-width: 120px;">
+                            {{restaurant.title}}
                         </div>
-                        <div class="restaurant-info" style="min-width: 0;">
-                            <div class="restaurant-name text-sm font-medium text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis" style="max-width: 120px;">
-                                {{restaurant.title}}
-                            </div>
-                            <div class="restaurant-subtitle text-xs text-gray-500 hidden sm:block">
-                                منوی دیجیتال
-                            </div>
+                        <div class="restaurant-subtitle text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                            منوی دیجیتال
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="header-actions flex items-center gap-2" style="flex-shrink: 0;">
-                    <a href="javascript:void(0);"
-                       class="reservation-btn bg-gradient-to-r from-#ef4444-500 to-red-500 hover:from-#ef4444-600 hover:to-red-600 text-white px-2 py-1.5 rounded-xl font-medium flex items-center gap-1 transition-all duration-300 shadow-md hover:shadow-lg text-xs"
-                       data-bs-toggle="modal"
-                       data-bs-target="#reservationModal">
-                        <i class="fas fa-chair text-xs"></i>
-                        <span style='color:orange;' class="">رزرو میز</span>
-                    </a>
-
-                    <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 text-gray-700 no-underline w-8 h-8 rounded-lg flex items-center justify-center text-xs hover:bg-gray-200 transition-colors">
-                        <span class="lang-text font-medium">EN</span>
-                    </a>
-
-                    <button id="theme-toggle" class="header-icon bg-gray-100 text-gray-600 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
-                       <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 384 512"
-     width="14"
-     height="14"
-     fill="currentColor">
-  <path d="M223.5 32c-1.7 0-3.4.1-5.1.2C154.1 39.2 96 94.3 96 160c0 70.7 57.3 128 128 128 65.7 0 120.8-58.1 127.8-122.4.1-1.7.2-3.4.2-5.1 0-6.6-7.4-10.3-12.6-6.3-16.9 12.9-38 20.6-60.9 20.6-55.2 0-100-44.8-100-100 0-22.9 7.7-44 20.6-60.9 4-5.2.3-12.6-6.3-12.6z"/>
+            <div class="header-actions flex items-center gap-2" style="flex-shrink: 0;">
+                <a href="javascript:void(0);"
+                   class="reservation-btn bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-2 py-1.5 rounded-xl font-medium flex items-center gap-1 transition-all duration-300 shadow-md hover:shadow-lg text-xs"
+                   data-bs-toggle="modal"
+                   data-bs-target="#reservationModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="12" height="12" fill="currentColor">
+    <path d="M112 128c0-29.5 16.2-55 40-68.9V256h48V48h48v208h48V59.1c23.8 13.9 40 39.4 40 68.9v128h48V128C384 57.3 326.7 0 256 0h-64C121.3 0 64 57.3 64 128v128h48V128zm272 320c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm-320 0c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm352 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm-352 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zM32 448c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm384 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm-352 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm320 0c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zM112 512c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z"/>
 </svg>
+                    <span class="text-white">رزرو میز</span>
+                </a>
 
-                    </button>
-                </div>
+                <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en" class="lang-btn bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 no-underline w-8 h-8 rounded-lg flex items-center justify-center text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <span class="lang-text font-medium">EN</span>
+                </a>
+
+                <button id="theme-toggle" class="header-icon bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 384 512"
+                         width="14"
+                         height="14"
+                         fill="currentColor">
+                        <path d="M223.5 32c-1.7 0-3.4.1-5.1.2C154.1 39.2 96 94.3 96 160c0 70.7 57.3 128 128 128 65.7 0 120.8-58.1 127.8-122.4.1-1.7.2-3.4.2-5.1 0-6.6-7.4-10.3-12.6-6.3-16.9 12.9-38 20.6-60.9 20.6-55.2 0-100-44.8-100-100 0-22.9 7.7-44 20.6-60.9 4-5.2.3-12.6-6.3-12.6z"/>
+                    </svg>
+                </button>
             </div>
         </div>
+    </div>
 
-        <div class="search-container bg-white py-2 border-t border-gray-100">
-            <div class="container mx-auto px-3">
-                <div class="search-box bg-gray-50 rounded-xl px-3 py-1.5 flex items-center gap-2 border border-gray-200">
-                   <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 512 512"
-     width="10"
-     height="10"
-     fill="currentColor"
-     class="text-gray-400">
-  <path d="M505 442.7L405.3 343c28.4-34.9 45.7-79.4 45.7-128C451 96.5 354.5 0 231 0S11 96.5 11 215.1 107.5 430.1 231 430.1c48.6 0 93.1-17.3 128-45.7L442.7 505c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.5-9.4 9.5-24.6.1-34zM231 370.1c-85.4 0-155-69.6-155-155s69.6-155 155-155 155 69.6 155 155-69.6 155-155 155z"/>
-</svg>
-
-                    <input type="text" placeholder="جستجوی غذا..."
-                           class="w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 text-xs">
-                </div>
+    <div class="search-container bg-white dark:bg-gray-800 py-2 border-t border-gray-100 dark:border-gray-700">
+        <div class="container mx-auto px-3">
+            <div class="search-box bg-gray-50 dark:bg-gray-700 rounded-xl px-3 py-1.5 flex items-center gap-2 border border-gray-200 dark:border-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512"
+                     width="10"
+                     height="10"
+                     fill="currentColor"
+                     class="text-gray-400 dark:text-gray-300">
+                    <path d="M505 442.7L405.3 343c28.4-34.9 45.7-79.4 45.7-128C451 96.5 354.5 0 231 0S11 96.5 11 215.1 107.5 430.1 231 430.1c48.6 0 93.1-17.3 128-45.7L442.7 505c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.5-9.4 9.5-24.6.1-34zM231 370.1c-85.4 0-155-69.6-155-155s69.6-155 155-155 155 69.6 155 155-69.6 155-155 155z"/>
+                </svg>
+                <input type="text" placeholder="جستجوی غذا..."
+                       class="w-full bg-transparent border-none outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 text-xs">
             </div>
         </div>
+    </div>
 
-        <!-- دسته‌بندی‌های زیر جستجو -->
-        <div class="categories-scroll-container">
-            <div class="container mx-auto px-3">
-                <div class="categories-scroll">
-                    <div style='color:background-color:#ef4444 !important;' class="category-bottom-item category-bottom-active" data-category="all">
-                        <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
-                           <svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 416 512"
-  width="16"
-  height="16"
-  fill="currentColor"
-  aria-hidden="true"
->
-  <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
-</svg>
-
-                        </div>
-                        <span class="category-bottom-name">همه</span>
+    <!-- دسته‌بندی‌های زیر جستجو -->
+    <div class="categories-scroll-container">
+        <div class="container mx-auto px-3">
+            <div class="categories-scroll">
+                <div class="category-bottom-item category-bottom-active" data-category="all">
+                    <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 416 512"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             aria-hidden="true">
+                            <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
+                        </svg>
                     </div>
-
-                    {% for menu_category in menu_categories %}
-                    <div class="category-bottom-item" data-category="{{ menu_category.id }}">
-                        {% if menu_category.displayImage %}
-                        <img src="{{ menu_category.displayImage.url }}" alt="{{ menu_category.category.title }}"
-                             class="category-bottom-icon object-cover shadow-md">
-                        {% else %}
-                        <div class="category-bottom-icon bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 shadow-md">
-                            <svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 416 512"
-  width="16"
-  height="16"
-  fill="currentColor"
-  aria-hidden="true"
->
-  <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
-</svg>
-
-                        </div>
-                        {% endif %}
-                        <span class="category-bottom-name">{{ menu_category.category.title|truncatechars:10 }}</span>
-                    </div>
-                    {% endfor %}
+                    <span class="category-bottom-name">همه</span>
                 </div>
+
+                {% for menu_category in menu_categories %}
+                <div class="category-bottom-item" data-category="{{ menu_category.id }}">
+                    {% if menu_category.displayImage %}
+                    <img src="{{ menu_category.displayImage.url }}" alt="{{ menu_category.category.title }}"
+                         class="category-bottom-icon object-cover shadow-md">
+                    {% else %}
+                    <div class="category-bottom-icon bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 416 512"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             aria-hidden="true">
+                            <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <span class="category-bottom-name">{{ menu_category.category.title|truncatechars:10 }}</span>
+                </div>
+                {% endfor %}
             </div>
         </div>
+    </div>
+</header>
+
+<!-- منوی کشویی همبرگری -->
+<div class="hamburger-menu-sidebar fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl z-50 transform -translate-x-full transition-transform duration-300">
+    <div class="p-4">
+        <!-- هدر منو -->
+        <div class="flex justify-between items-center mb-6 pb-4 border-b dark:border-gray-700">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white">منو</h3>
+            <button class="close-menu-btn text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512" width="20" height="20" fill="currentColor">
+                    <path d="M242.7 256l100.1-100.1c12.3-12.3 12.3-32.2 0-44.5l-22.2-22.2c-12.3-12.3-32.2-12.3-44.5 0L176 189.3 75.9 89.2c-12.3-12.3-32.2-12.3-44.5 0L9.2 111.4c-12.3 12.3-12.3 32.2 0 44.5L109.3 256 9.2 356.1c-12.3 12.3-12.3 32.2 0 44.5l22.2 22.2c12.3 12.3 32.2 12.3 44.5 0L176 322.7l100.1 100.1c12.3 12.3 32.2 12.3 44.5 0l22.2-22.2c12.3-12.3 12.3-32.2 0-44.5L242.7 256z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- محتوای منو -->
+        <div class="menu-content">
 
 
-    </header>
+            <div class="mt-8 pt-6 border-t dark:border-gray-700">
+    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">رستوران</h4>
+   <ul class="space-y-2">
+    <!-- وضعیت سیگار -->
+    <li>
+        <a href="#description" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
+                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 110c23.2 0 42 18.8 42 42s-18.8 42-42 42-42-18.8-42-42 18.8-42 42-42zm56 286h-24v-112h-64v-24c0-13.3 10.7-24 24-24h40c13.3 0 24 10.7 24 24v136z"/>
+                </svg>
+            </div>
+            <span class="text-gray-700 dark:text-gray-300">وضعیت محیط</span>
+
+            <!-- وضعیت آزادی سیگار -->
+            {% if restaurant.freeSmoke %}
+            <div class="ml-auto flex items-center gap-1">
+                <div class="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="10" height="10" fill="#ef4444">
+                        <path d="M216 23.86c0-23.8-30.65-32.77-44.15-13.04C48 191.85 224 200 224 288c0 35.63-29.11 64.46-64.85 63.99-35.17-.45-63.15-29.77-63.15-64.94v-85.51c0-21.7-26.47-32.23-41.43-16.5C27.8 213.16 0 261.33 0 320c0 105.87 86.13 192 192 192s192-86.13 192-192c0-170.29-168-193-168-296.14z"/>
+                    </svg>
+                </div>
+                <span class="text-xs text-red-600 dark:text-red-400 font-medium">سیگار آزاد</span>
+            </div>
+            {% else %}
+            <div class="ml-auto flex items-center gap-1">
+                <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="10" height="10" fill="#10b981">
+                        <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/>
+                    </svg>
+                </div>
+                <span class="text-xs text-green-600 dark:text-green-400 font-medium">بدون سیگار</span>
+            </div>
+            {% endif %}
+        </a>
+    </li>
+
+    <!-- تلفن -->
+    <li>
+        <a href="tel:{{ restaurant.phone }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
+                    <path d="M493.4 24.6l-104-24c-7.3-1.7-14.7 2.5-17.3 9.1L351.9 128H48C21.5 128 0 150.1 0 176v16c0 44.2 35.8 80 80 80h240v112c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V288h112c44.2 0 80-35.8 80-80v-16c0-25.9-21.5-48-48-48h-68.8l28.9-94.6c2.6-8.6-2.1-17.6-10.7-19.4z"/>
+                </svg>
+            </div>
+            <span class="text-gray-700 dark:text-gray-300">{{ restaurant.phone }}</span>
+        </a>
+    </li>
+
+    <!-- آدرس -->
+    {% if restaurant.address %}
+    <li>
+        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="14" height="14" fill="currentColor">
+                    <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/>
+                </svg>
+            </div>
+            <span class="text-gray-700 dark:text-gray-300 text-sm line-clamp-2">{{ restaurant.address }}</span>
+        </a>
+    </li>
+    {% endif %}
+
+    <!-- ساعت کاری -->
+    {% if restaurant.openingTime and restaurant.closingTime %}
+    <li>
+        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
+                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm57.1 345.1c4.7 4.7 4.7 12.3 0 17l-17 17c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l17-17c4.7-4.7 12.3-4.7 17 0l111 111z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <span class="text-gray-700 dark:text-gray-300">ساعت کاری</span>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
+                    {% now "H:i" as current_time %}
+                    {% if current_time >= restaurant.openingTime|time:"H:i" and current_time <= restaurant.closingTime|time:"H:i" %}
+                    <span class="mr-2 inline-flex items-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 ml-1 animate-pulse"></span>
+                        باز است
+                    </span>
+                    {% else %}
+                    <span class="mr-2 inline-flex items-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 ml-1"></span>
+                        بسته است
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+    </li>
+    {% endif %}
+
+    <!-- حداقل سفارش -->
+    {% if restaurant.minimumOrder %}
+    <li>
+        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" fill="currentColor">
+                    <path d="M504 217H295.5l-7.7-23.2c-1.7-5.1-6.5-8.8-12-8.8H216c-6.6 0-12 5.4-12 12s5.4 12 12 12h52.7l44.8 134.4c1.7 5.1 6.5 8.8 12 8.8h84c5.5 0 10.3-3.7 12-8.8l23.2-69.6h12.5c17.7 0 32-14.3 32-32s-14.3-32-32-32zm-53.2 64l-14.4 43.2H307.8l-14.4-43.2h116.6zM72 32C52.1 32 36 48.1 36 68v252c0 19.9 16.1 36 36 36h372c6.6 0 12-5.4 12-12v-8c0-6.6-5.4-12-12-12H72c-6.6 0-12-5.4-12-12V68c0-6.6 5.4-12 12-12zm320 448H88c-6.6 0-12-5.4-12-12v-8c0-6.6 5.4-12 12-12h304c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <span class="text-gray-700 dark:text-gray-300">حداقل سفارش</span>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {{ restaurant.minimumOrder|floatformat:"0" }} تومان
+                    {% if restaurant.deliveryFee and restaurant.deliveryFee > 0 %}
+                    | هزینه پیک: {{ restaurant.deliveryFee|floatformat:"0" }} تومان
+                    {% else %}
+                    | پیک رایگان
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+    </li>
+    {% endif %}
+
+    <!-- مالیات -->
+    {% if restaurant.taxRate %}
+    <li>
+        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="14" height="14" fill="currentColor">
+                    <path d="M624 32H16C7.2 32 0 39.2 0 48v288c0 8.8 7.2 16 16 16h608c8.8 0 16-7.2 16-16V48c0-8.8-7.2-16-16-16zm-32 272H48V80h544v224zM368 128c44.2 0 80 35.8 80 80s-35.8 80-80 80-80-35.8-80-80 35.8-80 80-80zm0 128c26.5 0 48-21.5 48-48s-21.5-48-48-48-48 21.5-48 48 21.5 48 48 48zm-240-32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zm0-96c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zm352 96c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zm0-96c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <span class="text-gray-700 dark:text-gray-300">مالیات</span>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {{ restaurant.taxRate }}%
+                    | {% if restaurant.show_usd_price %}نمایش قیمت دلار{% else %}قیمت تومان{% endif %}
+                    | {% if restaurant.show_preparation_time %}نمایش زمان آماده‌سازی{% endif %}
+                </div>
+            </div>
+        </a>
+    </li>
+    {% endif %}
+
+    <!-- وضعیت سئو -->
+    <li>
+        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="14" height="14" fill="currentColor">
+                    <path d="M634 471L36 3.5C29.1-2 19-.9 13.5 6l-10 12.5C-2 25.4-.9 35.5 6 41l598 467.5c6.9 5.5 17 4.4 22.5-2.5l10-12.5c5.5-6.9 4.4-17-2.5-22.5zM256 416c-53 0-96-43-96-96 0-30.4 14.1-57.5 36-75L82.9 161.3C33.2 202.8 0 262.9 0 328c0 78.1 56.8 142.3 131.2 156.8 32.1 6.4 63.2-2.3 88.7-21.2 22.5-16.7 39.1-39.6 47.3-65.8 8.2-26.2 7.8-53.9-1.4-79.6-9.2-25.7-26.8-46.9-49.2-60.9L256 336c0 26.5 21.5 48 48 48s48-21.5 48-48-21.5-48-48-48c-4.7 0-9.2.7-13.5 2l-52.4-41c25.3-15.1 56.1-23 87.9-23 70.7 0 134.7 40.4 164.6 102.8 4.6 9.5 13.7 16.1 24.1 16.1 2.7 0 5.5-.5 8.1-1.6 11.9-4.9 17.1-18.9 12.2-30.8-35.6-86.6-122.3-145.6-217-145.6-45.3 0-88.6 13.1-125.3 37.4l-45.4-35.5c44-31.4 98.1-49.9 155.7-49.9 123.8 0 227.4 91.5 244.8 212.1 1.8 12.4-7.3 23.5-19.7 25.3-12.4 1.8-23.5-7.3-25.3-19.7C454.5 185.5 379 128 292 128c-43.4 0-84.5 12.5-119.6 34.4l-64.4-50.4c55.1-36.2 123.1-56 194-56 159.1 0 294.5 118.7 314.2 276.4 1.6 12.8-7.3 24.2-20 25.8-12.8 1.6-24.2-7.3-25.8-20C558.5 278.5 435.4 176 292 176z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <span class="text-gray-700 dark:text-gray-300">سئو</span>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {% if restaurant.isSeo %}
+                    <span class="text-green-600 dark:text-green-400">فعال</span>
+                    {% else %}
+                    <span class="text-red-600 dark:text-red-400">غیرفعال</span>
+                    {% endif %}
+                    {% if restaurant.menu_active %}
+                    | <span class="text-green-600 dark:text-green-400">منو فعال</span>
+                    {% else %}
+                    | <span class="text-red-600 dark:text-red-400">منو غیرفعال</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+    </li>
+
+    <!-- تاریخ انقضا -->
+    {% if restaurant.expireDate %}
+    <li>
+        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="w-8 h-8 rounded-md bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
+                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <span class="text-gray-700 dark:text-gray-300">تاریخ انقضا</span>
+                <div class="text-xs {% if restaurant.expireDate > now %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-1">
+                    {{ restaurant.expireDate|date:"Y/m/d H:i" }}
+                    {% if restaurant.expireDate > now %}
+                    | <span class="text-green-600 dark:text-green-400">معتبر</span>
+                    {% else %}
+                    | <span class="text-red-600 dark:text-red-400">منقضی شده</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+    </li>
+    {% endif %}
+</ul>
+</div>
+        </div>
+    </div>
+</div>
+
+<!-- لایه محو پشت منو -->
+<div class="hamburger-menu-overlay fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
 <br>
     <!-- محتوای اصلی -->
     <div class="main-content">
@@ -937,12 +1143,12 @@
                                     <div class="flex items-center gap-2">
                                         <div class="cooking-time bg-gray-50 px-2 py-1 rounded-lg">
                                             <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 512 512"
-     width="12"
-     height="12"
-     fill="currentColor">
-  <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm12-328h-24c-6.6 0-12 5.4-12 12v128c0 6.6 5.4 12 12 12h96c6.6 0 12-5.4 12-12v-24c0-6.6-5.4-12-12-12h-72V140c0-6.6-5.4-12-12-12z"/>
-</svg>
+                                                viewBox="0 0 512 512"
+                                                width="12"
+                                                height="12"
+                                                fill="currentColor">
+                                            <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm12-328h-24c-6.6 0-12 5.4-12 12v128c0 6.6 5.4 12 12 12h96c6.6 0 12-5.4 12-12v-24c0-6.6-5.4-12-12-12h-72V140c0-6.6-5.4-12-12-12z"/>
+                                            </svg>
 
                                             <span class="text-xs font-medium">{{ food.preparationTime|default:"-" }} دقیقه</span>
                                         </div>
@@ -950,15 +1156,15 @@
                                                 {% if food.sound %}data-sound="{{ food.sound.url }}"{% endif %}
                                                 title="{% if food.sound %}پخش توضیحات صوتی{% else %}توضیحات صوتی موجود نیست{% endif %}">
                                             <svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 640 512"
-  width="12"
-  height="12"
-  fill="currentColor"
-  aria-hidden="true"
->
-  <path d="M320 64c-12.5 0-24.2 4.7-32.9 13.1L160 192H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h128l127.1 114.9c8.7 8.4 20.4 13.1 32.9 13.1 26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm141.5 49.1c-11.3-7.3-26.4-4.1-33.7 7.2-7.3 11.3-4.1 26.4 7.2 33.7 24.4 15.8 39 43.1 39 72s-14.6 56.2-39 72c-11.3 7.3-14.5 22.4-7.2 33.7 4.6 7.1 12.3 11 20.5 11 4.5 0 9-1.3 13.2-3.8C499.3 318.6 528 274.6 528 226s-28.7-92.6-66.5-112.9z"/>
-</svg>
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 640 512"
+                                            width="12"
+                                            height="12"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                            >
+                                            <path d="M320 64c-12.5 0-24.2 4.7-32.9 13.1L160 192H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h128l127.1 114.9c8.7 8.4 20.4 13.1 32.9 13.1 26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm141.5 49.1c-11.3-7.3-26.4-4.1-33.7 7.2-7.3 11.3-4.1 26.4 7.2 33.7 24.4 15.8 39 43.1 39 72s-14.6 56.2-39 72c-11.3 7.3-14.5 22.4-7.2 33.7 4.6 7.1 12.3 11 20.5 11 4.5 0 9-1.3 13.2-3.8C499.3 318.6 528 274.6 528 226s-28.7-92.6-66.5-112.9z"/>
+                                            </svg>
 
                                         </button>
                                     </div>
@@ -989,16 +1195,16 @@
     <!-- بقیه کدها بدون تغییر باقی می‌مانند -->
     <!-- دکمه لیست انتخاب غذا -->
     <div class="selection-list-btn">
-       <svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 512 512"
-  width="12"
-  height="12"
-  fill="currentColor"
-  aria-hidden="true"
->
-  <path d="M80 64c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zM176 96c-17.7 0-32 14.3-32 32s14.3 32 32 32h272c17.7 0 32-14.3 32-32s-14.3-32-32-32H176zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h272c17.7 0 32-14.3 32-32s-14.3-32-32-32H176zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h272c17.7 0 32-14.3 32-32s-14.3-32-32-32H176z"/>
-</svg>
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+            width="12"
+            height="12"
+            fill="currentColor"
+            aria-hidden="true"
+            >
+        <path d="M80 64c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zM176 96c-17.7 0-32 14.3-32 32s14.3 32 32 32h272c17.7 0 32-14.3 32-32s-14.3-32-32-32H176zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h272c17.7 0 32-14.3 32-32s-14.3-32-32-32H176zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h272c17.7 0 32-14.3 32-32s-14.3-32-32-32H176z"/>
+        </svg>
 
         <div class="selection-list-badge">0</div>
     </div>
@@ -1009,24 +1215,24 @@
             <span class="selection-list-title">لیست انتخاب شما</span>
             <div class="selection-list-close text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 352 512"
-     width="16"
-     height="16"
-     fill="currentColor">
-  <path d="M242.7 256l100.1-100.1c12.3-12.3 12.3-32.2 0-44.5l-22.2-22.2c-12.3-12.3-32.2-12.3-44.5 0L176 189.3 75.9 89.2c-12.3-12.3-32.2-12.3-44.5 0L9.2 111.4c-12.3 12.3-12.3 32.2 0 44.5L109.3 256 9.2 356.1c-12.3 12.3-12.3 32.2 0 44.5l22.2 22.2c12.3 12.3 32.2 12.3 44.5 0L176 322.7l100.1 100.1c12.3 12.3 32.2 12.3 44.5 0l22.2-22.2c12.3-12.3 12.3-32.2 0-44.5L242.7 256z"/>
-</svg>
+            viewBox="0 0 352 512"
+            width="16"
+            height="16"
+            fill="currentColor">
+        <path d="M242.7 256l100.1-100.1c12.3-12.3 12.3-32.2 0-44.5l-22.2-22.2c-12.3-12.3-32.2-12.3-44.5 0L176 189.3 75.9 89.2c-12.3-12.3-32.2-12.3-44.5 0L9.2 111.4c-12.3 12.3-12.3 32.2 0 44.5L109.3 256 9.2 356.1c-12.3 12.3-12.3 32.2 0 44.5l22.2 22.2c12.3 12.3 32.2 12.3 44.5 0L176 322.7l100.1 100.1c12.3 12.3 32.2 12.3 44.5 0l22.2-22.2c12.3-12.3 12.3-32.2 0-44.5L242.7 256z"/>
+    </svg>
 
             </div>
         </div>
         <div class="selection-list-content">
             <div class="selection-list-empty">
-              <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 352 512"
-     width="16"
-     height="16"
-     fill="currentColor">
-  <path d="M242.7 256l100.1-100.1c12.3-12.3 12.3-32.2 0-44.5l-22.2-22.2c-12.3-12.3-32.2-12.3-44.5 0L176 189.3 75.9 89.2c-12.3-12.3-32.2-12.3-44.5 0L9.2 111.4c-12.3 12.3-12.3 32.2 0 44.5L109.3 256 9.2 356.1c-12.3 12.3-12.3 32.2 0 44.5l22.2 22.2c12.3 12.3 32.2 12.3 44.5 0L176 322.7l100.1 100.1c12.3 12.3 32.2 12.3 44.5 0l22.2-22.2c12.3-12.3 12.3-32.2 0-44.5L242.7 256z"/>
-</svg>
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 352 512"
+                width="16"
+                height="16"
+                fill="currentColor">
+            <path d="M242.7 256l100.1-100.1c12.3-12.3 12.3-32.2 0-44.5l-22.2-22.2c-12.3-12.3-32.2-12.3-44.5 0L176 189.3 75.9 89.2c-12.3-12.3-32.2-12.3-44.5 0L9.2 111.4c-12.3 12.3-12.3 32.2 0 44.5L109.3 256 9.2 356.1c-12.3 12.3-12.3 32.2 0 44.5l22.2 22.2c12.3 12.3 32.2 12.3 44.5 0L176 322.7l100.1 100.1c12.3 12.3 32.2 12.3 44.5 0l22.2-22.2c12.3-12.3 12.3-32.2 0-44.5L242.7 256z"/>
+            </svg>
 
                 <p class="text-base">لیست انتخاب شما خالی است</p>
                 <p class="text-sm mt-1 opacity-75">غذاهای مورد نظر خود را با کلیک روی دکمه سفارش ذخیره کنید</p>
@@ -1275,7 +1481,9 @@
                             <button type="button"
                                     class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2"
                                     onclick="submitReservation()">
-                                <i class="fas fa-check"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor">
+    <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/>
+</svg>
                                 ثبت رزرو
                             </button>
                         </div>
@@ -1327,49 +1535,149 @@
 
     <!-- بخش توضیحات رستوران -->
     {% if restaurant.isSeo %}
-      <div class="restaurant-description-section" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
-        <div class="description-container" style="background: #f8f9fa; border-radius: 12px; padding: 0; overflow: hidden; border: 1px solid #e5e7eb;">
-            <div class="description-header" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease;">
-                <span style="font-size: 1rem; margin: 0; color: #374151; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                   <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 512 512"
-     width="12"
-     height="12"
-     fill="currentColor">
-  <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 110c23.2 0 42 18.8 42 42s-18.8 42-42 42-42-18.8-42-42 18.8-42 42-42zm56 286h-24v-112h-64v-24c0-13.3 10.7-24 24-24h40c13.3 0 24 10.7 24 24v136z"/>
-</svg>
-
-                     درباره {{ restaurant.title }}
-                </span>
-                <div class="toggle-icon" style="transition: transform 0.3s ease; color: #6b7280;">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 448 512"
-     width="14"
-     height="14"
-     fill="currentColor">
-  <path d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.746-154.02c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"/>
-</svg>
-
-                </div>
-            </div>
-
-            <div class="description-content" style="padding: 0 20px; max-height: 0; overflow: hidden; transition: all 0.4s ease; border-top: 1px solid transparent;">
-                <div style="padding: 20px 0; text-align: justify; line-height: 1.7; color: #4b5563; font-size: 0.9rem;">
-                    {% if restaurant.text and restaurant.text != 'خالی' %}
-                     {% autoescape off %}
-                        <h2>درباره {{ restaurant.title }}</h2>
-                        {{ restaurant.text }}
-                     {% endautoescape %}
-                    {% else %}
-                        <p style="color: #9ca3af; font-style: italic; text-align: center;">
-                            توضیحاتی برای این رستوران ثبت نشده است
-                        </p>
-                    {% endif %}
-                </div>
+<div class="restaurant-description-section" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+    <div class="description-container" style="background: #f8f9fa; border-radius: 12px; padding: 0; overflow: hidden; border: 1px solid #e5e7eb;">
+        <div class="description-header"
+             style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease;"
+             onclick="toggleDescription()">
+            <span style="font-size: 1rem; margin: 0; color: #374151; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="12" height="12" fill="currentColor">
+                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 110c23.2 0 42 18.8 42 42s-18.8 42-42 42-42-18.8-42-42 18.8-42 42-42zm56 286h-24v-112h-64v-24c0-13.3 10.7-24 24-24h40c13.3 0 24 10.7 24 24v136z"/>
+                </svg>
+                درباره {{ restaurant.title }}
+            </span>
+            <div class="toggle-icon" style="transition: transform 0.3s ease; color: #6b7280;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="14" height="14" fill="currentColor">
+                    <path d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.746-154.02c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"/>
+                </svg>
             </div>
         </div>
+
+        <div class="description-content" style="padding: 0 20px; max-height: 120px; overflow: hidden; transition: all 0.4s ease; border-top: 1px solid #e5e7eb; position: relative;">
+            <div style="padding: 20px 0; text-align: justify; line-height: 1.7; color: #4b5563; font-size: 0.9rem;">
+                {% if restaurant.text and restaurant.text != '' %}
+                    {% autoescape off %}
+                        <div style="max-height: 80px; overflow: hidden;">
+                            {{ restaurant.text|truncatechars:300 }}
+                        </div>
+                    {% endautoescape %}
+                {% else %}
+                    <p style="color: #9ca3af; font-style: italic; text-align: center;">
+                        توضیحاتی برای این رستوران ثبت نشده است
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Gradient overlay for showing "read more" effect -->
+            <div class="gradient-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to bottom, transparent, #f8f9fa); pointer-events: none;"></div>
+        </div>
     </div>
-    {% endif %}
+</div>
+
+<script>
+function toggleDescription() {
+    const content = document.querySelector('.description-content');
+    const toggleIcon = document.querySelector('.toggle-icon svg');
+    const header = document.querySelector('.description-header');
+
+    if (content.style.maxHeight === '0px' || content.style.maxHeight === '') {
+        // باز کردن
+        content.style.maxHeight = content.scrollHeight + 'px';
+        content.style.padding = '0 20px';
+        toggleIcon.style.transform = 'rotate(180deg)';
+        header.style.backgroundColor = '#f1f5f9';
+
+        // مخفی کردن گرادیان وقتی کاملاً باز است
+        const gradient = content.querySelector('.gradient-overlay');
+        if (gradient) {
+            gradient.style.display = 'none';
+        }
+
+        // به روزرسانی محتوا برای نمایش کامل
+        const innerDiv = content.querySelector('div > div');
+        if (innerDiv) {
+            innerDiv.style.maxHeight = 'none';
+        }
+    } else {
+        // بستن
+        content.style.maxHeight = '120px'; // ارتفاع اولیه برای نمایش بخشی از متن
+        content.style.padding = '0 20px';
+        toggleIcon.style.transform = 'rotate(0deg)';
+        header.style.backgroundColor = '';
+
+        // نمایش مجدد گرادیان
+        const gradient = content.querySelector('.gradient-overlay');
+        if (gradient) {
+            gradient.style.display = 'block';
+        }
+
+        // محدود کردن متن برای نمایش بخشی
+        const innerDiv = content.querySelector('div > div');
+        if (innerDiv) {
+            innerDiv.style.maxHeight = '80px';
+            innerDiv.style.overflow = 'hidden';
+        }
+    }
+}
+
+// مقداردهی اولیه
+document.addEventListener('DOMContentLoaded', function() {
+    const content = document.querySelector('.description-content');
+    const header = document.querySelector('.description-header');
+
+    // تنظیم ارتفاع اولیه برای نمایش بخشی از متن
+    if (content) {
+        content.style.maxHeight = '120px';
+        content.style.padding = '0 20px';
+
+        // افزودن رویداد کلیک به هدر
+        if (header) {
+            header.style.cursor = 'pointer';
+            header.onclick = toggleDescription;
+        }
+    }
+});
+</script>
+
+<style>
+.description-content {
+    position: relative;
+}
+
+.gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, #f8f9fa 90%);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* برای نمایش بهتر در حالت تاریک */
+.dark-mode .description-container {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.dark-mode .description-header span {
+    color: #f3f4f6;
+}
+
+.dark-mode .description-content {
+    color: #d1d5db;
+}
+
+.dark-mode .gradient-overlay {
+    background: linear-gradient(to bottom, transparent, #1f2937 90%);
+}
+
+.dark-mode .description-header:hover {
+    background-color: #374151 !important;
+}
+</style>
+{% endif %}
 
     <script src='{% static "/assets/script/bundle.js" %}' ></script>
 
@@ -1759,7 +2067,135 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // المنت‌های منوی همبرگری
+    const hamburgerBtn = document.getElementById('hamburgerMenuBtn');
+    const menuSidebar = document.querySelector('.hamburger-menu-sidebar');
+    const closeMenuBtn = document.querySelector('.close-menu-btn');
+    const menuOverlay = document.querySelector('.hamburger-menu-overlay');
 
+    // باز کردن منو
+    hamburgerBtn.addEventListener('click', function() {
+        menuSidebar.style.transform = 'translateX(0)';
+        menuOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // بستن منو
+    function closeMenu() {
+        menuSidebar.style.transform = 'translateX(-100%)';
+        menuOverlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    closeMenuBtn.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    // کلیک روی آیتم‌های دسته‌بندی در منو
+    const categoryMenuItems = document.querySelectorAll('.category-menu-item');
+    categoryMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const categoryId = this.getAttribute('data-category');
+
+            // حذف کلاس active از همه
+            categoryMenuItems.forEach(i => i.classList.remove('active'));
+            // اضافه کردن کلاس active به آیتم انتخاب شده
+            this.classList.add('active');
+
+            // بستن منو
+            closeMenu();
+
+            // فیلتر کردن غذاها بر اساس دسته‌بندی
+            filterFoodsByCategory(categoryId);
+        });
+    });
+
+    // تابع فیلتر کردن غذاها
+    function filterFoodsByCategory(categoryId) {
+        const foodItems = document.querySelectorAll('.food-item');
+
+        foodItems.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+
+            if (categoryId === 'all' || itemCategory === categoryId) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // به‌روزرسانی دسته‌بندی فعال در نوار پایین
+        updateActiveCategory(categoryId);
+    }
+
+    // به‌روزرسانی دسته‌بندی فعال
+    function updateActiveCategory(categoryId) {
+        const bottomItems = document.querySelectorAll('.category-bottom-item');
+        bottomItems.forEach(item => {
+            item.classList.remove('category-bottom-active');
+            if (item.getAttribute('data-category') === categoryId) {
+                item.classList.add('category-bottom-active');
+            }
+        });
+    }
+});
+</script>
+
+<style>
+/* استایل‌های منوی همبرگری */
+.hamburger-menu-sidebar {
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.hamburger-menu-sidebar.active {
+    transform: translateX(0);
+}
+
+.close-menu-btn {
+    transition: all 0.2s ease;
+}
+
+.close-menu-btn:hover {
+    transform: scale(1.1);
+}
+
+.category-menu-item.active {
+    background-color: #3b82f6;
+}
+
+.category-menu-item.active span {
+    color: white !important;
+}
+
+.category-menu-item.active div,
+.category-menu-item.active svg {
+    background-color: #1d4ed8 !important;
+    color: white !important;
+}
+
+/* انیمیشن‌ها */
+.hamburger-menu-sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger-menu-overlay {
+    transition: opacity 0.3s ease;
+}
+
+/* حالت دارک مود */
+.dark .hamburger-menu-sidebar {
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ریسپانسیو */
+@media (max-width: 640px) {
+    .hamburger-menu-sidebar {
+        width: 280px;
+    }
+}
+</style>
     {% include "./resScript.html" %}
     {% include "./persianCall.html" %}
 
