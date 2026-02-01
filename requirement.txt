@@ -1,0 +1,2 @@
+ssh -p 3031 root@185.255.91.91
+source /home/jldgbolx/virtualenv/web/3.9/bin/activate && cd /home/jldgbolx/web

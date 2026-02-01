@@ -919,8 +919,7 @@
                     <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 110c23.2 0 42 18.8 42 42s-18.8 42-42 42-42-18.8-42-42 18.8-42 42-42zm56 286h-24v-112h-64v-24c0-13.3 10.7-24 24-24h40c13.3 0 24 10.7 24 24v136z"/>
                 </svg>
             </div>
-            <span class="text-gray-700 dark:text-gray-300">وضعیت محیط</span>
-
+           
             <!-- وضعیت آزادی سیگار -->
             {% if restaurant.freeSmoke %}
             <div class="ml-auto flex items-center gap-1">
@@ -1002,99 +1001,11 @@
     {% endif %}
 
     <!-- حداقل سفارش -->
-    {% if restaurant.minimumOrder %}
-    <li>
-        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" fill="currentColor">
-                    <path d="M504 217H295.5l-7.7-23.2c-1.7-5.1-6.5-8.8-12-8.8H216c-6.6 0-12 5.4-12 12s5.4 12 12 12h52.7l44.8 134.4c1.7 5.1 6.5 8.8 12 8.8h84c5.5 0 10.3-3.7 12-8.8l23.2-69.6h12.5c17.7 0 32-14.3 32-32s-14.3-32-32-32zm-53.2 64l-14.4 43.2H307.8l-14.4-43.2h116.6zM72 32C52.1 32 36 48.1 36 68v252c0 19.9 16.1 36 36 36h372c6.6 0 12-5.4 12-12v-8c0-6.6-5.4-12-12-12H72c-6.6 0-12-5.4-12-12V68c0-6.6 5.4-12 12-12zm320 448H88c-6.6 0-12-5.4-12-12v-8c0-6.6 5.4-12 12-12h304c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <span class="text-gray-700 dark:text-gray-300">حداقل سفارش</span>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {{ restaurant.minimumOrder|floatformat:"0" }} تومان
-                    {% if restaurant.deliveryFee and restaurant.deliveryFee > 0 %}
-                    | هزینه پیک: {{ restaurant.deliveryFee|floatformat:"0" }} تومان
-                    {% else %}
-                    | پیک رایگان
-                    {% endif %}
-                </div>
-            </div>
-        </a>
-    </li>
-    {% endif %}
 
-    <!-- مالیات -->
-    {% if restaurant.taxRate %}
-    <li>
-        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="14" height="14" fill="currentColor">
-                    <path d="M624 32H16C7.2 32 0 39.2 0 48v288c0 8.8 7.2 16 16 16h608c8.8 0 16-7.2 16-16V48c0-8.8-7.2-16-16-16zm-32 272H48V80h544v224zM368 128c44.2 0 80 35.8 80 80s-35.8 80-80 80-80-35.8-80-80 35.8-80 80-80zm0 128c26.5 0 48-21.5 48-48s-21.5-48-48-48-48 21.5-48 48 21.5 48 48 48zm-240-32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zm0-96c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zm352 96c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zm0-96c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <span class="text-gray-700 dark:text-gray-300">مالیات</span>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {{ restaurant.taxRate }}%
-                    | {% if restaurant.show_usd_price %}نمایش قیمت دلار{% else %}قیمت تومان{% endif %}
-                    | {% if restaurant.show_preparation_time %}نمایش زمان آماده‌سازی{% endif %}
-                </div>
-            </div>
-        </a>
-    </li>
-    {% endif %}
 
-    <!-- وضعیت سئو -->
-    <li>
-        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="14" height="14" fill="currentColor">
-                    <path d="M634 471L36 3.5C29.1-2 19-.9 13.5 6l-10 12.5C-2 25.4-.9 35.5 6 41l598 467.5c6.9 5.5 17 4.4 22.5-2.5l10-12.5c5.5-6.9 4.4-17-2.5-22.5zM256 416c-53 0-96-43-96-96 0-30.4 14.1-57.5 36-75L82.9 161.3C33.2 202.8 0 262.9 0 328c0 78.1 56.8 142.3 131.2 156.8 32.1 6.4 63.2-2.3 88.7-21.2 22.5-16.7 39.1-39.6 47.3-65.8 8.2-26.2 7.8-53.9-1.4-79.6-9.2-25.7-26.8-46.9-49.2-60.9L256 336c0 26.5 21.5 48 48 48s48-21.5 48-48-21.5-48-48-48c-4.7 0-9.2.7-13.5 2l-52.4-41c25.3-15.1 56.1-23 87.9-23 70.7 0 134.7 40.4 164.6 102.8 4.6 9.5 13.7 16.1 24.1 16.1 2.7 0 5.5-.5 8.1-1.6 11.9-4.9 17.1-18.9 12.2-30.8-35.6-86.6-122.3-145.6-217-145.6-45.3 0-88.6 13.1-125.3 37.4l-45.4-35.5c44-31.4 98.1-49.9 155.7-49.9 123.8 0 227.4 91.5 244.8 212.1 1.8 12.4-7.3 23.5-19.7 25.3-12.4 1.8-23.5-7.3-25.3-19.7C454.5 185.5 379 128 292 128c-43.4 0-84.5 12.5-119.6 34.4l-64.4-50.4c55.1-36.2 123.1-56 194-56 159.1 0 294.5 118.7 314.2 276.4 1.6 12.8-7.3 24.2-20 25.8-12.8 1.6-24.2-7.3-25.8-20C558.5 278.5 435.4 176 292 176z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <span class="text-gray-700 dark:text-gray-300">سئو</span>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {% if restaurant.isSeo %}
-                    <span class="text-green-600 dark:text-green-400">فعال</span>
-                    {% else %}
-                    <span class="text-red-600 dark:text-red-400">غیرفعال</span>
-                    {% endif %}
-                    {% if restaurant.menu_active %}
-                    | <span class="text-green-600 dark:text-green-400">منو فعال</span>
-                    {% else %}
-                    | <span class="text-red-600 dark:text-red-400">منو غیرفعال</span>
-                    {% endif %}
-                </div>
-            </div>
-        </a>
-    </li>
 
     <!-- تاریخ انقضا -->
-    {% if restaurant.expireDate %}
-    <li>
-        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
-                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <span class="text-gray-700 dark:text-gray-300">تاریخ انقضا</span>
-                <div class="text-xs {% if restaurant.expireDate > now %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-1">
-                    {{ restaurant.expireDate|date:"Y/m/d H:i" }}
-                    {% if restaurant.expireDate > now %}
-                    | <span class="text-green-600 dark:text-green-400">معتبر</span>
-                    {% else %}
-                    | <span class="text-red-600 dark:text-red-400">منقضی شده</span>
-                    {% endif %}
-                </div>
-            </div>
-        </a>
-    </li>
-    {% endif %}
+
 </ul>
 </div>
         </div>
