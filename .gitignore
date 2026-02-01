@@ -19,3 +19,27 @@ venv/
 .vscode/
 .idea/
 *.swp
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Celery
+celerybeat-schedule*
+celery/
+
+# Local / temp files
+*.zip
+*.sql
+localhost.sql
+
+# Media & static zips
+static.zip
+media.zip
+
+# Test / unused assets
+coffe_style/
+Coffestyle/
+
+staticfiles/
+

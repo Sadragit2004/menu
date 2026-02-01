@@ -26,7 +26,12 @@ SECRET_KEY = 'django-insecure-339igi*k2opmxfm^+3ys0gj&$m*a_x_#3y%bvod!)x7t@e#cv^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'menubesaz.ir',
+    'www.menubesaz.ir',
+    '185.255.91.91',
+]
+
 
 
 # Application definition
@@ -93,18 +98,23 @@ WSGI_APPLICATION = 'web.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/5.1/ref/settings/
+
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
-        'NAME':'webmona',
-        'USER':'root',
-        'PASSWORD':'sadra1383@gmail.com',
-        'HOST':'localhost',
-        'PORT':'3306'
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'menubesaz',
+        'USER': 'menubesaz',
+        'PASSWORD': '123456789987654321Sadra1383@gmail.com',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        }
     }
 }
+
 
 
 # Password validation
@@ -144,11 +154,11 @@ LANGUAGE_CODE = 'fa-ir'
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR,'static/'),)
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 AUTH_USER_MODEL = 'user.CustomUser'
