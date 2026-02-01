@@ -17,7 +17,7 @@ try:
     QRCODE_AVAILABLE = True
 
 except ImportError as e:
-   
+
     QRCODE_AVAILABLE = False
     qrcode = None
 
@@ -839,6 +839,10 @@ def add_food(request, slug):
             'success': False,
             'message': f'خطا در افزودن غذا: {str(e)}'
         })
+
+
+
+
 
 @login_required
 @restaurant_owner_required
