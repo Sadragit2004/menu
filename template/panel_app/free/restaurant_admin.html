@@ -44,7 +44,9 @@
                     <button class="delete-category-sidebar text-xs p-1 rounded bg-red-100 text-red-700"
                             data-category-id="{{ menu_category.id }}"
                             title="حذف از منو">
-                        <i class="fas fa-times"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                     </button>
                 </div>
                 <div class="category-icon bg-gradient-to-br from-green-400 to-green-500 text-white shadow-md">
@@ -143,7 +145,9 @@
                             <input type="text" placeholder="جستجوی غذا، دسته‌بندی یا قیمت..." class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" id="search-input">
                             <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
                             <button class="absolute left-3 top-3 text-gray-400 hover:text-gray-600 clear-search hidden" id="clear-search">
-                                <i class="fas fa-times"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                             </button>
                         </div>
                     </div>
@@ -272,7 +276,9 @@
                                 <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded"
                                         data-food-id="{{ food_data.id }}"
                                         title="حذف از منو">
-                                    <i class="fas fa-times"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                                 </button>
                             </div>
                         </div>
@@ -365,7 +371,9 @@
                                     <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded"
                                             data-food-id="{{ food_data.id }}"
                                             title="حذف از منو">
-                                        <i class="fas fa-times"></i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                                     </button>
                                 </div>
                             </div>
@@ -475,7 +483,9 @@
                         <div class="flex gap-1">
                             {% if food.id in selected_food_ids %}
                             <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded" data-food-id="{{ food.id }}" title="حذف از منو">
-                                <i class="fas fa-times"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                             </button>
                             {% else %}
                             <button class="add-food-btn text-green-500 hover:text-green-700 p-1 rounded" data-food-id="{{ food.id }}" title="افزودن به منو">
@@ -650,7 +660,9 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800" id="stats-modal-title">آمار غذا</h3>
                 <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                 </button>
             </div>
 
@@ -747,7 +759,9 @@
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-gray-800">شخصی‌سازی غذاهای شرکت</h3>
             <button class="close-modal text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
             </button>
         </div>
 
@@ -849,7 +863,9 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800" id="modal-title">افزودن غذا</h3>
                 <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                 </button>
             </div>
             <form id="food-form" enctype="multipart/form-data">
@@ -943,7 +959,9 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">مدیریت دسته‌بندی‌ها</h3>
                 <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                 </button>
             </div>
 
@@ -1001,7 +1019,9 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">افزودن دسته‌بندی جدید به منو</h3>
                 <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                 </button>
             </div>
             <form id="add-category-form" enctype="multipart/form-data">
@@ -1057,7 +1077,9 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">انتخاب سریع دسته‌بندی‌ها</h3>
                 <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
                 </button>
             </div>
 
@@ -1121,7 +1143,9 @@
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-gray-800">تنظیمات رستوران - {{ restaurant.title }}</h3>
             <button class="close-modal text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
             </button>
         </div>
 
