@@ -427,7 +427,7 @@ function openModal(modalId) {
             const activeTab = document.querySelector('.tab-content.active').id;
 
             if (activeTab === 'selected-foods-tab') {
-                 
+
 
                 filterFoodsInSelectedTab(searchTerm, statusFilter);
             } else {
@@ -622,41 +622,135 @@ function openModal(modalId) {
             }
         }
 
-        async function loadFoodData(foodId) {
-            try {
-                document.getElementById('modal-title').textContent = 'ویرایش غذا';
-                document.getElementById('food-id').value = foodId;
+        // تابع اصلاح شده برای بارگذاری اطلاعات غذا
+async function loadFoodData(foodId) {
+    try {
+        console.log('بارگذاری اطلاعات غذا برای ویرایش، ID:', foodId);
 
-                const foodCard = document.querySelector(`[data-food-id="${foodId}"]`);
-                if (foodCard) {
-                    document.getElementById('food-title').value = foodCard.querySelector('h3').textContent;
-                    document.getElementById('food-description').value = foodCard.querySelector('p').textContent;
+        // نمایش لودینگ
+        showLoading('#food-modal');
 
-                    const priceText = foodCard.querySelector('.font-bold').textContent;
-                    const price = priceText.replace(/[^0-9]/g, '');
-                    document.getElementById('food-price').value = price;
+        // 1. ابتدا از روی کارت موجود در صفحه اطلاعات را بگیریم
+        const foodCard = document.querySelector(`[data-food-id="${foodId}"]`);
+        if (!foodCard) {
+            throw new Error('کارت غذا در صفحه پیدا نشد');
+        }
 
-                    const prepTime = foodCard.querySelector('.fa-clock').parentElement.textContent.replace(/[^0-9]/g, '');
-                    document.getElementById('food-preparation-time').value = prepTime;
+        // 2. اطلاعات را از کارت استخراج کنیم
+        const foodTitle = foodCard.querySelector('h3').textContent;
+        // حذف آیکون‌ها از عنوان
+        const cleanTitle = foodTitle.replace(/<i.*?<\/i>/g, '').trim();
 
-                    const isActive = foodCard.getAttribute('data-status') === 'active';
-                    document.getElementById('food-active').checked = isActive;
+        const foodDescription = foodCard.querySelector('p.text-gray-600')?.textContent || '';
 
-                    const categoryName = foodCard.querySelector('.fa-tag').parentElement.textContent.trim();
-                    const categorySelect = document.getElementById('food-category');
-                    for (let option of categorySelect.options) {
-                        if (option.text === categoryName) {
-                            $('.select2-category').val(option.value).trigger('change');
-                            break;
-                        }
-                    }
+        // 3. قیمت
+        const priceElement = foodCard.querySelector('.font-bold.text-green-600');
+        let price = 0;
+        if (priceElement) {
+            const priceText = priceElement.textContent.trim();
+            price = parseInt(priceText.replace(/[^0-9]/g, '')) || 0;
+        }
+
+        // 4. زمان آماده‌سازی
+        const prepElement = foodCard.querySelector('.fa-clock, .bi-clock');
+        let preparationTime = 0;
+        if (prepElement) {
+            const prepText = prepElement.parentElement?.textContent || '';
+            preparationTime = parseInt(prepText.replace(/[^0-9]/g, '')) || 0;
+        }
+
+        // 5. وضعیت فعال
+        const isActive = foodCard.getAttribute('data-status') === 'active';
+
+        // 6. دسته‌بندی
+        const categoryElement = foodCard.querySelector('.fa-tag, .bi-tag');
+        let selectedCategoryId = '';
+        if (categoryElement) {
+            const categoryText = categoryElement.parentElement?.textContent.trim() || '';
+
+            // پیدا کردن ID دسته‌بندی از لیست select
+            const categorySelect = document.getElementById('food-category');
+            for (let option of categorySelect.options) {
+                if (option.text === categoryText) {
+                    selectedCategoryId = option.value;
+                    break;
                 }
-
-                document.getElementById('food-modal').style.display = 'flex';
-            } catch (error) {
-                showNotification('خطا در بارگذاری اطلاعات غذا');
             }
         }
+
+        // 7. تصویر (اگر موجود باشد)
+        let imageUrl = null;
+        const imgElement = foodCard.querySelector('img');
+        if (imgElement && !imgElement.src.includes('gray-200')) {
+            imageUrl = imgElement.src;
+        }
+
+        // 8. پر کردن فرم مودال
+        document.getElementById('food-id').value = foodId;
+        document.getElementById('food-title').value = cleanTitle;
+        document.getElementById('food-description').value = foodDescription;
+        document.getElementById('food-price').value = price;
+        document.getElementById('food-preparation-time').value = preparationTime;
+        document.getElementById('food-active').checked = isActive;
+
+        // تنظیم select2 برای دسته‌بندی
+        if (selectedCategoryId) {
+            $('#food-category').val(selectedCategoryId).trigger('change');
+        } else {
+            $('#food-category').val('').trigger('change');
+        }
+
+        // نمایش پیش‌نمایش تصویر (اگر موجود باشد)
+        if (imageUrl) {
+            document.getElementById('food-image-preview').src = imageUrl;
+            document.getElementById('food-image-preview').style.display = 'block';
+        }
+
+        // تغییر عنوان مودال
+        document.getElementById('modal-title').textContent = 'ویرایش غذا';
+
+        // باز کردن مودال
+        openModal('food-modal');
+
+        hideLoading('#food-modal');
+
+        console.log('اطلاعات غذا با موفقیت بارگذاری شد');
+
+    } catch (error) {
+        console.error('خطا در loadFoodData:', error);
+        hideLoading('#food-modal');
+        showNotification('خطا در بارگذاری اطلاعات غذا: ' + error.message, 'error');
+    }
+}
+
+// تابع showLoading (اگر ندارید اضافه کنید)
+function showLoading(selector) {
+    const modal = document.querySelector(selector);
+    if (modal) {
+        const existingLoader = modal.querySelector('.modal-loader');
+        if (!existingLoader) {
+            const loader = document.createElement('div');
+            loader.className = 'modal-loader fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loader.innerHTML = `
+                <div class="bg-white p-4 rounded-lg">
+                    <div class="loading mx-auto"></div>
+                    <p class="mt-2 text-sm text-gray-600">در حال بارگذاری...</p>
+                </div>
+            `;
+            modal.appendChild(loader);
+        }
+    }
+}
+
+function hideLoading(selector) {
+    const modal = document.querySelector(selector);
+    if (modal) {
+        const loader = modal.querySelector('.modal-loader');
+        if (loader) {
+            loader.remove();
+        }
+    }
+}
 
         // توابع ارسال فرم
         async function submitFoodForm(form) {
