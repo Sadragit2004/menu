@@ -11,6 +11,12 @@
     <title>پنل مدیریت - {{ restaurant.title }}</title>
     <link rel="stylesheet" href="{% static 'assets/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/admin236.css' %}">
+    <!-- کامل ترین - شامل تمام آیکون‌های رایگان -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
 
 </head>
 
@@ -20,7 +26,11 @@
         <aside class="md:w-1/5 categories-sidebar scrollbar-hide" id="categories-sidebar">
             <div class="category-sidebar-item category-sidebar-btn category-active active" data-category="all">
                 <div class="category-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
-                    <i class="fas fa-utensils"></i>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+    <path d="M7 2v20"/>
+    <path d="M21 15V2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5"/>
+</svg>
                 </div>
                 <span class="category-name">همه موارد</span>
             </div>
@@ -85,7 +95,10 @@
                                 </span>
                             {% elif expiry_info.days_until_expiry <= 7 %}
                                 <span class="bg-orange-100 text-orange-800 text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
-                                    <i class="fas fa-clock"></i>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
                                     {{ expiry_info.days_until_expiry }} روز باقی‌مانده
                                 </span>
                             {% else %}
@@ -118,12 +131,17 @@
                     </button>
 
                     <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="quick-category-btn">
-                        <i class="fas fa-bolt"></i>
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+</svg>
                         افزودن سریع دسته
                     </button>
 
                     <button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="manage-categories-btn">
-                        <i class="fas fa-tags"></i>
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+    <line x1="7" y1="7" x2="7.01" y2="7"/>
+</svg>
                         مدیریت دسته‌ها
                     </button>
 
@@ -133,7 +151,14 @@
                     </button>
 
                     <button class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm" id="customize-foods-btn">
-                        <i class="fas fa-palette"></i>
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="1"/>
+    <circle cx="8.5" cy="8.5" r="1.5" fill="#FF5252"/>
+    <circle cx="15.5" cy="8.5" r="1.5" fill="#4CAF50"/>
+    <circle cx="8.5" cy="15.5" r="1.5" fill="#2196F3"/>
+    <circle cx="15.5" cy="15.5" r="1.5" fill="#FFC107"/>
+</svg>
                         شخصی‌سازی
                     </button>
                 </div>
@@ -271,7 +296,10 @@
                                 </button>
                                 <button class="edit-food-btn text-blue-500 hover:text-blue-700 p-1 rounded"
                                         data-food-id="{{ food_data.id }}">
-                                    <i class="fas fa-edit"></i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.03l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg>
                                 </button>
                                 <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded"
                                         data-food-id="{{ food_data.id }}"
@@ -285,7 +313,10 @@
                         <p class="text-gray-600 text-sm mb-3">{{ food_data.description|default:"بدون توضیحات" }}</p>
                         <div class="flex justify-between items-center text-sm text-gray-500">
                             <div class="flex items-center gap-1">
-                                <i class="fas fa-clock"></i>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
                                 <span>{{ food_data.preparationTime|default:"-" }} دقیقه</span>
                             </div>
                             <div class="flex items-center gap-1">
@@ -366,7 +397,10 @@
                                     </button>
                                     <button class="edit-food-btn text-blue-500 hover:text-blue-700 p-1 rounded"
                                             data-food-id="{{ food_data.id }}">
-                                        <i class="fas fa-edit"></i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.03l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg>
                                     </button>
                                     <button class="remove-food-btn text-red-500 hover:text-red-700 p-1 rounded"
                                             data-food-id="{{ food_data.id }}"
@@ -380,7 +414,10 @@
                             <p class="text-gray-600 text-sm mb-3">{{ food_data.description|default:"بدون توضیحات" }}</p>
                             <div class="flex justify-between items-center text-sm text-gray-500">
                                 <div class="flex items-center gap-1">
-                                    <i class="fas fa-clock"></i>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
                                     <span>{{ food_data.preparationTime|default:"-" }} دقیقه</span>
                                 </div>
                                 <div class="flex items-center gap-1">
@@ -527,7 +564,10 @@
 
                     <div class="flex justify-between items-center text-sm text-gray-500">
                         <div class="flex items-center gap-1">
-                            <i class="fas fa-clock"></i>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
                             <span>{{ food.preparationTime|default:"-" }} دقیقه</span>
                         </div>
                         <div class="flex items-center gap-1">
@@ -557,7 +597,14 @@
                             <p class="text-gray-600 mt-1">در این بخش می‌توانید غذاهای شرکت را شخصی‌سازی کنید</p>
                         </div>
                         <button class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" id="open-customize-modal-btn">
-                            <i class="fas fa-palette"></i>
+                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="1"/>
+    <circle cx="8.5" cy="8.5" r="1.5" fill="#FF5252"/>
+    <circle cx="15.5" cy="8.5" r="1.5" fill="#4CAF50"/>
+    <circle cx="8.5" cy="15.5" r="1.5" fill="#2196F3"/>
+    <circle cx="15.5" cy="15.5" r="1.5" fill="#FFC107"/>
+</svg>
                             شخصی‌سازی
                         </button>
                     </div>
@@ -591,7 +638,10 @@
                                 <p class="text-gray-600 text-sm mb-3">{{ food_data.description|default:"بدون توضیحات"|truncatewords:15 }}</p>
                                 <div class="flex justify-between items-center text-sm text-gray-500">
                                     <div class="flex items-center gap-1">
-                                        <i class="fas fa-clock"></i>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
                                         <span>{{ food_data.preparationTime|default:"-" }} دقیقه</span>
                                     </div>
                                     <div class="flex items-center gap-1">
@@ -632,23 +682,42 @@
         </div>
         <div class="fab-menu" id="fab-menu">
             <div class="fab-item" id="fab-add-food">
-                <i class="fas fa-utensils"></i>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+    <path d="M7 2v20"/>
+    <path d="M21 15V2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5"/>
+</svg>
                 <span class="fab-label">افزودن غذا</span>
             </div>
             <div class="fab-item" id="fab-quick-category">
-                <i class="fas fa-bolt"></i>
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+</svg>
                 <span class="fab-label">افزودن سریع دسته</span>
             </div>
             <div class="fab-item" id="fab-add-category">
-                <i class="fas fa-tags"></i>
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+    <line x1="7" y1="7" x2="7.01" y2="7"/>
+</svg>
                 <span class="fab-label">افزودن دسته</span>
             </div>
             <div class="fab-item" id="fab-restaurant-settings">
                 <i class="fas fa-cog"></i>
-                <span class="fab-label">تنظیمات</span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+</svg>
             </div>
             <div class="fab-item" id="fab-customize-foods">
-                <i class="fas fa-palette"></i>
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="1"/>
+    <circle cx="8.5" cy="8.5" r="1.5" fill="#FF5252"/>
+    <circle cx="15.5" cy="8.5" r="1.5" fill="#4CAF50"/>
+    <circle cx="8.5" cy="15.5" r="1.5" fill="#2196F3"/>
+    <circle cx="15.5" cy="15.5" r="1.5" fill="#FFC107"/>
+</svg>
                 <span class="fab-label">شخصی‌سازی</span>
             </div>
         </div>
@@ -746,7 +815,14 @@
             <div class="flex justify-end gap-3 mt-6">
                 <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors close-modal">بستن</button>
                 <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2" id="customize-from-stats-btn">
-                    <i class="fas fa-palette"></i>
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="1"/>
+    <circle cx="8.5" cy="8.5" r="1.5" fill="#FF5252"/>
+    <circle cx="15.5" cy="8.5" r="1.5" fill="#4CAF50"/>
+    <circle cx="8.5" cy="15.5" r="1.5" fill="#2196F3"/>
+    <circle cx="15.5" cy="15.5" r="1.5" fill="#FFC107"/>
+</svg>
                     شخصی‌سازی این غذا
                 </button>
             </div>
@@ -797,7 +873,10 @@
                                 <p class="text-gray-600 text-sm mt-1">{{ food_data.description|default:"بدون توضیحات"|truncatewords:10 }}</p>
                                 <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
                                     <div class="flex items-center gap-1">
-                                        <i class="fas fa-clock"></i>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
                                         <span>{{ food_data.preparationTime }} دقیقه</span>
                                     </div>
                                     <div class="flex items-center gap-1">
