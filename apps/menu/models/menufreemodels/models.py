@@ -169,6 +169,8 @@ class Restaurant(BaseModel):
     show_preparation_time = models.BooleanField(default=True, verbose_name="نمایش زمان آماده‌سازی")
     menu_active = models.BooleanField(default=True, verbose_name="منو فعال")
 
+
+
     def save(self, *args, **kwargs):
         if self.openingTime == "":
             self.openingTime = None

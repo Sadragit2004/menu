@@ -71,7 +71,8 @@ class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
         'displayOrder',
         'expiry_status_display',
         'createdAt',
-        'get_logo_preview'
+        'get_logo_preview',
+        'freeSmoke'
     ]
 
     list_filter = [
@@ -125,7 +126,7 @@ class RestaurantAdmin(admin.ModelAdmin, BilingualAdminMixin):
             'classes': ('collapse',)
         }),
         (_('Contact Information'), {
-            'fields': ('phone', 'address', 'address_en')
+            'fields': ('phone', 'address', 'address_en','freeSmoke')
         }),
         (_('Images'), {
             'fields': ('logo', 'get_logo_preview', 'coverImage', 'get_cover_preview')
@@ -356,7 +357,7 @@ class MenuCategoryAdmin(admin.ModelAdmin):
 class FoodAdmin(admin.ModelAdmin, BilingualAdminMixin):
     list_display = [
         'get_title_display', 'get_restaurants_list', 'menuCategory',
-        'get_price_display', 'preparationTime', 'isActive', 'displayOrder', 'image_preview'
+        'get_price_display', 'preparationTime', 'isActive', 'displayOrder', 'image_preview',
     ]
     list_filter = ['isActive', 'restaurants', 'menuCategory', 'createdAt']
     search_fields = [
