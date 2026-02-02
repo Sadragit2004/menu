@@ -721,6 +721,26 @@
         .dark-mode .category-bottom-name {
             color: #cbd5e1 !important;
         }
+
+
+        /* حل مشکل فاصله محتوا از هدر */
+.main-content {
+    padding-top: 240px !important; /* این مقدار را افزایش دهید */
+}
+
+/* برای موبایل‌ها */
+@media (max-width: 640px) {
+    .main-content {
+        padding-top: 220px !important; /* کاهش برای موبایل */
+    }
+}
+
+/* برای تبلت */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .main-content {
+        padding-top: 230px !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -767,6 +787,39 @@
 
     <!-- نوار بالایی اصلی -->
    <header class="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700" style="padding: 8px 0;">
+     <div class="restaurant-top-bar" style="background: rgb(255, 255, 255); padding: 8px 0; /*! border-bottom: 1px solid #eee; */ margin-bottom:15px; font-size: 13px;">
+    <div class="top-bar-content" style="max-width: 1200px; margin: 0 auto; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <!-- آدرس -->
+        <div class="top-info address" style="display: flex; align-items: center; gap: 5px; color: #0066cc;">
+            📍
+            {% if restaurant.address %}
+                {{ restaurant.address|truncatechars:30 }}
+            {% else %}
+                آدرس ثبت نشده
+            {% endif %}
+        </div>
+
+        <!-- ساعت کاری -->
+        <div class="top-info hours" style="display: flex; align-items: center; gap: 5px; color: #28a745;">
+            ⏰
+            {% if restaurant.openingTime and restaurant.closingTime %}
+                {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
+            {% else %}
+                ساعت کاری نامشخص
+            {% endif %}
+        </div>
+        <br>
+
+        <!-- وضعیت سیگار -->
+        <div class="top-info smoke" style="display: flex; align-items: center; gap: 5px; background: #f1f1f1; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #555;">
+            {% if restaurant.freeSmoke %}
+                🚭 بدون سیگار
+            {% else %}
+                🚬 سیگار مجاز
+            {% endif %}
+        </div>
+    </div>
+</div>
     <div class="container mx-auto px-3">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-2" style="min-width: 0; flex: 1;">
@@ -810,7 +863,7 @@
                    data-bs-target="#reservationModal">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="12" height="12" fill="currentColor">
     <path d="M112 128c0-29.5 16.2-55 40-68.9V256h48V48h48v208h48V59.1c23.8 13.9 40 39.4 40 68.9v128h48V128C384 57.3 326.7 0 256 0h-64C121.3 0 64 57.3 64 128v128h48V128zm272 320c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm-320 0c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm352 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm-352 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zM32 448c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm384 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm-352 0c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm320 0c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zM112 512c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z"/>
-</svg>
+    </svg>
                     <span class="text-white">رزرو میز</span>
                 </a>
 
@@ -831,7 +884,7 @@
         </div>
     </div>
 
-    <div class="search-container bg-white dark:bg-gray-800 py-2 border-t border-gray-100 dark:border-gray-700">
+    <div class="search-container bg-white dark:bg-gray-800 py-2">
         <div class="container mx-auto px-3">
             <div class="search-box bg-gray-50 dark:bg-gray-700 rounded-xl px-3 py-1.5 flex items-center gap-2 border border-gray-200 dark:border-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -895,7 +948,7 @@
 <div class="hamburger-menu-sidebar fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl z-50 transform -translate-x-full transition-transform duration-300">
     <div class="p-4">
         <!-- هدر منو -->
-        <div class="flex justify-between items-center mb-6 pb-4 border-b dark:border-gray-700">
+        <div class="flex justify-between items-center mb-6 pb-4">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white">منو</h3>
             <button class="close-menu-btn text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512" width="20" height="20" fill="currentColor">
@@ -912,38 +965,8 @@
     <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">رستوران</h4>
    <ul class="space-y-2">
     <!-- وضعیت سیگار -->
-    <li>
-        <a href="#description" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
-                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 110c23.2 0 42 18.8 42 42s-18.8 42-42 42-42-18.8-42-42 18.8-42 42-42zm56 286h-24v-112h-64v-24c0-13.3 10.7-24 24-24h40c13.3 0 24 10.7 24 24v136z"/>
-                </svg>
-            </div>
-           
-            <!-- وضعیت آزادی سیگار -->
-            {% if restaurant.freeSmoke %}
-            <div class="ml-auto flex items-center gap-1">
-                <div class="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="10" height="10" fill="#ef4444">
-                        <path d="M216 23.86c0-23.8-30.65-32.77-44.15-13.04C48 191.85 224 200 224 288c0 35.63-29.11 64.46-64.85 63.99-35.17-.45-63.15-29.77-63.15-64.94v-85.51c0-21.7-26.47-32.23-41.43-16.5C27.8 213.16 0 261.33 0 320c0 105.87 86.13 192 192 192s192-86.13 192-192c0-170.29-168-193-168-296.14z"/>
-                    </svg>
-                </div>
-                <span class="text-xs text-red-600 dark:text-red-400 font-medium">سیگار آزاد</span>
-            </div>
-            {% else %}
-            <div class="ml-auto flex items-center gap-1">
-                <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="10" height="10" fill="#10b981">
-                        <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/>
-                    </svg>
-                </div>
-                <span class="text-xs text-green-600 dark:text-green-400 font-medium">بدون سیگار</span>
-            </div>
-            {% endif %}
-        </a>
-    </li>
 
-    <!-- تلفن -->
+
     <li>
         <a href="tel:{{ restaurant.phone }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <div class="w-8 h-8 rounded-md bg-red-100 dark:bg-red-900 flex items-center justify-center">
@@ -955,56 +978,7 @@
         </a>
     </li>
 
-    <!-- آدرس -->
-    {% if restaurant.address %}
-    <li>
-        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="14" height="14" fill="currentColor">
-                    <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/>
-                </svg>
-            </div>
-            <span class="text-gray-700 dark:text-gray-300 text-sm line-clamp-2">{{ restaurant.address }}</span>
-        </a>
-    </li>
-    {% endif %}
 
-    <!-- ساعت کاری -->
-    {% if restaurant.openingTime and restaurant.closingTime %}
-    <li>
-        <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="w-8 h-8 rounded-md bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
-                    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm57.1 345.1c4.7 4.7 4.7 12.3 0 17l-17 17c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l17-17c4.7-4.7 12.3-4.7 17 0l111 111z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <span class="text-gray-700 dark:text-gray-300">ساعت کاری</span>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
-                    {% now "H:i" as current_time %}
-                    {% if current_time >= restaurant.openingTime|time:"H:i" and current_time <= restaurant.closingTime|time:"H:i" %}
-                    <span class="mr-2 inline-flex items-center">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 ml-1 animate-pulse"></span>
-                        باز است
-                    </span>
-                    {% else %}
-                    <span class="mr-2 inline-flex items-center">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 ml-1"></span>
-                        بسته است
-                    </span>
-                    {% endif %}
-                </div>
-            </div>
-        </a>
-    </li>
-    {% endif %}
-
-    <!-- حداقل سفارش -->
-
-
-
-    <!-- تاریخ انقضا -->
 
 </ul>
 </div>
