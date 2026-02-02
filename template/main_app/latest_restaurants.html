@@ -58,8 +58,10 @@
 
                         <a href="/menu/{{ restaurant.slug }}/"
                            class="btn btn-secondary"
-                           style="width:100%; padding:8px; display:inline-block; text-align:center;">
-                            مشاهده منو
+                           style="width:100%; padding:8px; display:inline-block; text-align:center;"
+                           title="مشاهده منو رستوران {{ restaurant.title }}"
+                           aria-label="مشاهده منوی رستوران {{ restaurant.title }}">
+                            منو کافه رستوران  {{ restaurant.title }}
                         </a>
                     </div>
 
@@ -221,6 +223,10 @@
     .res-info {
         padding: 16px;
     }
+
+    .btn-secondary {
+        font-size: 0.9rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -243,6 +249,11 @@
 
     .res-name {
         font-size: 1.1rem;
+    }
+
+    .btn-secondary {
+        font-size: 0.85rem;
+        padding: 6px;
     }
 }
 </style>
