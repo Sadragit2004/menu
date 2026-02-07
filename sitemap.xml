@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    
+    <!-- صفحه اصلی - بالاترین اولویت -->
+    <url>
+        <loc>https://menubesaz.ir/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <xhtml:link rel="alternate" hreflang="fa" href="https://menubesaz.ir/" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://menubesaz.ir/" />
+    </url>
+    
+    <!-- صفحه ثبت‌نام و ورود -->
+    <url>
+        <loc>https://menubesaz.ir/accounts/login/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- پنل کاربری -->
+    <url>
+        <loc>https://menubesaz.ir/panel/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- سوالات متداول -->
+    <url>
+        <loc>https://menubesaz.ir/faq/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- صفحه آموزش‌ها -->
+    <url>
+        <loc>https://menubesaz.ir/course/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- صفحات منوهای رستوران‌ها -->
+    <url>
+        <loc>https://menubesaz.ir/menu/falsh/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/menu/ilid/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/menu/vangog/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/menu/tib/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- صفحات خرید پلن‌ها -->
+    <url>
+        <loc>https://menubesaz.ir/plan/purchase/basic-plan/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/plan/purchase/ln-hrfh/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/plan/purchase/ln-vip/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- صفحه طراحی منوهای کاغذی -->
+    <url>
+        <loc>https://menubesaz.ir/panel/paper-menu-designs/</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <!-- صفحات آنکر لینک‌ها (ID-based) -->
+    <url>
+        <loc>https://menubesaz.ir/#features</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/#restaurants</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/#pricing</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://menubesaz.ir/#contact</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+</urlset>
