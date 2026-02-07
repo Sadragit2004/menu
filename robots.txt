@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /panel/
+Disallow: /panel
+Disallow: /*/panel/
+Disallow: /table/
+Disallow: /table
+Disallow: /*/table/
+Disallow: /admin/
+Disallow: /admin
+Disallow: /*/admin/
+Disallow: /?*panel
+Disallow: /?*table
+Disallow: /?*admin
+
+Allow: /$
+
+Sitemap: https://menubesaz.ir/sitemap.xml
