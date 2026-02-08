@@ -720,13 +720,6 @@ def get_food_details(request, food_id):
 
 
 
-
-
-
-
-
-
-
 def calculate_food_stats(food):
     """محاسبه آمار برای یک غذا"""
     # تعداد رستوران‌هایی که این غذا را انتخاب کرده‌اند

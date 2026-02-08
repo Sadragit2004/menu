@@ -196,7 +196,7 @@
 
         .parent-content.expanded {
             padding: 12px;
-            max-height: 500px;
+            max-height: none !important;
             border-top: 1px solid #f1f5f9;
         }
 
@@ -743,4 +743,3 @@ input:checked + .slider:before {
 
 
 
-        

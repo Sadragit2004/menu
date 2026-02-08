@@ -46,9 +46,9 @@ INSTALLED_APPS = [
     'apps.user.apps.UserConfig',
     'apps.menu.apps.MenuConfig',
     'apps.panel.apps.PanelConfig',
-     'django.contrib.humanize',
+    'django.contrib.humanize',
     'django_render_partial',
-     'ckeditor',
+    'ckeditor',
     'ckeditor_uploader',
     'apps.blog.apps.BlogConfig',
     'apps.plan.apps.PlanConfig',
@@ -56,10 +56,10 @@ INSTALLED_APPS = [
     'apps.order.apps.OrderConfig',
     'apps.peyment.apps.PeymentConfig',
     'apps.main.apps.MainConfig',
-    'django_celery_results',
     'django_celery_beat',
     'apps.table.apps.TableConfig',
     'django_cleanup.apps.CleanupConfig',
+    'django_celery_results',
 
 ]
 
@@ -213,11 +213,18 @@ CACHES = {
     }
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# settings.py - این تنظیمات را جایگزین کن:
+
+# تنظیمات Celery برای ویندوز
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # اگر Redis نصب دارید
+
+
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tehran'
 
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
