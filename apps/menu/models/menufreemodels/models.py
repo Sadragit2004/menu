@@ -145,6 +145,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 class Restaurant(BaseModel):
+    
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='restaurants', null=True, blank=True)
     english_name = models.CharField(max_length=255, unique=True, null=True, blank=True, help_text="نام انگلیسی برای تولید اسلاگ")
     description = models.TextField(null=True, blank=True, verbose_name="توضیح فارسی")
