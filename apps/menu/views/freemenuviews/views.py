@@ -1,85 +1,148 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404,redirect
+from django.core.cache import cache
+from django.db import models
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.db.models import Q
 from django.views import View
-from ...models.menufreemodels.models import Restaurant, MenuCategory, Food, FoodRestaurant, get_current_exchange_rate
+import hashlib
+import json
 
-# صفحه اصلی منوی دیجیتال
+# اصلاح import‌ها - بر اساس ساختار پروژه شما
+try:
+    # اگر models در همان اپ است
+    from ...models.menufreemodels.models import Restaurant, MenuCategory, Food, FoodRestaurant, get_current_exchange_rate
+except ImportError:
+    try:
+        # اگر ساختار متفاوت است
+        from apps.menu.models.menufreemodels.models import Restaurant, MenuCategory, Food, FoodRestaurant, get_current_exchange_rate
+    except ImportError:
+        # از relative import استفاده کن
+        from ...models.menufreemodels.models import Restaurant, MenuCategory, Food, FoodRestaurant, get_current_exchange_rate
+
+
 def digital_menu(request, restaurant_slug):
-    """صفحه اصلی منوی دیجیتال با پشتیبانی از شخصی‌سازی"""
-    restaurant = get_object_or_404(Restaurant, slug=restaurant_slug, isActive=True)
+    """بهینه‌ترین نسخه منوی دیجیتال با کش و حداقل query"""
 
-    # بررسی انقضای رستوران
+    # 1. ساخت کلید کش یکتا
+    lang = request.GET.get('lang', 'fa')
+    cache_key = f"digital_menu_{restaurant_slug}_{lang}"
+
+    # 2. تلاش برای دریافت از کش
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        return cached_response
+
+    # 3. دریافت رستوران با یک query
+    restaurant = get_object_or_404(
+        Restaurant.objects.select_related('owner'),
+        slug=restaurant_slug,
+        isActive=True
+    )
+
+    # 4. بررسی انقضا
     if restaurant.is_expired:
-        lang = request.GET.get('lang', 'fa')
         context = {
             'restaurant': restaurant,
             'current_language': lang,
             'lang': lang,
             'expired': True
         }
+        template = 'menu_app/free/restaurant_expired_en.html' if lang == 'en' else 'menu_app/free/restaurant_expired.html'
+        response = render(request, template, context)
+        cache.set(cache_key, response, 300)  # 5 دقیقه برای صفحات منقضی
+        return response
 
-        if lang == 'en':
-            return render(request, 'menu_app/free/restaurant_expired_en.html', context)
-        else:
-            return render(request, 'menu_app/free/restaurant_expired.html', context)
-
-    lang = request.GET.get('lang', 'fa')
-
-    # دریافت دسته‌بندی‌های فعال
+    # 5. فقط دو query اصلی برای همه داده‌ها
+    # Query اول: همه دسته‌بندی‌ها
     menu_categories = MenuCategory.objects.filter(
         restaurant=restaurant,
         isActive=True
-    ).select_related('category').prefetch_related('foods')
+    ).select_related('category').order_by('displayOrder')
 
-    # دریافت غذاهای فعال رستوران
-    foods = Food.objects.filter(
-        restaurants=restaurant,
-        isActive=True
-    ).select_related('menuCategory__category').distinct()
-
-    # دریافت اطلاعات شخصی‌سازی شده غذاها
-    customized_foods = FoodRestaurant.objects.filter(
+    # Query دوم: همه شخصی‌سازی‌های غذاها
+    custom_foods = FoodRestaurant.objects.filter(
         restaurant=restaurant,
-        food__in=foods,
         is_active=True
-    ).select_related('food')
+    ).select_related('food').only(
+        'food_id', 'custom_price', 'custom_image', 'display_order'
+    )
 
-    # به هر غذا فیلدهای final_price و final_image رو اضافه کن
-    for food in foods:
-        # پیدا کردن شخصی‌سازی برای این غذا
-        custom_food = None
-        for cf in customized_foods:
-            if cf.food.id == food.id:
-                custom_food = cf
-                break
+    # 6. ساخت map برای دسترسی سریع
+    custom_map = {cf.food_id: cf for cf in custom_foods}
 
-        if custom_food and (custom_food.custom_price or custom_food.custom_image):
-            # اگر شخصی‌سازی شده
-            food.final_price = custom_food.custom_price if custom_food.custom_price else food.price
-            food.final_image = custom_food.custom_image if custom_food.custom_image else food.image
+    # 7. دریافت ID دسته‌بندی‌ها
+    category_ids = list(menu_categories.values_list('id', flat=True))
+
+    # 8. دریافت غذاهای مرتبط
+    if category_ids:
+        foods_by_category = Food.objects.filter(
+            menuCategory_id__in=category_ids,
+            isActive=True,
+            restaurants=restaurant
+        ).select_related('menuCategory__category')
+    else:
+        foods_by_category = Food.objects.none()
+
+    # 9. پردازش داده‌ها
+    foods_dict = {}
+    all_foods_list = []
+
+    for food in foods_by_category:
+        cat_id = food.menuCategory_id
+        if cat_id not in foods_dict:
+            foods_dict[cat_id] = []
+
+        # اعمال شخصی‌سازی‌ها
+        cf = custom_map.get(food.id)
+        if cf:
+            food.final_price = cf.custom_price if cf.custom_price else food.price
+            food.final_image = cf.custom_image if cf.custom_image else food.image
+            food.is_customized = True
+            food.display_order = cf.display_order if cf.display_order else food.displayOrder
         else:
-            # اگر شخصی‌سازی نشده
             food.final_price = food.price
             food.final_image = food.image
+            food.is_customized = False
+            food.display_order = food.displayOrder
 
+        foods_dict[cat_id].append(food)
+        all_foods_list.append(food)
+
+    # 10. مرتب‌سازی و ساخت دسته‌بندی نهایی
+    processed_categories = []
+    for category in menu_categories:
+        cat_foods = foods_dict.get(category.id, [])
+        # مرتب‌سازی غذاها
+        cat_foods.sort(key=lambda x: x.display_order)
+        category.foods_list = cat_foods
+        processed_categories.append(category)
+
+    # 11. نرخ ارز
     exchange_rate = get_current_exchange_rate()
 
+    # 12. ساخت context
     context = {
         'restaurant': restaurant,
-        'menu_categories': menu_categories,
-        'foods': foods,
+        'menu_categories': processed_categories,
+        'foods': all_foods_list,
         'current_language': lang,
         'exchange_rate': exchange_rate,
         'lang': lang,
         'expired': False
     }
 
-    if lang == 'en':
-        return render(request, 'menu_app/free/restaurant_en.html', context)
-    else:
-        return render(request, 'menu_app/free/restaurant.html', context)
+    # 13. رندر و ذخیره در کش
+    template = 'menu_app/free/restaurant_en.html' if lang == 'en' else 'menu_app/free/restaurant.html'
+    response = render(request, template, context)
+
+    # کش کردن
+    if restaurant.menu_active:
+        cache.set(cache_key, response, 1800)  # 30 دقیقه
+
+    return response
+
+
 
 def get_foods_by_category(request, restaurant_slug, category_id):
     """دریافت غذاها بر اساس دسته‌بندی با پشتیبانی از شخصی‌سازی"""
