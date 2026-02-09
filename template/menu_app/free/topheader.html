@@ -1,0 +1,81 @@
+ <div class="restaurant-top-bar" style="
+    background: rgb(255, 255, 255);
+    padding: 8px 0;
+    margin-bottom: 15px;
+    font-size: 13px;
+">
+    <div class="top-bar-content" style="
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 10px;
+        overflow: hidden;
+    ">
+        <!-- آدرس (سمت چپ) -->
+        <div class="top-info address" style="
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #0066cc;
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: clamp(11px, 1.5vw, 13px);
+            justify-content: flex-start;
+        ">
+            📍
+            {% if restaurant.address %}
+                {{ restaurant.address|truncatechars:30 }}
+            {% else %}
+                آدرس ثبت نشده
+            {% endif %}
+        </div>
+
+        <!-- ساعت کاری (وسط) -->
+        <div class="top-info hours" style="
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #28a745;
+            flex: 0 0 auto;
+            white-space: nowrap;
+            font-size: clamp(11px, 1.5vw, 13px);
+            margin: 0 auto;
+        ">
+            ⏰
+            {% if restaurant.openingTime and restaurant.closingTime %}
+                {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
+            {% else %}
+                ساعت کاری نامشخص
+            {% endif %}
+        </div>
+
+        <!-- وضعیت سیگار (سمت راست) -->
+        <div class="top-info smoke" style="
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #555;
+            flex: 1 1 auto;
+            white-space: nowrap;
+            font-size: clamp(11px, 1.5vw, 13px);
+            justify-content: flex-end;
+        ">
+            {% if restaurant.freeSmoke %}
+                🚭 سیگار
+            {% else %}
+                🚬 سیگار
+            {% endif %}
+        </div>
+    </div>
+</div>

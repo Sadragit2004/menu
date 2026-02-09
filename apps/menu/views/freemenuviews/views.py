@@ -138,7 +138,7 @@ def digital_menu(request, restaurant_slug):
 
     # کش کردن
     if restaurant.menu_active:
-        cache.set(cache_key, response, 1800)  # 30 دقیقه
+        cache.set(cache_key, response, 0)  # 30 دقیقه
 
     return response
 
