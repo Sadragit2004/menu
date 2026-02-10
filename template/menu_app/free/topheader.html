@@ -1,6 +1,6 @@
- <div class="restaurant-top-bar" style="
+<div class="restaurant-top-bar" style="
     background: rgb(255, 255, 255);
-    padding: 8px 0;
+    padding: 12px 0 8px 0;
     margin-bottom: 15px;
     font-size: 13px;
 ">
@@ -10,72 +10,128 @@
         padding: 0 15px;
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap;
+        align-items: flex-start;
         gap: 10px;
-        overflow: hidden;
     ">
-        <!-- آدرس (سمت چپ) -->
-        <div class="top-info address" style="
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #0066cc;
-            flex: 1 1 auto;
-            min-width: 0;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            font-size: clamp(11px, 1.5vw, 13px);
-            justify-content: flex-start;
-        ">
-            📍
-            {% if restaurant.address %}
-                {{ restaurant.address|truncatechars:30 }}
-            {% else %}
-                آدرس ثبت نشده
-            {% endif %}
+
+        <!-- سمت چپ: تغییر زبان + رزرو -->
+        <div style="flex: 1; display: flex; align-items: flex-start; gap: 8px; padding-top: 2px;">
+            <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en"
+               style="
+                    background: #f3f4f6;
+                    color: #374151;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-decoration: none;
+               ">
+                EN
+            </a>
+
+            <a href="javascript:void(0);"
+               data-bs-toggle="modal"
+               data-bs-target="#reservationModal"
+               style="
+                    background: linear-gradient(to right, #ef4444, #dc2626);
+                    color: white;
+                    padding: 0 12px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 11px;
+                    height: 36px;
+                    text-decoration: none;
+               ">
+                ⏱ <span>رزرو میز</span>
+            </a>
         </div>
 
-        <!-- ساعت کاری (وسط) -->
-        <div class="top-info hours" style="
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #28a745;
-            flex: 0 0 auto;
-            white-space: nowrap;
-            font-size: clamp(11px, 1.5vw, 13px);
-            margin: 0 auto;
-        ">
-            ⏰
-            {% if restaurant.openingTime and restaurant.closingTime %}
-                {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
-            {% else %}
-                ساعت کاری نامشخص
-            {% endif %}
+        <!-- وسط: لوگو + نام + آدرس -->
+        <div style="flex: 0 0 auto; text-align: center;">
+            <div style="
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                margin: 0 auto 6px;
+                overflow: hidden;
+                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+            ">
+                {% if restaurant.logo %}
+                    <img src="{{ restaurant.logo.url }}" style="width:100%;height:100%;object-fit:cover;">
+                {% else %}
+                    {{ restaurant.title_en|default:restaurant.title|first }}
+                {% endif %}
+            </div>
+
+            <h3 style="margin: 0; font-size: 11px; font-weight: 500;">
+                {{ restaurant.title_en|default:restaurant.title }}
+            </h3>
+
+            <div class="top-info address" style="
+                margin-top: 2px;
+                font-size: 11px;
+                color: #0066cc;
+                white-space: nowrap;
+                max-width: 200px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            ">
+                📍 {{ restaurant.address|default:"آدرس ثبت نشده"|truncatechars:25 }}
+            </div>
         </div>
 
-        <!-- وضعیت سیگار (سمت راست) -->
-        <div class="top-info smoke" style="
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        <!-- سمت راست: حالت شب + ساعت کاری (کنار هم) -->
+        <div style="flex: 1; display: flex; justify-content: flex-end; padding-top: 2px;">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            ">
+                <!-- ساعت کاری -->
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 11px;
+                    color: #28a745;
+                    white-space: nowrap;
+                ">
+                    ⏰
+                    {% if restaurant.openingTime and restaurant.closingTime %}
+                        {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
+                    {% else %}
+                        نامشخص
+                    {% endif %}
+                </div>
 
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #555;
-            flex: 1 1 auto;
-            white-space: nowrap;
-            font-size: clamp(11px, 1.5vw, 13px);
-            justify-content: flex-end;
-        ">
-            {% if restaurant.freeSmoke %}
-                🚭 سیگار
-            {% else %}
-                🚬 سیگار
-            {% endif %}
+                <!-- دکمه حالت شب -->
+                <button id="theme-toggle"
+                        style="
+                            background: #f3f4f6;
+                            width: 36px;
+                            height: 36px;
+                            border-radius: 8px;
+                            border: none;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                    🌙
+                </button>
+            </div>
         </div>
+
     </div>
 </div>
