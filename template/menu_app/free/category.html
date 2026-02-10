@@ -1,40 +1,213 @@
- <div class="categories-scroll-container">
-        <div class="container mx-auto px-3">
-            <div class="categories-scroll">
-                <div class="category-bottom-item category-bottom-active" data-category="all">
-                    <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 416 512"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             aria-hidden="true">
-                            <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
-                        </svg>
-                    </div>
-                    <span class="category-bottom-name">همه</span>
-                </div>
+<div class="categories-scroll-container relative mb-6">
+    <div class="container mx-auto px-3">
+        <div class="categories-scroll">
+            <!-- دکمه جستجو - جلوگیری از رویداد کلیک روی دسته‌بندی -->
+          
 
-                {% for menu_category in menu_categories %}
-                <div class="category-bottom-item" data-category="{{ menu_category.id }}">
-                    {% if menu_category.displayImage %}
-                    <img loading="lazy"  src="{{ menu_category.displayImage.url }}" alt="{{ menu_category.category.title }}"
-                         class="category-bottom-icon object-cover shadow-md">
-                    {% else %}
-                    <div class="category-bottom-icon bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 416 512"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             aria-hidden="true">
-                            <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
-                        </svg>
-                    </div>
-                    {% endif %}
-                    <span class="category-bottom-name">{{ menu_category.category.title|truncatechars:10 }}</span>
+            <div class="category-bottom-item category-bottom-active" data-category="all" onclick="filterCategory('all')">
+                <div class="category-bottom-icon bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 416 512"
+                         width="16"
+                         height="16"
+                         fill="currentColor"
+                         aria-hidden="true">
+                        <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
+                    </svg>
                 </div>
-                {% endfor %}
+                <span class="category-bottom-name">همه</span>
+            </div>
+
+            {% for menu_category in menu_categories %}
+            <div class="category-bottom-item" data-category="{{ menu_category.id }}" onclick="filterCategory('{{ menu_category.id }}')">
+                {% if menu_category.displayImage %}
+                <img loading="lazy"  src="{{ menu_category.displayImage.url }}" alt="{{ menu_category.category.title }}"
+                     class="category-bottom-icon object-cover shadow-md">
+                {% else %}
+                <div class="category-bottom-icon bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 416 512"
+                         width="16"
+                         height="16"
+                         fill="currentColor"
+                         aria-hidden="true">
+                        <path d="M416 0c-17.7 0-32 14.3-32 32v224c0 53-43 96-96 96h-16V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v320h-16c-53 0-96-43-96-96V32c0-17.7-14.3-32-32-32S0 14.3 0 32v224c0 88.4 71.6 160 160 160h16v64c0 17.7 14.3 32 32 32s32-14.3 32-32v-64h16c88.4 0 160-71.6 160-160V32c0-17.7-14.3-32-32-32z"/>
+                    </svg>
+                </div>
+                {% endif %}
+                <span class="category-bottom-name">{{ menu_category.category.title|truncatechars:10 }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- جعبه جستجو -->
+    <div id="searchBox" class="search-box-container hidden absolute left-0 right-0 -bottom-3 z-50 px-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="p-3">
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-3 flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 512 512"
+                         width="16"
+                         height="16"
+                         fill="currentColor"
+                         class="text-gray-400 dark:text-gray-300 flex-shrink-0">
+                        <path d="M505 442.7L405.3 343c28.4-34.9 45.7-79.4 45.7-128C451 96.5 354.5 0 231 0S11 96.5 11 215.1 107.5 430.1 231 430.1c48.6 0 93.1-17.3 128-45.7L442.7 505c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.5-9.4 9.5-24.6.1-34zM231 370.1c-85.4 0-155-69.6-155-155s69.6-155 155-155 155 69.6 155 155-69.6 155-155 155z"/>
+                    </svg>
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="جستجوی غذا یا رستوران..."
+                           class="w-full bg-transparent border-none outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:ring-0">
+                    <button onclick="toggleSearchBox()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-sm flex-shrink-0">
+                        ✕
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<style>
+/* استایل برای دکمه جستجو */
+.search-toggle-button .category-bottom-icon {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+}
+
+.search-toggle-button:hover .category-bottom-icon {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* استایل برای دکمه جستجو در حالت فعال */
+.search-toggle-button.active .category-bottom-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+}
+
+/* انیمیشن برای جعبه جستجو */
+.search-box-container {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s ease-out;
+    pointer-events: none;
+}
+
+.search-box-container.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* جلوگیری از اعمال active state روی دکمه جستجو */
+.search-toggle-button:not(.category-bottom-active) {
+    opacity: 1;
+}
+
+.search-toggle-button:not(.category-bottom-active) .category-bottom-icon {
+    border: none;
+}
+
+/* اطمینان از اینکه z-index جعبه جستجو بالاتر باشد */
+.z-50 {
+    z-index: 50;
+}
+</style>
+
+<script>
+let searchBoxVisible = false;
+
+function toggleSearchBox() {
+    const searchBox = document.getElementById('searchBox');
+    const searchButton = document.querySelector('.search-toggle-button');
+
+    if (!searchBoxVisible) {
+        searchBox.classList.remove('hidden');
+        setTimeout(() => {
+            searchBox.classList.add('show');
+            document.getElementById('searchInput').focus();
+        }, 10);
+
+        // اضافه کردن کلاس active به دکمه جستجو
+        searchButton.classList.add('active');
+    } else {
+        searchBox.classList.remove('show');
+        setTimeout(() => {
+            searchBox.classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+        }, 300);
+
+        // حذف کلاس active از دکمه جستجو
+        searchButton.classList.remove('active');
+    }
+
+    searchBoxVisible = !searchBoxVisible;
+}
+
+// بستن جستجو با کلیک بیرون
+document.addEventListener('click', function(event) {
+    const searchBox = document.getElementById('searchBox');
+    const searchToggle = document.querySelector('.search-toggle-button');
+
+    if (searchBoxVisible &&
+        !searchBox.contains(event.target) &&
+        !searchToggle.contains(event.target)) {
+        toggleSearchBox();
+    }
+});
+
+// بستن با کلید Esc
+document.addEventListener('keydown', function(event) {
+    if (searchBoxVisible && event.key === 'Escape') {
+        toggleSearchBox();
+    }
+});
+
+// جستجو با Enter
+document.getElementById('searchInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        performSearch(this.value);
+    }
+});
+
+function performSearch(query) {
+    if (query.trim() !== '') {
+        // کد جستجوی شما
+        console.log('جستجو برای:', query);
+
+        // بستن جعبه جستجو
+        if (searchBoxVisible) {
+            toggleSearchBox();
+        }
+
+        // اینجا می‌توانید عملیات جستجو را انجام دهید
+        // برای مثال:
+        // window.location.href = `/search/?q=${encodeURIComponent(query)}`;
+
+        // یا اگر AJAX جستجو دارید:
+        // searchItems(query);
+    }
+}
+
+// تابع فیلتر دسته‌بندی‌ها (اگر دارید)
+function filterCategory(categoryId) {
+    // حذف active از همه دسته‌بندی‌ها
+    document.querySelectorAll('.category-bottom-item').forEach(item => {
+        item.classList.remove('category-bottom-active');
+    });
+
+    // اضافه کردن active به دسته‌بندی انتخاب شده
+    event.currentTarget.classList.add('category-bottom-active');
+
+    // اینجا کد فیلتر کردن غذاها بر اساس دسته‌بندی
+    console.log('فیلتر بر اساس دسته‌بندی:', categoryId);
+
+    // اگر دسته‌بندی جستجو فعال است، آن را غیرفعال کنید
+    const searchButton = document.querySelector('.search-toggle-button');
+    searchButton.classList.remove('active');
+
+    // اگر باکس جستجو باز است، آن را ببندید
+    if (searchBoxVisible) {
+        toggleSearchBox();
+    }
+}
+</script>
