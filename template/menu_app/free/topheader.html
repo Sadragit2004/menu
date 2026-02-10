@@ -14,45 +14,23 @@
         gap: 10px;
     ">
 
-        <!-- سمت چپ: تغییر زبان + رزرو -->
-        <div style="flex: 1; display: flex; align-items: flex-start; gap: 8px; padding-top: 2px;">
-            <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en"
-               style="
-                    background: #f3f4f6;
-                    color: #374151;
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-decoration: none;
-               ">
-                EN
-            </a>
-
-            <a href="javascript:void(0);"
-               data-bs-toggle="modal"
-               data-bs-target="#reservationModal"
-               style="
-                    background: linear-gradient(to right, #ef4444, #dc2626);
-                    color: white;
-                    padding: 0 12px;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    font-size: 11px;
-                    height: 36px;
-                    text-decoration: none;
-               ">
-                ⏱ <span>رزرو میز</span>
-            </a>
+        <!-- سمت چپ: آدرس -->
+        <div style="flex: 1; display: flex; align-items: flex-start; padding-top: 2px;">
+            <div class="top-info address" style="
+                font-size: 11px;
+                color: #0066cc;
+                white-space: nowrap;
+                max-width: 200px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                direction: rtl;
+                text-align: right;
+            ">
+                📍 {{ restaurant.address|default:"آدرس ثبت نشده"|truncatechars:25 }}
+            </div>
         </div>
 
-        <!-- وسط: لوگو + نام + آدرس -->
+        <!-- وسط: لوگو + نام + ساعت کاری -->
         <div style="flex: 0 0 auto; text-align: center;">
             <div style="
                 width: 44px;
@@ -78,42 +56,50 @@
                 {{ restaurant.title_en|default:restaurant.title }}
             </h3>
 
-            <div class="top-info address" style="
+            <!-- ساعت کاری زیر نام -->
+            <div style="
                 margin-top: 2px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
                 font-size: 11px;
-                color: #0066cc;
+                color: #28a745;
                 white-space: nowrap;
-                max-width: 200px;
-                overflow: hidden;
-                text-overflow: ellipsis;
             ">
-                📍 {{ restaurant.address|default:"آدرس ثبت نشده"|truncatechars:25 }}
+
+                {% if restaurant.openingTime and restaurant.closingTime %}
+                    {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
+                {% else %}
+                    نامشخص
+                {% endif %}
             </div>
         </div>
 
-        <!-- سمت راست: حالت شب + ساعت کاری (کنار هم) -->
+        <!-- سمت راست: تغییر زبان + حالت شب -->
         <div style="flex: 1; display: flex; justify-content: flex-end; padding-top: 2px;">
             <div style="
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
             ">
-                <!-- ساعت کاری -->
-                <div style="
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    font-size: 11px;
-                    color: #28a745;
-                    white-space: nowrap;
-                ">
-                    ⏰
-                    {% if restaurant.openingTime and restaurant.closingTime %}
-                        {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
-                    {% else %}
-                        نامشخص
-                    {% endif %}
-                </div>
+                <!-- دکمه تغییر زبان -->
+                <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en"
+                   style="
+                        background: #f3f4f6;
+                        color: #374151;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-decoration: none;
+                   ">
+                    EN
+                </a>
 
                 <!-- دکمه حالت شب -->
                 <button id="theme-toggle"
