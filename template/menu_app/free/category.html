@@ -1,12 +1,14 @@
 <div class="header-categories-wrapper relative -mx-4">
     <!-- کانتینر اسکرول با پدینگ داخلی -->
     <div class="categories-scroll no-scrollbar px-4">
-        <!-- 1. دکمه همه (All) -->
-        <div class="category-item category-active" data-category="all">
+        <!-- 1. دکمه همه (All) - با آیکون جدید و بک‌گراند سیاه سفید -->
+        <div class="category-item category-active grayscale-bg" data-category="all">
             <div class="category-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
                 </svg>
             </div>
             <span class="category-name">همه</span>
@@ -116,6 +118,24 @@
 
     .default-icon-bg { background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); }
 
+    /* --- استایل سیاه سفید برای دکمه همه --- */
+    .grayscale-bg .category-icon {
+        background-color: #6b7280 !important;
+        color: #f3f4f6 !important;
+        border-color: #4b5563 !important;
+    }
+
+    .grayscale-bg.category-active .category-icon {
+        background-color: #4b5563 !important;
+        border-color: #1f2937 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(75, 85, 99, 0.25) !important;
+    }
+
+    .grayscale-bg.category-active .category-name {
+        color: #1f2937 !important;
+    }
+
     /* مد تاریک */
     @media (prefers-color-scheme: dark) {
         .category-name { color: #9ca3af; }
@@ -126,6 +146,23 @@
             color: #60a5fa;
         }
         .category-item.category-active .category-name { color: #60a5fa; }
+
+        /* استایل سیاه سفید در مد تاریک */
+        .grayscale-bg .category-icon {
+            background-color: #374151 !important;
+            color: #e5e7eb !important;
+            border-color: #4b5563 !important;
+        }
+
+        .grayscale-bg.category-active .category-icon {
+            background-color: #4b5563 !important;
+            border-color: #9ca3af !important;
+            color: #ffffff !important;
+        }
+
+        .grayscale-bg.category-active .category-name {
+            color: #e5e7eb !important;
+        }
     }
 </style>
 
