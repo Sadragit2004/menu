@@ -800,116 +800,107 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // -----------------------------------------------------------
+    // 0. تزریق استایل‌های ضروری برای عملکرد صحیح اسکرول (جدید)
+    // این بخش باعث می‌شود وقتی کلاس scrolled اضافه شد، هدر بالا واقعاً مخفی شود
+    // -----------------------------------------------------------
+    const style = document.createElement('style');
+    style.innerHTML = `
+        /* وقتی اسکرول شد، بخش بالایی هدر جمع شود */
+        .header.scrolled .header-top {
+            height: 0 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            pointer-events: none; /* غیرفعال کردن کلیک روی المان مخفی */
+        }
+
+        /* انیمیشن نرم برای تغییرات */
+        .header, .header-top, .main-content {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 1. تعریف متغیرها
     const header = document.querySelector('.header');
     const headerTop = document.querySelector('.header-top');
     const mainContent = document.querySelector('.main-content');
-    const SCROLL_THRESHOLD = 100;
+    const SCROLL_THRESHOLD = 50;
     let isHandlingClick = false;
 
-    // تنظیم padding-top برای main-content بر اساس وضعیت هدر
+    // 2. تابع تنظیم فاصله بالای محتوا
     function updateMainContentPadding() {
-        if (!mainContent) return;
+        if (!mainContent || !header) return;
 
-        const headerHeight = header.offsetHeight;
+        // محاسبه ارتفاع دقیق هدر در همان لحظه
+        const headerHeight = header.getBoundingClientRect().height;
 
-        if (header.classList.contains('scrolled')) {
-            // حالت کوچک شده هدر
-            mainContent.style.paddingTop = `${headerHeight + 20}px`; // 20px فاصله اضافه
-        } else {
-            // حالت کامل هدر
-            mainContent.style.paddingTop = `${headerHeight + 20}px`;
-        }
+        // اعمال فاصله (کمی بیشتر برای زیبایی)
+        mainContent.style.paddingTop = `${headerHeight + 20}px`;
     }
 
-    // تنظیم مجدد موقعیت اسکرول بعد از کلیک روی دسته‌بندی
-    function adjustScrollAfterCategoryClick() {
-        setTimeout(() => {
-            const headerHeight = header.offsetHeight;
-            const firstFoodItem = document.querySelector('.food-item:not([style*="display: none"])');
-
-            if (firstFoodItem) {
-                const elementPosition = firstFoodItem.getBoundingClientRect().top + window.scrollY;
-                const targetPosition = elementPosition - headerHeight - 30; // 30px فاصله اضافی
-
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        }, 100);
-    }
-
-    // مدیریت کلیک روی دسته‌بندی
-    document.addEventListener('click', function(e) {
-        const categoryItem = e.target.closest('.category-bottom-item');
-        if (categoryItem) {
-            e.preventDefault();
-
-            // ذخیره موقعیت فعلی
-            const currentScroll = window.scrollY;
-
-            isHandlingClick = true;
-
-            // انتخاب دسته‌بندی
-            const categoryId = categoryItem.dataset.category;
-            handleCategorySelect(categoryId, categoryItem);
-
-            // فیلتر غذاها
-            filterFoodsByCategory(categoryId);
-
-            // اگر اسکرول پایین بود، موقعیت رو تنظیم کن
-            if (currentScroll > SCROLL_THRESHOLD) {
-                // ابتدا padding رو آپدیت کن
-                updateMainContentPadding();
-
-                // سپس موقعیت اسکرول رو تنظیم کن
-                setTimeout(() => {
-                    adjustScrollAfterCategoryClick();
-                }, 50);
-            }
-
-            setTimeout(() => {
-                isHandlingClick = false;
-            }, 300);
-        }
-    });
-
-    // مدیریت اسکرول
-    let lastScrollY = window.scrollY;
-    window.addEventListener('scroll', function() {
+    // 3. تابع مدیریت اسکرول صفحه
+    function handleScroll() {
         if (isHandlingClick) return;
 
         const currentScrollY = window.scrollY;
 
+        // منطق اصلی: اگر اسکرول بیشتر از حد بود، کلاس اضافه شود
         if (currentScrollY > SCROLL_THRESHOLD) {
-            header.classList.add('scrolled');
-            if (headerTop) headerTop.classList.add('hidden');
+            if (!header.classList.contains('scrolled')) {
+                header.classList.add('scrolled');
+                // بعد از 300 میلی‌ثانیه (مدت انیمیشن) پدینگ را آپدیت کن
+                setTimeout(updateMainContentPadding, 300);
+            }
         } else {
-            header.classList.remove('scrolled');
-            if (headerTop) headerTop.classList.remove('hidden');
+            if (header.classList.contains('scrolled')) {
+                header.classList.remove('scrolled');
+                setTimeout(updateMainContentPadding, 300);
+            }
         }
+    }
 
-        // آپدیت padding در حین اسکرول
-        updateMainContentPadding();
-        lastScrollY = currentScrollY;
-    });
+    // 4. تابع اسکرول نرم به ابتدای لیست غذاها (اصلاح شده)
+    function scrollToFoods() {
+        // اجبار به حالت فشرده
+        header.classList.add('scrolled');
 
-    // تابع فیلتر غذاها
+        // محاسبه تقریبی ارتفاع هدر فشرده (فقط دسته‌بندی‌ها)
+        // معمولا حدود 70 تا 80 پیکسل است. اینجا دستی محاسبه می‌کنیم تا پرش نداشته باشد
+        const estimatedCollapsedHeight = 80;
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        setTimeout(updateMainContentPadding, 350);
+    }
+
+    // 5. تابع اصلی فیلتر کردن غذاها
     function filterFoodsByCategory(categoryId) {
         const allFoodItems = document.querySelectorAll('.food-item');
+        const foodGrid = document.querySelector('.food-grid');
         let hasVisibleItems = false;
 
+        const existingMessage = document.querySelector('.no-food-message');
+        if (existingMessage) existingMessage.remove();
+
         allFoodItems.forEach(item => {
-            const itemCategory = item.dataset.category;
+            const itemCategory = item.getAttribute('data-category');
 
             if (categoryId === 'all' || itemCategory === categoryId) {
                 item.style.display = 'block';
-                setTimeout(() => {
+                // انیمیشن ورود
+                requestAnimationFrame(() => {
                     item.style.opacity = '1';
                     item.style.transform = 'translateY(0)';
-                }, 10);
+                });
                 hasVisibleItems = true;
             } else {
+                // انیمیشن خروج
                 item.style.opacity = '0';
                 item.style.transform = 'translateY(20px)';
                 setTimeout(() => {
@@ -918,40 +909,75 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // مدیریت پیام خالی
-        const emptyMessage = document.querySelector('.no-food-message');
-        if (!hasVisibleItems && !emptyMessage) {
-            const foodGrid = document.querySelector('.food-grid');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'no-food-message w-full text-center py-12 text-gray-400';
-            messageDiv.innerHTML = `
-                <i class="fas fa-utensils text-4xl mb-3 opacity-50"></i>
-                <p class="text-base">هیچ غذایی در این دسته موجود نیست</p>
-                <p class="text-sm mt-1 opacity-75">لطفاً دسته دیگری انتخاب کنید</p>
-            `;
-            foodGrid.appendChild(messageDiv);
-        } else if (emptyMessage && hasVisibleItems) {
-            emptyMessage.remove();
+        // پیام نبود غذا
+        if (!hasVisibleItems) {
+            setTimeout(() => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'no-food-message col-span-full w-full text-center py-12 text-gray-400 fade-in';
+                messageDiv.innerHTML = `
+                    <div class="flex flex-col items-center justify-center">
+                        <i class="fas fa-utensils text-4xl mb-3 opacity-50"></i>
+                        <p class="text-base font-medium">هیچ غذایی در این دسته موجود نیست</p>
+                    </div>
+                `;
+                foodGrid.appendChild(messageDiv);
+            }, 300);
         }
     }
 
-    // تابع انتخاب دسته‌بندی
-    function handleCategorySelect(categoryId, clickedElement) {
-        document.querySelectorAll('.category-bottom-item').forEach(item => {
-            item.classList.remove('category-bottom-active');
-        });
-        clickedElement.classList.add('category-bottom-active');
-    }
+    // 6. لیسنر کلیک روی دسته‌بندی‌ها
+    document.addEventListener('click', function(e) {
+        // پیدا کردن آیتم دسته‌بندی
+        const categoryItem = e.target.closest('.category-item');
 
-    // تنظیم اولیه
-    updateMainContentPadding();
+        if (categoryItem) {
+            isHandlingClick = true;
+
+            // مدیریت کلاس اکتیو
+            document.querySelectorAll('.category-item').forEach(el => el.classList.remove('category-active'));
+            categoryItem.classList.add('category-active');
+
+            // دریافت ID و فیلتر
+            const categoryId = categoryItem.getAttribute('data-category');
+            filterFoodsByCategory(categoryId);
+
+            // اگر کاربر پایین صفحه است، اسکرول مدیریت شود
+            if (window.scrollY > SCROLL_THRESHOLD) {
+                header.classList.add('scrolled');
+
+                // اسکرول به بالا
+                setTimeout(() => {
+                   window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
+
+                // آپدیت پدینگ کانتنت
+                setTimeout(updateMainContentPadding, 300);
+            }
+
+            // بازگرداندن وضعیت کلیک
+            setTimeout(() => {
+                isHandlingClick = false;
+            }, 500);
+        }
+    });
+
+    // 7. اتصال رویدادها
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', updateMainContentPadding);
+
+    // 8. اجرای اولیه
+    // اگر هنگام لود صفحه اسکرول پایین بود، هدر را جمع کن
     if (window.scrollY > SCROLL_THRESHOLD) {
         header.classList.add('scrolled');
-        if (headerTop) headerTop.classList.add('hidden');
-        updateMainContentPadding();
     }
+
+    // یک تاخیر کوچک برای اطمینان از لود کامل و محاسبه صحیح پدینگ
+    setTimeout(updateMainContentPadding, 100);
 });
+
+
 </script>
+
 
 <br>
     <!-- محتوای اصلی -->
@@ -2082,9 +2108,125 @@ document.addEventListener("DOMContentLoaded", function () {
         width: 280px;
     }
 }
+
+/* تنظیم پرسپکتیو برای ایجاد عمق سه بعدی */
+.food-grid {
+    perspective: 1000px;
+    /* حفظ ساختار گرید */
+    display: grid;
+    /* تنظیمات گرید شما (مثلا 2 ستون یا ریسپانسیو) */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+/* حالت اولیه آیتم‌ها (وقتی مخفی هستند) */
+.food-item {
+    display: none; /* پیش‌فرض مخفی */
+    opacity: 0;
+    transform-origin: center bottom;
+    /* این ترنزیشن برای وقتی است که موس روی آیتم می‌رود، نه ورود */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* کلاسی که جاوااسکریپت برای نمایش می‌دهد */
+.food-item.active {
+    display: block;
+}
+
+/* کلاسی که انیمیشن ورود را اجرا می‌کند */
+.food-item.animate-in {
+    animation: specialEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* تعریف انیمیشن خاص */
+@keyframes specialEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(60px) scale(0.8) rotateX(-20deg);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateX(0);
+        filter: blur(0);
+    }
+}
+
 </style>
     {% include "./resScript.html" %}
     {% include "./persianCall.html" %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // تابع اصلی فیلتر کردن غذاها
+    // ورودی: آیدی دسته‌بندی (مثلاً 'all' یا '1', '2')
+    function filterFoods(categoryId) {
+        const allFoods = document.querySelectorAll('.food-item');
+        let visibleCount = 0;
+
+        allFoods.forEach(food => {
+            const foodCategory = food.getAttribute('data-category');
+
+            // حذف انیمیشن قبلی برای ریست شدن
+            food.classList.remove('animate-in');
+
+            // بررسی تطابق دسته‌بندی
+            if (categoryId === 'all' || foodCategory === categoryId) {
+                // نمایش آیتم
+                food.classList.add('active');
+
+                // اعمال انیمیشن با تاخیر (Stagger Effect)
+                // هر آیتم 50 میلی‌ثانیه دیرتر از قبلی شروع می‌شود
+                setTimeout(() => {
+                    food.classList.add('animate-in');
+                }, visibleCount * 70); // 70ms تاخیر بین هر کارت
+
+                visibleCount++;
+            } else {
+                // مخفی کردن آیتم
+                food.classList.remove('active');
+            }
+        });
+
+        // مدیریت پیام "هیچ غذایی موجود نیست"
+        const emptyMessage = document.querySelector('.food-grid .col-span-2');
+        // نکته: اگر پیام empty شما کلاس خاصی دارد آن را جایگزین سلکتور بالا کنید
+        if(emptyMessage) {
+            if(visibleCount === 0) {
+                emptyMessage.style.display = 'block';
+            } else {
+                emptyMessage.style.display = 'none';
+            }
+        }
+    }
+
+    // اتصال دکمه‌های دسته‌بندی به این تابع
+    // فرض بر این است که دکمه‌های هدر شما کلاس .category-btn و ویژگی data-id دارند
+    const categoryBtns = document.querySelectorAll('.category-item, .category-btn'); // کلاس دکمه‌های دسته‌بندی خود را اینجا بگذارید
+
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); // جلوگیری از رفرش صفحه اگر تگ a هستند
+
+            // مدیریت کلاس فعال برای خود دکمه‌ها (اختیاری)
+            categoryBtns.forEach(b => b.classList.remove('active-cat')); // کلاس استایل فعال دکمه
+            this.classList.add('active-cat');
+
+            // گرفتن آیدی دسته‌بندی از دکمه کلیک شده
+            // فرض می‌کنیم در HTML دکمه‌ها ویژگی data-id="..." یا href="#cat-..." دارند
+            // مثال: <div class="category-item" data-id="5">...</div>
+            const catId = this.getAttribute('data-id') || this.getAttribute('data-category');
+
+            if(catId) {
+                filterFoods(catId);
+            }
+        });
+    });
+
+    // اجرای اولیه برای نمایش همه غذاها (یا کتگوری پیش‌فرض)
+    filterFoods('all');
+});
+</script>
 
 </body>
 </html>

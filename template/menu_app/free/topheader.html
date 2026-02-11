@@ -3,6 +3,9 @@
     padding: 12px 0 8px 0;
     margin-bottom: 15px;
     font-size: 13px;
+    position: relative;
+    overflow: visible;
+    z-index: 10;
 ">
     <div class="top-bar-content" style="
         max-width: 1200px;
@@ -12,39 +15,37 @@
         justify-content: space-between;
         align-items: flex-start;
         gap: 10px;
+        position: relative;
+        z-index: 20;
     ">
 
-        <!-- سمت چپ: آدرس -->
+        <!-- سمت راست: آدرس + آیکون سیگار -->
         <div style="flex: 1; display: flex; align-items: flex-start; padding-top: 2px;">
-            <div class="top-info address" style="
-                font-size: 11px;
-                color: #0066cc;
-                white-space: nowrap;
-                max-width: 200px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                direction: rtl;
-                text-align: right;
-            ">
-                📍 {{ restaurant.address|default:"آدرس ثبت نشده"|truncatechars:25 }}
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 0;">
+                <div class="top-info address" style="
+                    font-size: 11px; color: #0066cc; white-space: nowrap;
+                    max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+                    direction: rtl; text-align: right;">
+                    📍 {{ restaurant.address|default:"آدرس ثبت نشده"|truncatechars:25 }}
+                </div>
+
+                <!-- آیکون سیگار -->
+                <div id="cigarette-icon" style="
+                    width: 20px; height: 20px; display: flex; align-items: center;
+                    justify-content: center; color: #555; font-size: 16px;
+                    cursor: pointer; margin-top: 6px; position: relative; z-index: 21;">
+                    🚬
+                </div>
             </div>
         </div>
 
-        <!-- وسط: لوگو + نام + ساعت کاری -->
-        <div style="flex: 0 0 auto; text-align: center;">
-            <div style="
-                width: 44px;
-                height: 44px;
-                border-radius: 12px;
-                margin: 0 auto 6px;
-                overflow: hidden;
-                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-            ">
+        <!-- وسط: لوگو (مقصد دود) -->
+        <div style="flex: 0 0 auto; text-align: center; position: relative; z-index: 21;">
+            <div id="smoke-target" style="
+                width: 44px; height: 44px; border-radius: 12px; margin: 0 auto 6px;
+                overflow: hidden; background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                display: flex; align-items: center; justify-content: center;
+                color: white; font-weight: bold; position: relative;">
                 {% if restaurant.logo %}
                     <img src="{{ restaurant.logo.url }}" style="width:100%;height:100%;object-fit:cover;">
                 {% else %}
@@ -55,69 +56,160 @@
             <h3 style="margin: 0; font-size: 11px; font-weight: 500;">
                 {{ restaurant.title_en|default:restaurant.title }}
             </h3>
-
-            <!-- ساعت کاری زیر نام -->
-            <div style="
-                margin-top: 2px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 4px;
-                font-size: 11px;
-                color: #28a745;
-                white-space: nowrap;
-            ">
-
-                {% if restaurant.openingTime and restaurant.closingTime %}
-                    {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
-                {% else %}
-                    نامشخص
-                {% endif %}
-            </div>
+            <!-- ساعت کاری از اینجا حذف شد -->
         </div>
 
-        <!-- سمت راست: تغییر زبان + حالت شب -->
+        <!-- سمت چپ: دکمه‌ها و ساعت کاری (زیر دکمه‌ها) -->
         <div style="flex: 1; display: flex; justify-content: flex-end; padding-top: 2px;">
-            <div style="
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            ">
-                <!-- دکمه تغییر زبان -->
-                <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en"
-                   style="
-                        background: #f3f4f6;
-                        color: #374151;
-                        width: 36px;
-                        height: 36px;
-                        border-radius: 8px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 12px;
-                        font-weight: 600;
-                        text-decoration: none;
-                   ">
-                    EN
-                </a>
 
-                <!-- دکمه حالت شب -->
-                <button id="theme-toggle"
-                        style="
-                            background: #f3f4f6;
-                            width: 36px;
-                            height: 36px;
-                            border-radius: 8px;
-                            border: none;
-                            cursor: pointer;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">
-                    🌙
-                </button>
+            <!-- کانتینر ستونی برای دکمه‌ها و ساعت -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+
+                <!-- ردیف دکمه‌ها -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <!-- دکمه تغییر زبان -->
+                    <a href="{% url 'menu:change_language' restaurant.slug %}?lang=en"
+                       style="
+                            background: #f3f4f6; color: #374151; width: 36px; height: 36px;
+                            border-radius: 8px; display: flex; align-items: center;
+                            justify-content: center; font-size: 12px; font-weight: 600;
+                            text-decoration: none;">
+                        EN
+                    </a>
+
+                    <!-- دکمه حالت شب -->
+                    <button id="theme-toggle"
+                            style="
+                                background: #f3f4f6; width: 36px; height: 36px;
+                                border-radius: 8px; border: none; cursor: pointer;
+                                display: flex; align-items: center; justify-content: center;">
+                        🌙
+                    </button>
+                </div>
+
+                <!-- ردیف ساعت کاری (منتقل شده به اینجا) -->
+                <div style="font-size: 10px; color: #28a745; font-weight: 500; white-space: nowrap;">
+                    {% if restaurant.openingTime and restaurant.closingTime %}
+                        {{ restaurant.openingTime|time:"H:i" }} - {{ restaurant.closingTime|time:"H:i" }}
+                    {% else %}
+                        نامشخص
+                    {% endif %}
+                </div>
+
             </div>
         </div>
 
     </div>
+
+    <!-- کانتینر دود -->
+    <div id="smoke-container" style="
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 100; overflow: hidden;"></div>
 </div>
+
+<style>
+    .smoke-particle {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(220, 220, 220, 0.8) 0%, rgba(200, 200, 200, 0.4) 40%, transparent 80%);
+        filter: blur(8px);
+        opacity: 0;
+        transform-origin: center center;
+        animation: smokeMove var(--duration) ease-out forwards;
+    }
+
+    @keyframes smokeMove {
+        0% {
+            transform: translate(0, 0) scale(0.5) rotate(0deg);
+            opacity: 0.1;
+        }
+        15% {
+            opacity: 0.7;
+            transform: translate(calc(var(--move-x) * 0.15), calc(var(--move-y) * 0.15 - 10px)) scale(1.2);
+        }
+        50% {
+            opacity: 0.5;
+            transform: translate(calc(var(--move-x) * 0.5), calc(var(--move-y) * 0.5 - 25px)) scale(2.5) rotate(45deg);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(calc(var(--move-x) + var(--spread-x)), calc(var(--move-y) - 40px)) scale(5) rotate(120deg);
+        }
+    }
+
+    @keyframes puffIcon {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); filter: drop-shadow(0 0 5px rgba(0,0,0,0.2)); }
+        100% { transform: scale(1); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('smoke-container');
+        const cigarette = document.getElementById('cigarette-icon');
+        const target = document.getElementById('smoke-target');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        function createSmokeParticle() {
+            if (!container || !cigarette || !target) return;
+
+            const contRect = container.getBoundingClientRect();
+            const cigRect = cigarette.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+
+            const startX = (cigRect.left + cigRect.width / 2) - contRect.left;
+            const startY = (cigRect.top + cigRect.height / 2) - contRect.top;
+
+            const endX = (targetRect.left + targetRect.width / 2) - contRect.left;
+            const endY = (targetRect.top + targetRect.height / 2) - contRect.top;
+
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+
+            const particle = document.createElement('div');
+            particle.classList.add('smoke-particle');
+
+            const size = 15 + Math.random() * 20;
+            const duration = 2.5 + Math.random() * 1.5;
+            const spreadX = (Math.random() - 0.5) * 60;
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${startX - size/2}px`;
+            particle.style.top = `${startY - size/2}px`;
+
+            particle.style.setProperty('--move-x', `${deltaX}px`);
+            particle.style.setProperty('--move-y', `${deltaY}px`);
+            particle.style.setProperty('--spread-x', `${spreadX}px`);
+            particle.style.setProperty('--duration', `${duration}s`);
+
+            container.appendChild(particle);
+
+            setTimeout(() => particle.remove(), duration * 1000);
+        }
+
+        function puffSmoke() {
+            cigarette.style.animation = 'puffIcon 0.4s ease';
+            setTimeout(() => cigarette.style.animation = '', 400);
+
+            let count = 0;
+            const maxParticles = 6 + Math.floor(Math.random() * 5);
+
+            const interval = setInterval(() => {
+                createSmokeParticle();
+                count++;
+                if (count >= maxParticles) clearInterval(interval);
+            }, 60);
+        }
+
+        setInterval(puffSmoke, 3000);
+        setTimeout(puffSmoke, 500);
+
+        cigarette.addEventListener('click', puffSm);
+        if(themeToggle) {
+            themeToggle.addEventListener('click', puffSmoke);
+        }
+    });
+</script>
+`
