@@ -1,4 +1,3 @@
-<!-- این رپر با مارجین منفی، از کادر کانتینر والد بیرون می‌زند -->
 <div class="header-categories-wrapper relative -mx-4">
     <!-- کانتینر اسکرول با پدینگ داخلی -->
     <div class="categories-scroll no-scrollbar px-4">
@@ -34,28 +33,25 @@
 
 <style>
     /* --- کانتینر اصلی --- */
-    .categories-wrapper {
+    .header-categories-wrapper {
         position: relative;
-        width: 100vw; /* عرض کل صفحه */
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw; /* ترفند وسط‌چین کردن تمام عرض */
-        margin-right: -50vw;
+        width: 100%;
         overflow: hidden;
     }
 
     .categories-scroll {
         display: flex;
         align-items: flex-start;
-        gap: 12px; /* فاصله بین آیتم‌ها کمی کمتر شد تا تراکم بیشتر شود */
+        gap: 12px;
         overflow-x: auto;
         padding-bottom: 10px;
         padding-top: 5px;
-        /* پدینگ چپ و راست برای اینکه آیتم اول و آخر به لبه نچسبند */
         padding-left: 16px;
         padding-right: 16px;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
+        scroll-padding-left: 16px;
+        scroll-padding-right: 16px;
     }
 
     /* مخفی کردن اسکرول‌بار */
@@ -69,16 +65,15 @@
         align-items: center;
         justify-content: flex-start;
         cursor: pointer;
-        /* عرض ثابت و کم برای اینکه تعداد بیشتری جا شوند و یکی نصفه بماند */
         min-width: 64px;
         max-width: 72px;
-        flex-shrink: 0; /* جلوگیری از جمع شدن آیتم‌ها */
+        flex-shrink: 0;
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
     }
 
     .category-icon {
-        width: 50px; /* کمی کوچکتر برای ظرافت */
+        width: 50px;
         height: 50px;
         border-radius: 16px;
         background-color: #f3f4f6;
@@ -125,17 +120,207 @@
     @media (prefers-color-scheme: dark) {
         .category-name { color: #9ca3af; }
         .category-icon { background-color: #1f2937; color: #9ca3af; }
-        .category-item.category-active .category-icon { background-color: #1f2937; border-color: #60a5fa; color: #60a5fa; }
+        .category-item.category-active .category-icon {
+            background-color: #1f2937;
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
         .category-item.category-active .category-name { color: #60a5fa; }
     }
 </style>
 
 <script>
-    function filterCategory(id, element) {
-        document.querySelectorAll('.category-item').forEach(el => el.classList.remove('category-active'));
-        element.classList.add('category-active');
-        // اسکرول اتوماتیک برای اینکه آیتم انتخاب شده بیاد وسط (اختیاری)
-        element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        console.log('Category selected:', id);
+document.addEventListener('DOMContentLoaded', function() {
+    // -----------------------------------------------------------
+    // 0. تزریق استایل‌های ضروری برای عملکرد صحیح اسکرول (فقط هدر)
+    // -----------------------------------------------------------
+    const style = document.createElement('style');
+    style.innerHTML = `
+        /* وقتی اسکرول شد، بخش بالایی هدر جمع شود */
+        .header.scrolled .header-top {
+            height: 0 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            pointer-events: none;
+        }
+
+        /* انیمیشن نرم برای تغییرات */
+        .header, .header-top, .main-content {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 1. تعریف متغیرها
+    const header = document.querySelector('.header');
+    const headerTop = document.querySelector('.header-top');
+    const mainContent = document.querySelector('.main-content');
+    const categoriesScroll = document.querySelector('.categories-scroll');
+    const SCROLL_THRESHOLD = 50;
+    let isHandlingClick = false;
+
+    // 2. تابع تنظیم فاصله بالای محتوا
+    function updateMainContentPadding() {
+        if (!mainContent || !header) return;
+        const headerHeight = header.getBoundingClientRect().height;
+        mainContent.style.paddingTop = `${headerHeight + 20}px`;
     }
+
+    // 3. تابع مدیریت اسکرول صفحه
+    function handleScroll() {
+        if (isHandlingClick) return;
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > SCROLL_THRESHOLD) {
+            if (!header.classList.contains('scrolled')) {
+                header.classList.add('scrolled');
+                setTimeout(updateMainContentPadding, 300);
+            }
+        } else {
+            if (header.classList.contains('scrolled')) {
+                header.classList.remove('scrolled');
+                setTimeout(updateMainContentPadding, 300);
+            }
+        }
+    }
+
+    // 4. تابع اسکرول نرم به ابتدای لیست غذاها
+    function scrollToFoods() {
+        header.classList.add('scrolled');
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        setTimeout(updateMainContentPadding, 350);
+    }
+
+    // 5. تابع اصلی فیلتر کردن غذاها
+    function filterFoodsByCategory(categoryId) {
+        const allFoodItems = document.querySelectorAll('.food-item');
+        const foodGrid = document.querySelector('.food-grid');
+        let hasVisibleItems = false;
+
+        const existingMessage = document.querySelector('.no-food-message');
+        if (existingMessage) existingMessage.remove();
+
+        allFoodItems.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+
+            if (categoryId === 'all' || itemCategory === categoryId) {
+                item.style.display = 'block';
+                requestAnimationFrame(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                });
+                hasVisibleItems = true;
+            } else {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    item.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        if (!hasVisibleItems) {
+            setTimeout(() => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'no-food-message col-span-full w-full text-center py-12 text-gray-400 fade-in';
+                messageDiv.innerHTML = `
+                    <div class="flex flex-col items-center justify-center">
+                        <i class="fas fa-utensils text-4xl mb-3 opacity-50"></i>
+                        <p class="text-base font-medium">هیچ غذایی در این دسته موجود نیست</p>
+                    </div>
+                `;
+                foodGrid.appendChild(messageDiv);
+            }, 300);
+        }
+    }
+
+    // 6. تابع اسکرول اتوماتیک برای دسته‌بندی‌ها - فقط اسکرول، بدون تغییر ظاهر
+    function autoScrollCategories(clickedItem) {
+        if (!categoriesScroll) return;
+
+        // محاسبه موقعیت آیتم کلیک شده
+        const containerRect = categoriesScroll.getBoundingClientRect();
+        const itemRect = clickedItem.getBoundingClientRect();
+
+        // محاسبه مرکز آیتم
+        const itemCenter = itemRect.left + itemRect.width / 2;
+        const containerCenter = containerRect.left + containerRect.width / 2;
+
+        // محاسبه میزان اسکرول مورد نیاز
+        const scrollOffset = itemCenter - containerCenter;
+
+        // اسکرول نرم به موقعیت آیتم
+        categoriesScroll.scrollBy({
+            left: scrollOffset,
+            behavior: 'smooth'
+        });
+
+        // بررسی موقعیت برای بازگشت به ابتدا
+        const maxScrollLeft = categoriesScroll.scrollWidth - categoriesScroll.clientWidth;
+        const currentScroll = categoriesScroll.scrollLeft;
+
+        // اگر در انتهای لیست هستیم، به ابتدا برگرد
+        if (currentScroll >= maxScrollLeft - 10) {
+            setTimeout(() => {
+                categoriesScroll.scrollTo({
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            }, 500);
+        }
+    }
+
+    // 7. تابع مدیریت کلیک روی دسته‌بندی‌ها
+    function handleCategoryClick(e) {
+        const categoryItem = e.target.closest('.category-item');
+        if (!categoryItem) return;
+
+        isHandlingClick = true;
+
+        // مدیریت کلاس اکتیو
+        document.querySelectorAll('.category-item').forEach(el => {
+            el.classList.remove('category-active');
+        });
+        categoryItem.classList.add('category-active');
+
+        // دریافت ID و فیلتر غذاها
+        const categoryId = categoryItem.getAttribute('data-category');
+        filterFoodsByCategory(categoryId);
+
+        // اسکرول اتوماتیک دسته‌بندی‌ها - فقط این قابلیت اضافه شده
+        autoScrollCategories(categoryItem);
+
+        // مدیریت اسکرول صفحه اصلی
+        if (window.scrollY > SCROLL_THRESHOLD) {
+            header.classList.add('scrolled');
+
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
+
+            setTimeout(updateMainContentPadding, 300);
+        }
+
+        setTimeout(() => {
+            isHandlingClick = false;
+        }, 500);
+    }
+
+    // 8. اتصال رویدادها
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', updateMainContentPadding);
+    document.addEventListener('click', handleCategoryClick);
+
+    // 9. اجرای اولیه
+    if (window.scrollY > SCROLL_THRESHOLD) {
+        header.classList.add('scrolled');
+    }
+
+    setTimeout(updateMainContentPadding, 100);
+});
 </script>
