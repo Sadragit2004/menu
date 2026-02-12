@@ -9,6 +9,7 @@ db.sqlite3
 media/
 *.log
 
+/web/setting.py
 # Environments
 venv/
 .env
